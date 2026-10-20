@@ -6,7 +6,7 @@ import { ANSWER_KEYS } from '../data/answers';
 import { REFINEMENTS } from '../data/prompts';
 import { STUDIO_STEPS } from '../data/studioSteps';
 import { navigate, queryParam, segments } from '../lib/router';
-import { LIVE_SYNC_AVAILABLE, sendResponse, useLiveState } from '../lib/sync';
+import { LIVE_SYNC_AVAILABLE, sendIdea, sendResponse, useLiveState, type LiveAct } from '../lib/sync';
 import { usePersistentState } from '../lib/storage';
 import { AI_STUDIO_URL, CHATGPT_URL } from '../lib/urls';
 import { PromptLab } from '../screens/PromptLab';
@@ -52,6 +52,100 @@ export function Mobile({ path }: { path: string }) {
     default:
       return <Hub />;
   }
+}
+
+/** Participación: el docente responde o envía ideas que aparecen en el tablero. */
+function Participate({ session, act }: { session: string; act: LiveAct }) {
+  const [picks, setPicks] = usePersistentState<Record<string, number>>('mobile:picks', {});
+  const [sent, setSent] = usePersistentState<Record<string, string[]>>('mobile:ideas', {});
+  const [text, setText] = useState('');
+  const [state, setState] = useState<SendState>('idle');
+  const [wait, setWait] = useState(false);
+
+  async function choose(i: number) {
+    setState('sending');
+    setPicks((p) => ({ ...p, [act.key]: i }));
+    try {
+      await sendResponse(session, act.key, String(i));
+      setState('sent');
+    } catch {
+      setState('error');
+    }
+  }
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    const t = text.trim();
+    if (!t || wait) return;
+    setState('sending');
+    setWait(true);
+    window.setTimeout(() => setWait(false), 1200);
+    try {
+      await sendIdea(session, act.key, t);
+      setSent((s) => ({ ...s, [act.key]: [...(s[act.key] ?? []), t] }));
+      setText('');
+      setState('sent');
+    } catch {
+      setState('error');
+    }
+  }
+
+  const mine = sent[act.key] ?? [];
+  const picked = picks[act.key];
+
+  return (
+    <section className="part glass" aria-label="Participa">
+      <span className="kicker">Tu turno</span>
+      <h3>{act.prompt}</h3>
+      {!act.open && <p className="note-warn">Esperando a que el facilitador abra la participación…</p>}
+
+      {act.kind === 'choice' ? (
+        <div className="part__opts">
+          {(act.options ?? []).map((o, i) => (
+            <button
+              key={o}
+              type="button"
+              className={`part__opt ${picked === i ? 'is-picked' : ''}`}
+              style={{ '--c': ANSWER_KEYS[i % 4].color } as CSSProperties}
+              disabled={!act.open}
+              onClick={() => choose(i)}
+            >
+              <b>{ANSWER_KEYS[i % 4].letter}</b>
+              {o}
+              {picked === i && <Check />}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <form className="mob__form" onSubmit={submit}>
+          <textarea
+            className="input"
+            rows={3}
+            value={text}
+            maxLength={280}
+            disabled={!act.open}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Escribe tu idea…"
+            aria-label="Tu idea"
+          />
+          <button type="submit" className="btn btn--primary btn--lg" disabled={!act.open || !text.trim() || wait}>
+            Enviar al tablero
+          </button>
+        </form>
+      )}
+
+      {state === 'sending' && <p className="note-muted">Enviando…</p>}
+      {state === 'sent' && <p className="note-ok">¡Enviado! Míralo en el tablero.</p>}
+      {state === 'error' && <p className="note-warn">No se pudo enviar. Revisa tu conexión e inténtalo de nuevo.</p>}
+      {act.kind === 'ideas' && mine.length > 0 && (
+        <ul className="part__sent" aria-label="Tus ideas enviadas">
+          {mine.slice(-3).map((m, i) => (
+            <li key={i}>{m}</li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
 }
 
 /** Seguimiento en vivo: refleja la pantalla que el facilitador proyecta. */
@@ -126,6 +220,8 @@ function Live({ session: fromUrl }: { session: string }) {
       ) : (
         <p className="mob__lead">{status === 'live' ? 'Esperando a que el facilitador inicie el taller…' : 'Conectando con el taller…'}</p>
       )}
+
+      {state?.act && <Participate session={session} act={state.act} />}
 
       <h3 className="mob__h">Recorrido del taller</h3>
       <ol className="timeline">

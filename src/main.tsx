@@ -7,6 +7,7 @@ import './styles/presenter.css';
 import './styles/screens.css';
 import './styles/mobile.css';
 import './styles/extra.css';
+import './styles/whiteboard.css';
 import App from './App';
 
 createRoot(document.getElementById('root')!).render(

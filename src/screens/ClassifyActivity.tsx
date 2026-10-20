@@ -1,7 +1,9 @@
 import type { LucideIcon } from 'lucide-react';
-import { ArrowRight, Check, RotateCcw, X } from 'lucide-react';
-import { ActivityControls, ActivityGate } from '../components/ActivityShell';
+import { ArrowRight, Check, RotateCcw, Smartphone, X } from 'lucide-react';
+import { ActivityControls, ActivityGate, useActivityStatus } from '../components/ActivityShell';
+import { useAnnounce } from '../presenter/announce';
 import { usePersistentState } from '../lib/storage';
+import { LIVE_SYNC_AVAILABLE, useLiveResponses, useSessionCode } from '../lib/sync';
 
 type Side = 'A' | 'B';
 
@@ -34,6 +36,26 @@ export function ClassifyActivity({ cfg }: { cfg: ClassifyConfig }) {
   const item = items[Math.min(st.index, items.length - 1)];
   const pick = st.picks[st.index] ?? null;
   const correct = st.picks.filter((p, i) => p === items[i].answer).length;
+
+  // Respuestas de los celulares para la situación actual.
+  const [status] = useActivityStatus(id);
+  const { code } = useSessionCode();
+  const itemKey = `${id}-${Math.min(st.index, items.length - 1)}`;
+  const live = useLiveResponses(LIVE_SYNC_AVAILABLE ? code : '', itemKey);
+  const phoneA = live.responses.filter((r) => r.value === '0').length;
+  const phoneB = live.responses.filter((r) => r.value === '1').length;
+  useAnnounce(
+    id,
+    done
+      ? null
+      : {
+          key: itemKey,
+          kind: 'choice',
+          prompt: item.text,
+          options: [cfg.labels.A.label, cfg.labels.B.label],
+          open: status === 'open' && !pick,
+        },
+  );
 
   const choose = (k: Side) => {
     if (pick) return;
@@ -84,6 +106,23 @@ export function ClassifyActivity({ cfg }: { cfg: ClassifyConfig }) {
                 );
               })}
             </div>
+
+            {LIVE_SYNC_AVAILABLE && (
+              <div className="tvi__live" aria-live="polite">
+                <span>
+                  <Smartphone /> Desde los celulares: <b>{phoneA + phoneB}</b>
+                </span>
+                {[phoneA, phoneB].map((n, i) => {
+                  const total = Math.max(1, phoneA + phoneB);
+                  return (
+                    <span key={i} className="tvi__live-bar">
+                      <i style={{ width: `${(n / total) * 100}%` }} />
+                      {cfg.labels[i === 0 ? 'A' : 'B'].label} · {n}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
 
             <div className={`tvi__feedback ${pick ? 'is-shown' : ''} ${pick === item.answer ? 'is-ok' : 'is-bad'}`} aria-live="polite">
               {pick && (

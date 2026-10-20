@@ -14,7 +14,7 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app';
 import { collection, doc, getFirestore, onSnapshot, setDoc, type Firestore } from 'firebase/firestore';
 import { usePersistentState } from './storage';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const env = import.meta.env;
 const config = {
@@ -36,6 +36,7 @@ if (LIVE_SYNC_AVAILABLE) {
 }
 
 export interface LiveResponse {
+  id: string;
   device: string;
   activityId: string;
   value: string;
@@ -83,15 +84,41 @@ export async function sendResponse(session: string, activityId: string, value: s
 
 export type LiveStatus = 'off' | 'connecting' | 'live' | 'error';
 
+/** Actividad que el celular debe mostrar para que los docentes participen. */
+export interface LiveAct {
+  key: string;
+  kind: 'choice' | 'ideas';
+  prompt: string;
+  options?: string[];
+  open: boolean;
+}
+
 export interface LiveState {
   screenId: string;
   at: number;
+  act?: LiveAct;
 }
 
-/** El facilitador publica la pantalla que está proyectando. */
-export async function publishLive(session: string, screenId: string): Promise<void> {
+/** El facilitador publica la pantalla que proyecta y la actividad abierta (si la hay). */
+export async function publishLive(session: string, screenId: string, act?: LiveAct | null): Promise<void> {
   if (!db) return;
-  await setDoc(doc(db, 'sessions', session.toUpperCase(), 'live', 'state'), { screenId, at: Date.now() });
+  const data: LiveState = { screenId, at: Date.now() };
+  if (act) data.act = act;
+  await setDoc(doc(db, 'sessions', session.toUpperCase(), 'live', 'state'), data);
+}
+
+/** Envía una idea: cada envío es un documento nuevo (un docente puede enviar varias). */
+export async function sendIdea(session: string, activityId: string, value: string): Promise<void> {
+  if (!db) throw new Error('Sincronización en vivo no configurada');
+  const clean = session.trim().toUpperCase();
+  if (!/^[A-Z0-9]{3,12}$/.test(clean)) throw new Error('Código de sesión inválido');
+  const text = value.trim().slice(0, 280);
+  if (!text) return;
+  await setDoc(doc(db, 'sessions', clean, 'responses', `${deviceId()}__${activityId}__${Date.now().toString(36)}`), {
+    activityId,
+    value: text,
+    at: Date.now(),
+  });
 }
 
 /** Los celulares siguen en tiempo real la pantalla del facilitador. */
@@ -104,8 +131,9 @@ export function useLiveState(session: string) {
     setStatus('connecting');
     const unsub = onSnapshot(
       doc(db, 'sessions', session.toUpperCase(), 'live', 'state'),
+      { includeMetadataChanges: true },
       (snap) => {
-        setStatus('live');
+        setStatus(snap.metadata.fromCache ? 'connecting' : 'live');
         setState(snap.exists() ? (snap.data() as LiveState) : null);
       },
       () => setStatus('error'),
@@ -116,30 +144,30 @@ export function useLiveState(session: string) {
   return { state, status };
 }
 
-/** Suscripción en tiempo real a las respuestas de una actividad. */
+
+/** Suscripción en tiempo real a las respuestas de la sesión, filtradas por actividad. */
 export function useLiveResponses(session: string, activityId: string) {
-  const [responses, setResponses] = useState<LiveResponse[]>([]);
+  const [all, setAll] = useState<LiveResponse[]>([]);
   const [status, setStatus] = useState<LiveStatus>(LIVE_SYNC_AVAILABLE ? 'connecting' : 'off');
 
   useEffect(() => {
     if (!db || !session) return;
     setStatus('connecting');
-    setResponses([]);
+    setAll([]);
     const unsub = onSnapshot(
       collection(db, 'sessions', session, 'responses'),
+      { includeMetadataChanges: true },
       (snap) => {
-        setStatus('live');
-        setResponses(
-          snap.docs
-            .map((d) => ({ device: d.id.split('__')[0], ...(d.data() as Omit<LiveResponse, 'device'>) }))
-            .filter((r) => r.activityId === activityId)
-            .sort((a, b) => a.at - b.at),
+        setStatus(snap.metadata.fromCache ? 'connecting' : 'live');
+        setAll(
+          snap.docs.map((d) => ({ id: d.id, device: d.id.split('__')[0], ...(d.data() as Omit<LiveResponse, 'id' | 'device'>) })),
         );
       },
       () => setStatus('error'),
     );
     return unsub;
-  }, [session, activityId]);
+  }, [session]);
 
+  const responses = useMemo(() => all.filter((r) => r.activityId === activityId).sort((a, b) => a.at - b.at), [all, activityId]);
   return { responses, status };
 }

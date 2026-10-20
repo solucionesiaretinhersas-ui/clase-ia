@@ -16,12 +16,16 @@ import { Route } from './Route';
 import { StudioStation } from './StudioStation';
 import { TraditionalVsInteractive } from './TraditionalVsInteractive';
 import { Welcome } from './Welcome';
+import { WallDialogo, WallLluvia, WallReflexion } from './Walls';
 
 export const SCREEN_COMPONENTS: Record<string, ComponentType> = {
   inicio: Welcome,
   ruta: Route,
   votacion: OpeningVote,
   copiloto: Copilot,
+  lluvia: WallLluvia,
+  dialogo: WallDialogo,
+  reflexion: WallReflexion,
   'humano-ia': HumanVsAI,
   'ai-studio': AIStudioIntro,
   estacion: StudioStation,

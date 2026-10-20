@@ -83,8 +83,8 @@ export const SCREENS: ScreenMeta[] = [
     title: 'Votación de apertura',
     kind: 'activity',
     notes: {
-      minutes: 3,
-      participant: 'Vota desde tu celular: escanea el QR de la votación y toca tu letra.',
+      minutes: 2,
+      participant: 'Escanea el QR del tablero, toca tu respuesta y mira cómo se suma la del grupo.',
       objective: 'Diagnosticar cuánta experiencia tiene el grupo con la IA y romper el hielo.',
       explanation: 'El resultado ajusta el ritmo: si la mayoría nunca ha usado IA, dedica más tiempo al Momento 2.',
       steps: [
@@ -101,7 +101,7 @@ export const SCREENS: ScreenMeta[] = [
     title: 'La IA es tu copiloto',
     kind: 'content',
     notes: {
-      minutes: 5,
+      minutes: 4,
       participant: 'Escucha la charla. Idea clave: tú diriges, la IA propone. La sabiduría sigue siendo humana.',
       objective: 'Instalar la idea de docencia aumentada: la IA llegó para ayudar, no para reemplazar.',
       explanation:
@@ -116,13 +116,32 @@ export const SCREENS: ScreenMeta[] = [
     },
   },
   {
+    id: 'lluvia',
+    moment: 'm1',
+    title: 'Lluvia de ideas',
+    kind: 'activity',
+    notes: {
+      minutes: 3,
+      participant: 'Escribe tu idea en el celular y envíala: aparecerá en el tablero al instante.',
+      objective: 'Abrir un espacio de diálogo: que cada docente exprese qué espera de la IA.',
+      explanation:
+        'Las ideas del grupo muestran para qué se quiere la IA: ahorrar tiempo, crear recursos, personalizar. Ahí está la oportunidad de la docencia aumentada.',
+      steps: [
+        'Pulsa “Abrir muro” y pide que escaneen el QR y escriban su idea.',
+        'Lee en voz alta 3 o 4 ideas, destaca las que más se repiten con la estrella y oculta las que no aplican.',
+        'Conecta con la siguiente actividad: ¿qué tareas ayuda la IA y cuáles solo tú puedes hacer?',
+      ],
+      activity: 'Muro de ideas con participación desde los celulares.',
+    },
+  },
+  {
     id: 'humano-ia',
     moment: 'm1',
     title: '¿La IA ayuda o solo tú?',
     kind: 'activity',
     notes: {
-      minutes: 4,
-      participant: 'Mira el tablero: ¿la IA te ayuda o solo tú puedes hacerlo? Opina con tu mano levantada.',
+      minutes: 3,
+      participant: 'Para cada situación, toca en tu celular si la IA ayuda o si solo tú puedes hacerlo.',
       objective: 'Distinguir qué tareas puede acelerar la IA y cuáles solo puede hacer el docente.',
       explanation:
         'La IA ayuda con borradores y variantes; la decisión pedagógica, el cuidado de los estudiantes y la verificación son responsabilidad humana.',
@@ -196,7 +215,7 @@ export const SCREENS: ScreenMeta[] = [
     kind: 'activity',
     notes: {
       minutes: 4,
-      participant: 'Piensa qué tema te cuesta más enseñar: de ahí saldrá tu recurso.',
+      participant: 'Escribe desde tu celular el tema que más te cuesta enseñar: aparecerá en el tablero.',
       objective: 'Conectar la herramienta con un problema de aprendizaje real de cada docente.',
       explanation:
         'Los mejores recursos nacen de una dificultad concreta, no de la herramienta. Este tablero es la materia prima del laboratorio.',
@@ -215,7 +234,7 @@ export const SCREENS: ScreenMeta[] = [
     kind: 'activity',
     notes: {
       minutes: 4,
-      participant: 'Mira cada situación y decide: ¿clase tradicional o interactiva? Esto te ayudará a pedirle lo correcto a la IA.',
+      participant: 'Para cada situación, toca en tu celular: ¿clase tradicional o interactiva?',
       objective: 'Identificar qué hace interactiva una clase para pedírselo después a la IA: simuladores, decisiones, retroalimentación.',
       explanation:
         'Una experiencia interactiva le pide al estudiante decidir, equivocarse y recibir retroalimentación inmediata. Eso es lo que vamos a solicitar.',
@@ -312,7 +331,7 @@ export const SCREENS: ScreenMeta[] = [
     title: 'Galería de recursos',
     kind: 'activity',
     notes: {
-      minutes: 7,
+      minutes: 4,
       participant: 'Uno o dos docentes presentan su recurso. Prepárate para dar retroalimentación.',
       objective: 'Socializar uno o dos recursos creados y recibir retroalimentación entre pares.',
       explanation:
@@ -326,12 +345,31 @@ export const SCREENS: ScreenMeta[] = [
     },
   },
   {
+    id: 'dialogo',
+    moment: 'm5',
+    title: 'Diálogo y reflexión',
+    kind: 'activity',
+    notes: {
+      minutes: 3,
+      participant: 'Después de ver los recursos, comparte un aprendizaje, una duda o una idea desde tu celular.',
+      objective: 'Dialogar y reflexionar colectivamente sobre lo visto en los recursos presentados.',
+      explanation:
+        'El aprendizaje entre colegas multiplica el valor del taller: cada recurso despierta ideas para otra aula.',
+      steps: [
+        'Abre el muro y pide un aprendizaje, una duda o una idea.',
+        'Lee y comenta algunas contribuciones; invita a responderlas oralmente.',
+        'Pregunta: ¿qué se llevan para su propia práctica?',
+      ],
+      activity: 'Muro de diálogo con participación desde los celulares.',
+    },
+  },
+  {
     id: 'etica',
     moment: 'm6',
     title: 'Ética y docencia humanizada',
     kind: 'content',
     notes: {
-      minutes: 4,
+      minutes: 3,
       participant: 'Cierre: uso ético de la IA, docencia humanizada y cómo evaluar de otra manera.',
       objective: 'Cerrar con el uso ético de la IA, la docencia humanizada y una evaluación que amplíe el conocimiento.',
       explanation:
@@ -345,12 +383,31 @@ export const SCREENS: ScreenMeta[] = [
     },
   },
   {
+    id: 'reflexion',
+    moment: 'm6',
+    title: 'Una regla para mi aula',
+    kind: 'activity',
+    notes: {
+      minutes: 2,
+      participant: 'Escribe la regla ética que aplicarás al usar IA con tus estudiantes.',
+      objective: 'Convertir la reflexión ética en compromisos concretos y compartidos.',
+      explanation:
+        'Una regla breve y propia, por ejemplo “siempre verifico y lo cuento”, vuelve práctico el uso ético.',
+      steps: [
+        'Abre el muro y pide una regla ética por docente.',
+        'Lee las reglas, agrupa las repetidas y destaca con la estrella las que el grupo quiera adoptar.',
+        'Cierra: estas son nuestras reglas como comunidad.',
+      ],
+      activity: 'Muro de reglas éticas con participación desde los celulares.',
+    },
+  },
+  {
     id: 'cierre',
     moment: 'm6',
     title: 'Cierre y compromiso',
     kind: 'activity',
     notes: {
-      minutes: 4,
+      minutes: 3,
       participant: 'Escribe tu compromiso desde el celular: qué recurso vas a crear y cómo lo aplicarás.',
       objective: 'Consolidar aprendizajes y concretar un compromiso de aplicación en el aula.',
       explanation: 'La IA propone, el docente dispone: el criterio pedagógico sigue siendo humano.',

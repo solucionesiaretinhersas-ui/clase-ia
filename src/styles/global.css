@@ -508,7 +508,7 @@ textarea.input {
   left: 50%;
   bottom: 6.5rem;
   z-index: 120;
-  transform: translateX(-50%);
+  translate: -50% 0;
   display: inline-flex;
   align-items: center;
   gap: 0.6em;

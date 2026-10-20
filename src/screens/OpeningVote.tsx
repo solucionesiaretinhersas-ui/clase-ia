@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import { Eye, EyeOff, Minus, RefreshCw, Smartphone } from 'lucide-react';
 import { ActivityControls, useActivityStatus } from '../components/ActivityShell';
 import { QRCode } from '../components/QRCode';
+import { useAnnounce } from '../presenter/announce';
 import { ANSWER_KEYS } from '../data/answers';
 import { LIVE_SYNC_AVAILABLE, useLiveResponses, useSessionCode } from '../lib/sync';
 import { usePersistentState } from '../lib/storage';
@@ -33,7 +34,14 @@ export function OpeningVote() {
   const leader = total ? votes.indexOf(Math.max(...votes)) : -1;
 
   const bump = (i: number, d: number) => setManual((v) => v.map((n, j) => (j === i ? Math.max(0, n + d) : n)));
-  const phoneUrl = internalUrl(base, `/m/responder?s=${code}`);
+  const phoneUrl = internalUrl(base, `/m/vivo?s=${code}`);
+  useAnnounce('votacion', {
+    key: ID,
+    kind: 'choice',
+    prompt: '¿Has usado inteligencia artificial para preparar tus clases?',
+    options: OPTIONS,
+    open,
+  });
 
   return (
     <section className="vote enter">

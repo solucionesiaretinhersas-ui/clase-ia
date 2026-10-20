@@ -7,6 +7,7 @@ import {
   LayoutGrid,
   NotebookPen,
   Pause,
+  PenTool,
   Play,
   Shrink,
   Smartphone,
@@ -14,9 +15,11 @@ import {
 import { MOMENTS, SCREENS, TOTAL_MINUTES, momentOf, screenIndex } from '../data/workshop';
 import { navigate } from '../lib/router';
 import { writeStored } from '../lib/storage';
-import { LIVE_SYNC_AVAILABLE, publishLive, useSessionCode } from '../lib/sync';
+import { LIVE_SYNC_AVAILABLE, publishLive, useSessionCode, type LiveAct } from '../lib/sync';
 import { fmt, useTicker } from '../components/ui';
 import { PresenterCtx } from './context';
+import { AnnounceCtx, type AnnounceApi } from './announce';
+import { Whiteboard } from './Whiteboard';
 import { elapsedOf, useTimers } from './timers';
 import { FacilitatorDrawer } from './FacilitatorDrawer';
 import { Overview } from './Overview';
@@ -42,17 +45,34 @@ export function Presenter({ screenId }: { screenId: string }) {
   // Seguimiento en vivo: publica la pantalla actual para los celulares.
   const { code } = useSessionCode();
   const [liveState, setLiveState] = useState<'pending' | 'ok' | 'error'>('pending');
+  // La pantalla activa anuncia qué actividad deben mostrar los celulares.
+  const [announced, setAnnounced] = useState<{ screenId: string; act: LiveAct } | null>(null);
+  const announceApi = useMemo<AnnounceApi>(
+    () => ({
+      set: (sid, act) =>
+        setAnnounced((cur) => {
+          if (act) return { screenId: sid, act };
+          return cur?.screenId === sid ? null : cur;
+        }),
+    }),
+    [],
+  );
+  const act = announced?.screenId === screen.id ? announced.act : null;
+  const actSig = act ? JSON.stringify(act) : '';
+
   useEffect(() => {
     if (!LIVE_SYNC_AVAILABLE || !code) return;
     let cancelled = false;
-    publishLive(code, screen.id).then(
+    publishLive(code, screen.id, actSig ? (JSON.parse(actSig) as LiveAct) : null).then(
       () => !cancelled && setLiveState('ok'),
       () => !cancelled && setLiveState('error'),
     );
     return () => {
       cancelled = true;
     };
-  }, [code, screen.id]);
+  }, [code, screen.id, actSig]);
+
+  const [boardOpen, setBoardOpen] = useState(false);
 
   const goTo = useCallback((id: string) => navigate(`/s/${id}`), []);
   const next = useCallback(() => {
@@ -95,8 +115,11 @@ export function Presenter({ screenId }: { screenId: string }) {
         setNotesOpen((v) => !v);
       } else if (k === 'g' || k === 'G') {
         setOverview(true);
+      } else if (k === 'd' || k === 'D') {
+        setBoardOpen((v) => !v);
       } else if (k === 'Escape') {
         setNotesOpen(false);
+        setBoardOpen(false);
       } else if ((k === 't' || k === 'T') && moment) {
         toggle(moment.id);
       }
@@ -112,6 +135,7 @@ export function Presenter({ screenId }: { screenId: string }) {
 
   return (
     <PresenterCtx.Provider value={api}>
+      <AnnounceCtx.Provider value={announceApi}>
       <div className={`stage ${isCover ? 'stage--cover' : ''}`} style={{ '--accent': accent } as CSSProperties}>
         <header className="topbar">
           <button type="button" className="brand" onClick={() => goTo('inicio')} aria-label="Ir al inicio">
@@ -182,6 +206,16 @@ export function Presenter({ screenId }: { screenId: string }) {
             >
               <NotebookPen />
             </button>
+            <button
+              type="button"
+              className={`btn btn--ghost btn--icon ${boardOpen ? 'is-on' : ''}`}
+              onClick={() => setBoardOpen((v) => !v)}
+              title="Pizarra: escribir, dibujar y señalar (D)"
+              aria-label="Pizarra interactiva"
+              aria-pressed={boardOpen}
+            >
+              <PenTool />
+            </button>
             <button type="button" className="btn btn--ghost btn--icon" onClick={toggleFull} title="Pantalla completa (F)" aria-label="Pantalla completa">
               {isFull ? <Shrink /> : <Expand />}
             </button>
@@ -228,9 +262,11 @@ export function Presenter({ screenId }: { screenId: string }) {
           </div>
         </footer>
 
+        <Whiteboard screenId={screen.id} open={boardOpen} onClose={() => setBoardOpen(false)} />
         {notesOpen && <FacilitatorDrawer screen={screen} onClose={() => setNotesOpen(false)} />}
         {overview && <Overview currentId={screen.id} onPick={(id) => { goTo(id); setOverview(false); }} onClose={() => setOverview(false)} />}
       </div>
+      </AnnounceCtx.Provider>
     </PresenterCtx.Provider>
   );
 }

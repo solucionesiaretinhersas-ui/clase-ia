@@ -10,11 +10,12 @@ rules_version = '2';
 //  - y únicamente dentro de sessions/{código}/responses y sessions/{código}/live/state.
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Respuestas, votos e ideas enviados desde los celulares.
     match /sessions/{session}/responses/{response} {
       allow read: if true;
       allow create, update: if request.resource.data.keys().hasOnly(['activityId', 'value', 'at'])
                             && request.resource.data.activityId is string
-                            && request.resource.data.activityId.size() <= 40
+                            && request.resource.data.activityId.size() <= 60
                             && request.resource.data.value is string
                             && request.resource.data.value.size() <= 900
                             && request.resource.data.at is number
@@ -22,14 +23,15 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // Pantalla que el facilitador está proyectando (seguimiento en vivo).
+    // Pantalla que el facilitador proyecta y actividad abierta (seguimiento en vivo).
     match /sessions/{session}/live/{docId} {
       allow read: if true;
       allow create, update: if docId == 'state'
-                            && request.resource.data.keys().hasOnly(['screenId', 'at'])
+                            && request.resource.data.keys().hasOnly(['screenId', 'at', 'act'])
                             && request.resource.data.screenId is string
                             && request.resource.data.screenId.size() <= 30
                             && request.resource.data.at is number
+                            && (!('act' in request.resource.data) || request.resource.data.act is map)
                             && session.size() <= 12;
       allow delete: if false;
     }

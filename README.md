@@ -30,6 +30,21 @@ npm run preview    # sirve dist/ localmente
 
 Con Firebase configurado, el celular de cada docente (`#/m/vivo`) muestra en tiempo real el momento y la pantalla que el facilitador proyecta, qué hacer ahora, accesos directos (ChatGPT, AI Studio, sus prompts) y el recorrido completo. El QR “Sigue el taller” está en la pantalla de la ruta y en el Centro QR. La etiqueta superior del facilitador indica si la conexión está activa (“En vivo”) o falló (“Sin conexión”).
 
+## Participación desde los celulares
+
+Con Firebase activo, el celular (`#/m/vivo`) muestra un cuadro **“Tu turno”** cada vez que el facilitador abre una actividad, y lo que envían aparece en el tablero al instante:
+
+- **Votación de apertura** y **“¿La IA ayuda o solo tú?” / “Tradicional o interactiva”**: botones por situación; el tablero muestra cuántos votaron desde el celular.
+- **Muros de ideas** (lluvia de ideas, diálogo tras la galería, regla ética): ideas ilimitadas que caen como notas adhesivas; el facilitador puede destacar (estrella) u ocultar.
+- **Reto pedagógico**: los temas difíciles llegan desde los celulares y se pueden marcar para el laboratorio.
+- **Cierre**: los compromisos enviados forman el muro final.
+
+La participación solo está habilitada mientras la actividad esté “En curso” (botón Abrir/Cerrar del tablero).
+
+## Pizarra interactiva
+
+Tecla **D** (o el botón de lápiz de la barra inferior) abre las herramientas sobre cualquier pantalla: lápiz, resaltador, texto, flecha, rectángulo, círculo, borrador, **puntero láser** y **foco** para señalar, deshacer/rehacer (Ctrl+Z), borrar todo, 7 colores, 3 grosores, y **pizarra en blanco** (oscura o blanca). Funciona con el dedo o lápiz en pizarras táctiles. Cada pantalla conserva sus anotaciones mientras no se recargue la página. `Esc` cierra las herramientas.
+
 ## Atajos del facilitador
 
 | Tecla | Acción | | Tecla | Acción |
@@ -37,7 +52,8 @@ Con Firebase configurado, el celular de cada docente (`#/m/vivo`) muestra en tie
 | → / Espacio | Siguiente | | N | Notas del facilitador |
 | ← | Anterior | | G | Vista general |
 | Inicio | Portada | | T | Iniciar/pausar cronómetro del momento |
-| F | Pantalla completa | | Esc | Cerrar paneles |
+| F | Pantalla completa | | D | Pizarra interactiva |
+| Esc | Cerrar paneles y pizarra | | | |
 
 ## Estructura
 
