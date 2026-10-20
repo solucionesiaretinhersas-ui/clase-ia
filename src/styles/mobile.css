@@ -1,0 +1,23 @@
+.mob { position: relative; min-height: 100dvh; display: grid; grid-template-rows: auto 1fr; max-width: 34rem; margin: 0 auto; font-size: 16px; }
+.mob__head { display: flex; align-items: center; gap: 0.8rem; padding: max(0.8rem, env(safe-area-inset-top)) 1rem 0.8rem; position: sticky; top: 0; z-index: 5; background: rgba(7,7,13,0.8); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+.mob__head div { display: grid; line-height: 1.2; } .mob__head strong { font-family: var(--font-display); font-size: 1.15rem; } .mob__head small { color: var(--text-3); font-size: 0.72rem; }
+.mob__head .brand__mark { flex: none; }
+.mob__main { display: grid; gap: 1rem; align-content: start; padding: 1.2rem 1rem max(2rem, env(safe-area-inset-bottom)); }
+.mob__lead { font-size: 1.1rem; color: var(--text-2); }
+.mob__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem; }
+.mob__item { width: 100%; display: flex; align-items: center; gap: 1rem; padding: 1rem; text-align: left; text-decoration: none; border-radius: var(--r-md); min-height: 4.5rem; }
+.mob__item > svg:first-child { flex: none; width: 2.6rem; height: 2.6rem; padding: 0.6rem; border-radius: 14px; background: var(--grad-soft); color: var(--cyan); }
+.mob__item > svg:last-child { flex: none; margin-left: auto; color: var(--text-3); }
+.mob__item span { display: grid; } .mob__item strong { font-family: var(--font-display); font-size: 1.1rem; } .mob__item small { color: var(--text-3); }
+.mob__keys { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+.mob__keys button { aspect-ratio: 1; border: 0; border-radius: var(--r-lg); background: var(--c); color: #fff; font-family: var(--font-display); font-size: 5rem; font-weight: 700; box-shadow: 0 14px 40px -14px var(--c); } .mob__keys button:active { transform: scale(0.96); }
+.card-up { display: grid; justify-items: center; gap: 1.2rem; padding: 2rem 1rem; text-align: center; border-radius: var(--r-xl); background: var(--c); color: #fff; } .card-up span { font-family: var(--font-display); font-size: 12rem; line-height: 1; font-weight: 700; } .card-up p { font-size: 1.2rem; font-weight: 600; } .card-up .btn { color: var(--text); }
+.mob__steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.8rem; }
+.mob__steps li { display: flex; gap: 0.9rem; align-items: flex-start; } .mob__steps li > button { flex: none; display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 50%; border: 1px solid var(--line-strong); background: var(--surface); font-family: var(--font-display); font-weight: 700; } .mob__steps li.is-done > button { background: var(--mint); border-color: transparent; color: #05140e; }
+.mob__steps strong { font-family: var(--font-display); } .mob__steps p { color: var(--text-2); font-size: 0.92rem; margin-top: 0.2rem; }
+.mob__cta { width: 100%; } .mob__h { font-size: 1.3rem; margin-top: 0.6rem; }
+.mob__form { display: grid; gap: 1rem; } .mob__form .input { font-size: 1rem; }
+.exit-done { display: grid; gap: 1rem; justify-items: start; } .exit-done > svg { width: 3rem; height: 3rem; padding: 0.7rem; border-radius: 50%; background: var(--mint); color: #05140e; } .exit-done h2 { font-size: 1.6rem; }
+.exit-done pre { width: 100%; margin: 0; padding: 1rem; white-space: pre-wrap; font-family: var(--font-body); border-radius: var(--r-md); background: var(--surface-2); line-height: 1.5; }
+.mob .lab__textarea { min-height: 12rem; } .mob .lab__row { grid-template-columns: 1fr; }
+@media (max-width: 480px) { .mob .btn--lg { width: 100%; } .mob .lab__actions .btn { width: 100%; } }
