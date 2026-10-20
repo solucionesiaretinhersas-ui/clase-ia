@@ -1,5 +1,6 @@
 import { Clock, Flag, Keyboard, ListChecks, MessageSquareText, RotateCcw, Smartphone, Users, X } from 'lucide-react';
-import { MOMENTS, momentOf, type ScreenMeta } from '../data/workshop';
+import type { ScreenMeta } from '../data/workshop';
+import { useWorkshop } from '../data/workshops';
 import { resetWorkshop } from '../lib/storage';
 import { fmt } from '../components/ui';
 import { elapsedOf, useTimers } from './timers';
@@ -18,6 +19,7 @@ const SHORTCUTS: [string, string][] = [
 ];
 
 export function FacilitatorDrawer({ screen, onClose }: { screen: ScreenMeta; onClose: () => void }) {
+  const { moments: MOMENTS, momentOf } = useWorkshop();
   const moment = momentOf(screen.moment);
   const { timers, reset, resetAll } = useTimers();
   const n = screen.notes;

@@ -49,6 +49,27 @@ Tecla **R** (o el botón de dados): la ruleta se arma con los docentes que se re
 - Los celulares que entran con el código nuevo borran automáticamente lo guardado del taller anterior y vuelven a pedir el nombre.
 - Si la sesión guardada tiene más de 12 horas, se reinicia sola al abrir la app.
 - Los datos antiguos en Firebase quedan bajo el código anterior, sin ningún enlace que los muestre. Para borrarlos de la nube, elimina la colección `sessions` desde la consola de Firebase.
+## Dos talleres en la misma aplicación
+
+En la portada hay un selector: **Taller para docentes** (90 min, 6 momentos) y **Taller para estudiantes** (90 min, 5 momentos). Cambia el guion, las actividades, los textos del celular y el certificado; el diseño y las herramientas (pizarra, ruleta, QR, tema claro/oscuro) son los mismos. El QR de ingreso lleva el taller en el enlace (`&w=d` o `&w=e`), así que el celular sabe cuál es sin configurar nada.
+
+**Taller de estudiantes** — enfocado en crear aplicaciones con Google AI Studio:
+
+| # | Momento | Min | Qué ocurre |
+|---|---|---|---|
+| 1 | Despierta tu curiosidad | 12 | Votación, qué es la IA, nube “¿dónde ves IA?” y “¿es IA o no?” |
+| 2 | ¿Cómo funciona la IA? | 14 | Datos → modelo → predicción, juego de adivinar la palabra (nube de palabras) y “¿confío o verifico?” |
+| 3 | Crear con Google AI Studio | 14 | Qué es AI Studio (nivel gratuito con límites, apps web vs. Android), programar escribiendo (*vibe coding*), ejemplo y acceso a Build |
+| 4 | Manos a la obra: tu aplicación | 40 | Idea, constructor de prompt, taller con prompts de mejora (incluye agregar IA con Gemini dentro de la app) y muestra con ruleta |
+| 5 | Cierre y reconocimiento | 10 | Uso responsable, “lo que me llevo” y certificados |
+
+> **Antes de usarlo con estudiantes:** verifica las condiciones de uso de Google AI Studio (edad mínima y tipo de cuenta) y las políticas de la institución. Si los estudiantes no pueden tener cuenta propia, usen la del docente en parejas o en pantalla compartida. El uso gratuito de los modelos tiene límites y puede cambiar.
+
+## Registro obligatorio, asistencia y certificados
+
+- Todos los participantes deben escribir **nombre y grado** (docentes: área o grado en que enseñan) al entrar desde el celular.
+- Pantalla final **“Asistencia y certificados”**: lista de registrados, descarga de la **lista de asistencia en CSV** (se abre en Excel con tildes) y vista previa del certificado de cualquier participante. Escribe tu nombre de facilitador para que aparezca en la firma.
+- Cada participante, desde su celular, descarga su **certificado tipo diploma** de la I.E. Santa Rosa de Lima como **imagen (PNG)** o **PDF**, sin servidor: se genera en el propio dispositivo. Se habilita cuando llegas a la pantalla de certificados.
 ## Participación desde los celulares
 
 Con Firebase activo, el celular (`#/m/vivo`) muestra un cuadro **“Tu turno”** cada vez que el facilitador abre una actividad, y lo que envían aparece en el tablero al instante:

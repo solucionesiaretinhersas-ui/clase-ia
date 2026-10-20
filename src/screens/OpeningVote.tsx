@@ -1,7 +1,9 @@
+import { joinRoute } from '../data/workshops';
 import type { CSSProperties } from 'react';
 import { Eye, EyeOff, Minus, RefreshCw, Smartphone } from 'lucide-react';
 import { ActivityControls, useActivityStatus } from '../components/ActivityShell';
 import { QRCode } from '../components/QRCode';
+import { useWorkshop } from '../data/workshops';
 import { useAnnounce } from '../presenter/announce';
 import { ANSWER_KEYS } from '../data/answers';
 import { LIVE_SYNC_AVAILABLE, useLiveResponses, useSessionCode } from '../lib/sync';
@@ -10,9 +12,14 @@ import { usePublicBase } from '../lib/usePublicBase';
 import { internalUrl } from '../lib/urls';
 
 const ID = 'apertura';
-const OPTIONS = ['Nunca la he usado', 'Alguna vez, por curiosidad', 'La uso para planear clases', 'Ya creo recursos con IA'];
+const OPTIONS_D = ['Nunca la he usado', 'Alguna vez, por curiosidad', 'La uso para planear clases', 'Ya creo recursos con IA'];
+const OPTIONS_E = ['Nunca la he usado', 'Alguna vez, por curiosidad', 'La uso para mis tareas', 'Ya creo cosas con IA'];
 
 export function OpeningVote() {
+  const ws = useWorkshop();
+  const student = ws.audience === 'estudiante';
+  const OPTIONS = student ? OPTIONS_E : OPTIONS_D;
+  const QUESTION = student ? '¿Has usado inteligencia artificial?' : '¿Has usado inteligencia artificial para preparar tus clases?';
   const [status] = useActivityStatus(ID);
   const [manual, setManual] = usePersistentState<number[]>(`vote:${ID}`, [0, 0, 0, 0]);
   const [showResults, setShowResults] = usePersistentState(`vote:${ID}:show`, false);
@@ -34,11 +41,11 @@ export function OpeningVote() {
   const leader = total ? votes.indexOf(Math.max(...votes)) : -1;
 
   const bump = (i: number, d: number) => setManual((v) => v.map((n, j) => (j === i ? Math.max(0, n + d) : n)));
-  const phoneUrl = internalUrl(base, `/m/vivo?s=${code}`);
+  const phoneUrl = internalUrl(base, joinRoute(code));
   useAnnounce('votacion', {
     key: ID,
     kind: 'choice',
-    prompt: '¿Has usado inteligencia artificial para preparar tus clases?',
+    prompt: QUESTION,
     options: OPTIONS,
     open,
   });
@@ -48,7 +55,7 @@ export function OpeningVote() {
       <header className="screen-head screen-head--row">
         <div>
           <span className="kicker">Votación de apertura</span>
-          <h2 className="h-lg">¿Has usado inteligencia artificial para preparar tus clases?</h2>
+          <h2 className="h-lg">{QUESTION}</h2>
         </div>
         <ActivityControls id={ID} onReset={() => { setManual([0, 0, 0, 0]); setShowResults(false); renew(); }} openLabel="Abrir votación" />
       </header>

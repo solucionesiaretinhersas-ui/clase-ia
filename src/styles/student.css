@@ -1,0 +1,55 @@
+/* Selector de taller */
+.seg { display: inline-flex; gap: 0.3rem; padding: 0.3rem; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); }
+.seg__btn { display: inline-flex; align-items: center; gap: 0.5em; min-height: 2.8rem; padding: 0.4em 1.2em; border: 0; border-radius: 999px; background: none; color: var(--text-2); font-weight: 600; font-size: 0.95rem; transition: background 0.25s var(--ease), color 0.25s; }
+.seg__btn svg { width: 1.2em; height: 1.2em; }
+.seg__btn.is-on { background: var(--btn-primary); color: #fff; box-shadow: 0 6px 18px -8px var(--btn-primary); }
+
+/* Nube de palabras */
+.cloud { list-style: none; margin: 0; padding: 1rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.5rem 1.4rem; min-height: 20rem; }
+.cloud__word { --t: var(--violet); position: relative; display: inline-flex; align-items: flex-start; gap: 0.1em; font-family: var(--font-display); font-weight: 700; line-height: 1.1; color: var(--t); animation: pop 0.5s var(--ease) both; }
+.cloud__word--violet { --t: var(--violet); } .cloud__word--blue { --t: var(--blue); } .cloud__word--cyan { --t: var(--cyan); } .cloud__word--mint { --t: var(--mint); } .cloud__word--amber { --t: var(--amber); } .cloud__word--rose { --t: var(--rose); }
+.cloud__word sup { font-size: 0.4em; font-weight: 600; color: var(--text-3); }
+.cloud__word button { position: absolute; right: -0.6em; top: -0.6em; display: grid; place-items: center; width: 1.6rem; height: 1.6rem; padding: 0; border: 0; border-radius: 50%; background: var(--surface-2); color: var(--text-2); opacity: 0; transition: opacity 0.2s; }
+.cloud__word:hover button, .cloud__word:focus-within button { opacity: 1; } .cloud__word button svg { width: 0.9rem; height: 0.9rem; }
+
+/* Pantallas del taller de estudiantes */
+.stu { min-height: 100%; display: grid; align-content: center; gap: 1.2rem; }
+.stu__cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; }
+.stu__card { display: grid; gap: 0.5rem; padding: 1.4rem; animation: rise 0.6s var(--ease) both; }
+.stu__card svg { width: 2.8rem; height: 2.8rem; padding: 0.7rem; border-radius: 0.9rem; background: var(--btn-primary); color: #fff; } .stu__card h3 { font-size: clamp(1.2rem, 1.8vw, 1.8rem); } .stu__card p { color: var(--text-2); font-size: clamp(1rem, 1.3vw, 1.3rem); }
+.stu__chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; } .stu__chips .chip { font-size: 0.95rem; padding: 0.45em 1em; }
+.stu__steps { list-style: none; margin: 0; padding: 0; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.stu__steps button { display: inline-flex; align-items: center; gap: 0.6em; padding: 0.6em 1.2em; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface); font-weight: 600; font-size: 1.05rem; color: var(--text-2); }
+.stu__steps b { display: grid; place-items: center; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--surface-2); font-family: var(--font-display); }
+.stu__steps .is-on { background: var(--btn-primary); border-color: transparent; color: #fff; } .stu__steps .is-on b { background: rgb(255 255 255 / 0.25); } .stu__steps .is-past b { background: var(--mint); color: #fff; }
+.stu__panel { display: grid; gap: 1rem; padding: clamp(1.2rem, 2.6vw, 2.2rem); animation: rise 0.45s var(--ease) both; }
+.stu__panel-icon { width: 3.4rem; height: 3.4rem; padding: 0.8rem; border-radius: 1rem; background: var(--grad-soft); color: var(--accent); }
+.stu__panel-text { font-family: var(--font-display); font-size: clamp(1.4rem, 2.4vw, 2.4rem); line-height: 1.2; max-width: 34ch; }
+.stu__predict { display: grid; gap: 0.5rem; max-width: 40rem; } .stu__predict p { font-size: clamp(1.1rem, 1.6vw, 1.6rem); color: var(--text-2); }
+.stu__bar { position: relative; display: grid; grid-template-columns: 8rem 1fr 3rem; align-items: center; gap: 0.8rem; font-weight: 600; } .stu__bar i { display: block; height: 1.1rem; border-radius: 999px; background: var(--btn-primary); animation: grow 0.9s var(--ease) both; transform-origin: left; } .stu__bar em { font-style: normal; color: var(--text-2); }
+@keyframes grow { from { transform: scaleX(0); } }
+.stu__note { display: flex; align-items: center; gap: 0.6em; color: var(--amber); font-size: clamp(0.95rem, 1.2vw, 1.2rem); } .stu__note svg { flex: none; width: 1.3em; }
+.stu__split { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 1.6rem; align-items: start; }
+.stu__facts { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.1rem; } .stu__facts li { display: flex; gap: 1rem; align-items: flex-start; }
+.stu__facts li > svg { flex: none; width: 2.8rem; height: 2.8rem; padding: 0.7rem; border-radius: 0.9rem; background: var(--grad-soft); color: var(--accent); } .stu__facts strong { display: block; font-family: var(--font-display); font-size: clamp(1.1rem, 1.6vw, 1.6rem); } .stu__facts span { color: var(--text-2); }
+.stu__ideas h3 { display: flex; align-items: center; gap: 0.5em; font-size: 1.3rem; margin-bottom: 0.8rem; } .stu__ideas h3 svg { width: 1.2em; color: var(--accent); }
+.stu__ideas ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.6rem; } .stu__ideas li { padding: 0.55em 1.1em; border-radius: 999px; background: var(--surface); border: 1px solid var(--line-strong); font-weight: 600; font-size: clamp(1rem, 1.3vw, 1.3rem); animation: pop 0.5s var(--ease) both; }
+.stu__loop { display: grid; gap: 0.6rem; }
+.stu__loop-item { display: flex; gap: 0.9rem; align-items: center; padding: 0.9rem 1rem; text-align: left; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--surface); transition: border-color 0.2s, background 0.2s; }
+.stu__loop-item b { display: grid; place-items: center; flex: none; width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--surface-2); font-family: var(--font-display); } .stu__loop-item span { display: grid; } .stu__loop-item small { color: var(--text-2); font-size: 0.9rem; }
+.stu__loop-item.is-on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); } .stu__loop-item.is-on b { background: var(--btn-primary); color: #fff; }
+.stu__code { display: grid; gap: 0.5rem; padding: 1.3rem; } .stu__code p { font-size: clamp(1rem, 1.4vw, 1.4rem); color: var(--text); }
+.station__safe { display: flex; align-items: center; gap: 0.6em; margin-bottom: 1rem; padding: 0.8rem 1rem; border-radius: var(--r-md); background: color-mix(in srgb, var(--amber) 12%, transparent); border: 1px solid color-mix(in srgb, var(--amber) 40%, transparent); color: var(--text); } .station__safe svg { flex: none; width: 1.3em; color: var(--amber); }
+
+/* Asistencia y certificados */
+.certs__body { display: grid; grid-template-columns: minmax(16rem, 22rem) 1fr; gap: 1.5rem; align-items: start; }
+.certs__list { display: grid; gap: 0.8rem; padding: 1.1rem; } .certs__list h3 { display: flex; align-items: center; gap: 0.5em; font-size: 1.15rem; } .certs__list h3 svg { width: 1.2em; color: var(--accent); }
+.certs__list ul { list-style: none; margin: 0; padding: 0; max-height: 17rem; overflow-y: auto; border-radius: var(--r-md); border: 1px solid var(--line); }
+.certs__list li + li { border-top: 1px solid var(--line); }
+.certs__list li button { width: 100%; display: flex; justify-content: space-between; gap: 0.8rem; padding: 0.55rem 0.8rem; text-align: left; border: 0; background: none; } .certs__list li button span { color: var(--text-3); font-size: 0.85rem; } .certs__list li button.is-on { background: color-mix(in srgb, var(--blue) 16%, transparent); }
+.certcard { display: grid; gap: 0.8rem; justify-items: center; }
+.certcard__img { width: min(100%, 60rem); height: auto; border-radius: 10px; box-shadow: 0 20px 50px -20px rgb(0 0 0 / 0.5); border: 1px solid var(--line-strong); -webkit-touch-callout: default; user-select: none; }
+.certcard__btns { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; width: 100%; }
+@media (max-width: 480px) { .certcard__btns .btn { width: 100%; } }
+
+@media (max-width: 1000px) { .stu__split, .certs__body { grid-template-columns: 1fr; } }

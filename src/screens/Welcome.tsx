@@ -1,28 +1,44 @@
-import { ArrowRight, Lightbulb, Sparkles, WandSparkles } from 'lucide-react';
+import { ArrowRight, GraduationCap, Lightbulb, School, Sparkles, WandSparkles } from 'lucide-react';
 import { usePresenter } from '../presenter/context';
 import { resetWorkshop } from '../lib/storage';
+import { navigate } from '../lib/router';
 import { BrandLogo } from '../components/BrandLogo';
-import { TOTAL_MINUTES } from '../data/workshop';
+import { WORKSHOPS, setWorkshopId, useWorkshop, type WorkshopId } from '../data/workshops';
 
 export function Welcome() {
   const { goTo } = usePresenter();
+  const ws = useWorkshop();
+
+  function pick(id: WorkshopId) {
+    if (id === ws.id) return;
+    setWorkshopId(id);
+    navigate(`/s/${WORKSHOPS[id].introCover}`);
+  }
+
   return (
     <section className="welcome">
       <div className="welcome__copy enter">
         <span className="welcome__inst">Institución Educativa Santa Rosa de Lima</span>
         <h1 className="welcome__title">
-          Aula IA<span className="welcome__sub grad-text">De la idea a la experiencia</span>
+          Aula IA<span className="welcome__sub grad-text">{ws.subtitle}</span>
         </h1>
-        <p className="welcome__quote">
-          La inteligencia artificial no transforma la enseñanza por sí sola. La transforman los docentes que se atreven a
-          imaginar con ella.
-        </p>
+        <p className="welcome__quote">{ws.quote}</p>
+
+        <div className="seg" role="group" aria-label="Elige el taller">
+          {(Object.keys(WORKSHOPS) as WorkshopId[]).map((id) => (
+            <button key={id} type="button" className={`seg__btn ${ws.id === id ? 'is-on' : ''}`} onClick={() => pick(id)} aria-pressed={ws.id === id}>
+              {id === 'docentes' ? <School /> : <GraduationCap />}
+              {WORKSHOPS[id].label}
+            </button>
+          ))}
+        </div>
+
         <div className="welcome__actions">
-          <button type="button" className="btn btn--primary btn--xl" onClick={() => goTo('ruta')}>
+          <button type="button" className="btn btn--primary btn--xl" onClick={() => goTo(ws.screens[1].id)}>
             Comenzar el taller <ArrowRight />
           </button>
           <span className="welcome__meta">
-            Taller docente · {TOTAL_MINUTES} minutos
+            Taller para {ws.audience === 'docente' ? 'docentes' : 'estudiantes'} · {ws.total} minutos
           </span>
           <BrandLogo label="con Google AI Studio" />
           <button
@@ -55,7 +71,7 @@ export function Welcome() {
           </div>
           <div className="orbit__node orbit__node--c">
             <Sparkles />
-            <b>Experiencia</b>
+            <b>{ws.audience === 'docente' ? 'Experiencia' : 'Tu app'}</b>
           </div>
         </div>
       </div>

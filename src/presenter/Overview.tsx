@@ -1,9 +1,10 @@
 import type { CSSProperties } from 'react';
-import { MOMENTS, SCREENS } from '../data/workshop';
+import { useWorkshop } from '../data/workshops';
 import { Modal } from '../components/ui';
 
 export function Overview({ currentId, onPick, onClose }: { currentId: string; onPick: (id: string) => void; onClose: () => void }) {
-  const intro = SCREENS.filter((s) => s.moment === 'm0');
+  const { moments: MOMENTS, screens: SCREENS } = useWorkshop();
+  const intro = SCREENS.filter((s) => !MOMENTS.some((m) => m.id === s.moment));
   return (
     <Modal onClose={onClose} label="Vista general del taller">
       <div className="overview">
@@ -32,6 +33,7 @@ export function Overview({ currentId, onPick, onClose }: { currentId: string; on
 }
 
 function Item({ id, title, active, onPick }: { id: string; title: string; active: boolean; onPick: (id: string) => void }) {
+  const { screens: SCREENS } = useWorkshop();
   const n = SCREENS.findIndex((s) => s.id === id) + 1;
   return (
     <button type="button" className={`overview__item ${active ? 'is-active' : ''}`} onClick={() => onPick(id)}>

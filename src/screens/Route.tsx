@@ -1,24 +1,19 @@
+import { joinRoute } from '../data/workshops';
 import type { CSSProperties } from 'react';
 import { ArrowRight, Hammer, HeartHandshake, Layers, MessagesSquare, ShieldCheck, Smartphone, Telescope } from 'lucide-react';
 import { QRCode } from '../components/QRCode';
-import { MOMENTS, SCREENS, TOTAL_MINUTES } from '../data/workshop';
+import { useWorkshop } from '../data/workshops';
 import { LIVE_SYNC_AVAILABLE, useParticipants, useSessionCode } from '../lib/sync';
 import { internalUrl } from '../lib/urls';
 import { usePublicBase } from '../lib/usePublicBase';
 import { usePresenter } from '../presenter/context';
 
 const ICONS = [HeartHandshake, Telescope, Layers, Hammer, MessagesSquare, ShieldCheck];
-const OUTCOMES = [
-  'La IA como copiloto, no reemplazo',
-  'Llegar a la sección Build',
-  'La estructura de tu clase con ChatGPT',
-  'Tu recurso interactivo funcionando',
-  'Uno o dos recursos en el tablero',
-  'Ética y docencia humanizada',
-];
 
 export function Route() {
   const { goTo, openJoin } = usePresenter();
+  const ws = useWorkshop();
+  const { moments: MOMENTS, screens: SCREENS, total: TOTAL_MINUTES, outcomes: OUTCOMES } = ws;
   const { base, reachable } = usePublicBase();
   const { code } = useSessionCode();
   const people = useParticipants(LIVE_SYNC_AVAILABLE ? code : '');
@@ -56,18 +51,18 @@ export function Route() {
 
       <div className="route__goal">
         <div className="route__follow">
-          <QRCode value={internalUrl(base, `/m/vivo?s=${code}`)} size={120} />
+          <QRCode value={internalUrl(base, joinRoute(code))} size={120} />
           <div>
             <span>
-              <Smartphone /> Únete con tu nombre
+              <Smartphone /> Únete con tu nombre y grado
             </span>
-            <small>{reachable ? 'Un solo QR: registra tu nombre y recibe aquí todos los enlaces del taller.' : 'Disponible al abrir la web publicada.'}</small>
-            {LIVE_SYNC_AVAILABLE && <small><b>{people.length}</b> docentes conectados</small>}
+            <small>{reachable ? 'Un solo QR: escribe tu nombre y grado y recibe aquí todos los enlaces del taller.' : 'Disponible al abrir la web publicada.'}</small>
+            {LIVE_SYNC_AVAILABLE && <small><b>{people.length}</b> {ws.audience === 'docente' ? 'docentes' : 'estudiantes'} conectados</small>}
             <button type="button" className="btn" onClick={openJoin}>Ampliar QR</button>
           </div>
         </div>
-        <strong>Cada docente sale con un recurso educativo interactivo, creado con su criterio.</strong>
-        <button type="button" className="btn btn--primary btn--lg" onClick={() => goTo('votacion')}>
+        <strong>{ws.audience === 'docente' ? 'Cada docente sale con un recurso educativo interactivo, creado con su criterio.' : 'Cada estudiante sale con una aplicación propia, creada con inteligencia artificial.'}</strong>
+        <button type="button" className="btn btn--primary btn--lg" onClick={() => goTo(SCREENS[2].id)}>
           Empezar <ArrowRight />
         </button>
       </div>

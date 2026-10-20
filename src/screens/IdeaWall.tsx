@@ -1,3 +1,4 @@
+import { joinRoute } from '../data/workshops';
 import { useMemo, useState, type FormEvent } from 'react';
 import { EyeOff, Plus, Smartphone, Star } from 'lucide-react';
 import { ActivityControls, useActivityStatus } from '../components/ActivityShell';
@@ -14,8 +15,10 @@ export interface WallConfig {
   screenId: string;
   kicker: string;
   title: string;
-  /** Lo que ven los docentes en su celular. */
+  /** Lo que ven los participantes en su celular. */
   prompt: string;
+  /** Mostrar las respuestas como nube de palabras (las repetidas crecen). */
+  cloud?: boolean;
 }
 
 interface Idea {
@@ -44,6 +47,19 @@ export function IdeaWall({ cfg }: { cfg: WallConfig }) {
     const remote = live.responses.map((r) => ({ id: r.id, text: r.value, at: r.at, local: false }));
     return [...manual, ...remote].filter((i) => !hidden.includes(i.id)).sort((a, b) => b.at - a.at);
   }, [live.responses, manual, hidden]);
+
+  // Nube de palabras: agrupa respuestas iguales.
+  const words = useMemo(() => {
+    const map = new Map<string, { text: string; ids: string[] }>();
+    ideas.forEach((i) => {
+      const k = i.text.trim().toLowerCase();
+      const cur = map.get(k);
+      if (cur) cur.ids.push(i.id);
+      else map.set(k, { text: i.text.trim(), ids: [i.id] });
+    });
+    return [...map.values()].sort((a, b) => b.ids.length - a.ids.length);
+  }, [ideas]);
+  const maxCount = Math.max(1, ...words.map((w) => w.ids.length));
 
   function add(e: FormEvent) {
     e.preventDefault();
@@ -84,6 +100,18 @@ export function IdeaWall({ cfg }: { cfg: WallConfig }) {
                   : 'Pulsa “Abrir muro” para que los docentes puedan enviar sus ideas.'}
               </span>
             </div>
+          ) : cfg.cloud ? (
+            <ul className="cloud" aria-live="polite">
+              {words.map((w, i) => (
+                <li key={w.text} className={`cloud__word cloud__word--${TONES[i % TONES.length]}`} style={{ fontSize: `calc(1.1rem + ${(w.ids.length / maxCount) * 3.2}rem)` }}>
+                  {w.text}
+                  {w.ids.length > 1 && <sup>{w.ids.length}</sup>}
+                  <button type="button" onClick={() => setHidden((h) => [...h, ...w.ids])} aria-label={`Ocultar ${w.text}`}>
+                    <EyeOff />
+                  </button>
+                </li>
+              ))}
+            </ul>
           ) : (
             <ul className="stickies" aria-live="polite">
               {ideas.map((idea, i) => (
@@ -112,7 +140,7 @@ export function IdeaWall({ cfg }: { cfg: WallConfig }) {
               <span className="vote__phone-head">
                 <Smartphone /> Participa desde tu celular
               </span>
-              <QRCode value={internalUrl(base, `/m/vivo?s=${code}`)} size={150} />
+              <QRCode value={internalUrl(base, joinRoute(code))} size={150} />
               <span className={`chip ${live.status === 'live' ? 'chip--live' : live.status === 'error' ? 'chip--warn' : 'chip--muted'}`}>
                 {live.status === 'live' ? 'En vivo' : live.status === 'error' ? 'Sin conexión' : 'Conectando…'} · {code}
               </span>

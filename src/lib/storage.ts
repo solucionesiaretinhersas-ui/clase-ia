@@ -85,6 +85,6 @@ export function usePersistentState<T>(key: string, initial: T) {
  * nuevo). Conserva solo la dirección pública configurada.
  */
 export function resetWorkshop() {
-  clearStored((k) => k !== 'publicBase' && k !== 'theme');
+  clearStored((k) => k !== 'publicBase' && k !== 'theme' && k !== 'workshop:mode');
   window.dispatchEvent(new Event('aula-ia:reset'));
 }

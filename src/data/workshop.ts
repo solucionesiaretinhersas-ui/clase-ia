@@ -1,4 +1,4 @@
-export type MomentId = 'm0' | 'm1' | 'm2' | 'm3' | 'm4' | 'm5' | 'm6';
+export type MomentId = string;
 
 export interface Moment {
   id: MomentId;
@@ -389,7 +389,7 @@ export const SCREENS: ScreenMeta[] = [
     title: 'Cierre y compromiso',
     kind: 'activity',
     notes: {
-      minutes: 3,
+      minutes: 2,
       participant: 'Escribe tu compromiso desde el celular: qué recurso vas a crear y cómo lo aplicarás.',
       objective: 'Consolidar aprendizajes y concretar un compromiso de aplicación en el aula.',
       explanation: 'La IA propone, el docente dispone: el criterio pedagógico sigue siendo humano.',
@@ -399,6 +399,24 @@ export const SCREENS: ScreenMeta[] = [
         'Invita a 3 docentes a leer el suyo y agradece su participación.',
       ],
       activity: 'Muro de compromisos alimentado desde los celulares.',
+    },
+  },
+  {
+    id: 'certificados',
+    moment: 'm6',
+    title: 'Asistencia y certificados',
+    kind: 'tool',
+    notes: {
+      minutes: 1,
+      participant: 'Tu certificado ya está disponible: descárgalo en tu celular como imagen o PDF.',
+      objective: 'Cerrar el taller entregando la lista de asistencia y los certificados de participación.',
+      explanation: 'Cada docente registrado puede descargar su certificado desde su celular; el facilitador descarga la lista de asistencia.',
+      steps: [
+        'Escribe tu nombre como facilitador para que aparezca en el certificado.',
+        'Descarga la lista de asistencia (CSV, se abre en Excel).',
+        'Pide que revisen su celular: en “Hola, …” aparece su certificado para guardar.',
+      ],
+      activity: 'Descarga de certificados desde los celulares.',
     },
   },
 ];

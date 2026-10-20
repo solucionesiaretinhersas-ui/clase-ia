@@ -80,7 +80,7 @@ export function Gallery() {
     <section className="gallery enter">
       <header className="screen-head screen-head--row">
         <div>
-          <span className="kicker">Momento 5 · Socialización</span>
+          <span className="kicker">Muestra de lo creado</span>
           <h2 className="h-lg">Galería de recursos creados</h2>
         </div>
         <div className="activity-controls">

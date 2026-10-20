@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowRight, HeartHandshake, Lightbulb, Scale, ShieldCheck } from 'lucide-react';
 import { usePresenter } from '../presenter/context';
+import { useWorkshop } from '../data/workshops';
 
 const PILLARS = [
   {
@@ -46,21 +47,51 @@ const PILLARS = [
   },
 ];
 
+const PILLARS_E = [
+  {
+    icon: ShieldCheck,
+    title: 'Verifica',
+    lead: 'La IA puede equivocarse con total seguridad.',
+    points: ['Comprueba datos, fechas y fuentes.', 'Prueba lo que genera antes de usarlo.', 'Si algo parece raro, pregunta a tu docente.'],
+  },
+  {
+    icon: Scale,
+    title: 'Cuida tu información',
+    lead: 'Lo que escribes puede quedar guardado.',
+    points: ['No compartas datos personales ni fotos tuyas o de otros.', 'No escribas contraseñas ni direcciones.', 'Usa solo la cuenta que tu docente indique.'],
+  },
+  {
+    icon: Lightbulb,
+    title: 'Crea tú',
+    lead: 'Copiar sin entender no es aprender.',
+    points: ['Pon tus ideas primero y luego pide ayuda.', 'Explica con tus palabras lo que hace tu app.', 'Cuenta siempre cuándo usaste IA.'],
+  },
+  {
+    icon: HeartHandshake,
+    title: 'Tú decides',
+    lead: 'La IA es una ayudante, no la jefa.',
+    points: ['Tú eliges qué pedir y qué cambiar.', 'Úsala para aprender más, no para hacer menos.', 'Úsala con respeto: nada que lastime a otros.'],
+  },
+];
+
 export function Ethics() {
+  const ws = useWorkshop();
+  const student = ws.audience === 'estudiante';
+  const pillars = student ? PILLARS_E : PILLARS;
   const [i, setI] = useState(0);
-  const { goTo } = usePresenter();
-  const p = PILLARS[i];
+  const { next } = usePresenter();
+  const p = pillars[i];
   const Icon = p.icon;
   return (
     <section className="ethics enter">
       <header className="screen-head">
-        <span className="kicker">Momento 6 · Cierre</span>
-        <h2 className="h-lg">La IA llegó para ayudarnos, <span className="grad-text">no para reemplazarnos</span></h2>
+        <span className="kicker">{student ? 'Momento 5 · Cierre' : 'Momento 6 · Cierre'}</span>
+        <h2 className="h-lg">{student ? <>Usa la IA <span className="grad-text">con cabeza</span></> : <>La IA llegó para ayudarnos, <span className="grad-text">no para reemplazarnos</span></>}</h2>
       </header>
 
       <div className="ethics__body">
         <ul className="ethics__tabs">
-          {PILLARS.map((x, k) => {
+          {pillars.map((x, k) => {
             const I = x.icon;
             return (
               <li key={x.title}>
@@ -85,11 +116,11 @@ export function Ethics() {
       </div>
 
       <div className="ethics__foot">
-        <button type="button" className="btn" onClick={() => setI((i + 1) % PILLARS.length)}>
+        <button type="button" className="btn" onClick={() => setI((i + 1) % pillars.length)}>
           Siguiente eje <ArrowRight />
         </button>
-        <button type="button" className="btn btn--primary btn--lg" onClick={() => goTo('cierre')}>
-          Compromiso final <ArrowRight />
+        <button type="button" className="btn btn--primary btn--lg" onClick={next}>
+          Continuar <ArrowRight />
         </button>
       </div>
     </section>

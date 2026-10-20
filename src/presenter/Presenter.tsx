@@ -14,9 +14,9 @@ import {
   Shrink,
   Smartphone,
 } from 'lucide-react';
-import { MOMENTS, SCREENS, TOTAL_MINUTES, momentOf, screenIndex } from '../data/workshop';
+import { useWorkshop } from '../data/workshops';
 import { navigate } from '../lib/router';
-import { readStored, resetWorkshop, writeStored } from '../lib/storage';
+import { readStored, resetWorkshop, usePersistentState, writeStored } from '../lib/storage';
 import { LIVE_SYNC_AVAILABLE, publishLive, useParticipants, useSessionCode, type LiveAct } from '../lib/sync';
 import { fmt, useTicker } from '../components/ui';
 import { PresenterCtx } from './context';
@@ -36,9 +36,11 @@ function isTyping(el: EventTarget | null) {
 }
 
 export function Presenter({ screenId }: { screenId: string }) {
-  const idx = screenIndex(screenId);
+  const ws = useWorkshop();
+  const { screens: SCREENS, moments: MOMENTS } = ws;
+  const idx = ws.screenIndex(screenId);
   const screen = SCREENS[idx];
-  const moment = momentOf(screen.moment);
+  const moment = ws.momentOf(screen.moment);
   const [notesOpen, setNotesOpen] = useState(false);
   const [overview, setOverview] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
@@ -58,6 +60,7 @@ export function Presenter({ screenId }: { screenId: string }) {
     const started = readStored<number>('session:started', 0);
     if (started && Date.now() - started > 12 * 3600 * 1000) resetWorkshop();
   }, []);
+  const [fac] = usePersistentState('cert:facilitator', '');
   const [liveState, setLiveState] = useState<'pending' | 'ok' | 'error'>('pending');
   // La pantalla activa anuncia qué actividad deben mostrar los celulares.
   const [announced, setAnnounced] = useState<{ screenId: string; act: LiveAct } | null>(null);
@@ -77,14 +80,14 @@ export function Presenter({ screenId }: { screenId: string }) {
   useEffect(() => {
     if (!LIVE_SYNC_AVAILABLE || !code) return;
     let cancelled = false;
-    publishLive(code, screen.id, actSig ? (JSON.parse(actSig) as LiveAct) : null).then(
+    publishLive(code, screen.id, actSig ? (JSON.parse(actSig) as LiveAct) : null, fac).then(
       () => !cancelled && setLiveState('ok'),
       () => !cancelled && setLiveState('error'),
     );
     return () => {
       cancelled = true;
     };
-  }, [code, screen.id, actSig]);
+  }, [code, screen.id, actSig, fac]);
 
   const [boardOpen, setBoardOpen] = useState(false);
 
@@ -120,7 +123,7 @@ export function Presenter({ screenId }: { screenId: string }) {
         prev();
       } else if (k === 'Home') {
         e.preventDefault();
-        goTo('inicio');
+        goTo(ws.introCover);
       } else if (k === 'End') {
         goTo(SCREENS[SCREENS.length - 1].id);
       } else if (k === 'f' || k === 'F') {
@@ -144,7 +147,7 @@ export function Presenter({ screenId }: { screenId: string }) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [next, prev, goTo, toggleFull, toggle, moment]);
+  }, [next, prev, goTo, toggleFull, toggle, moment, ws]);
 
   const api = useMemo(
     () => ({ goTo, next, prev, current: screen.id, openJoin: () => setJoinOpen(true), openWheel: () => setWheelOpen(true) }),
@@ -159,7 +162,7 @@ export function Presenter({ screenId }: { screenId: string }) {
       <AnnounceCtx.Provider value={announceApi}>
       <div className={`stage ${isCover ? 'stage--cover' : ''}`} style={{ '--accent': accent } as CSSProperties}>
         <header className="topbar">
-          <button type="button" className="brand" onClick={() => goTo('inicio')} aria-label="Ir al inicio">
+          <button type="button" className="brand" onClick={() => goTo(ws.introCover)} aria-label="Ir al inicio">
             <span className="brand__mark" aria-hidden="true">
               A
             </span>
@@ -189,7 +192,7 @@ export function Presenter({ screenId }: { screenId: string }) {
                 title={liveState === 'error' ? 'No se pudo conectar con Firebase: revisa que Firestore esté activo y las reglas publicadas' : 'Sesión en vivo: muestra el QR de ingreso (J)'}
               >
                 {liveState === 'ok' && <span className="dot dot--pulse" />}
-                {liveState === 'ok' ? 'En vivo' : liveState === 'error' ? 'Sin conexión' : 'Conectando'} · {code} · {people.length} docentes
+                {liveState === 'ok' ? 'En vivo' : liveState === 'error' ? 'Sin conexión' : 'Conectando'} · {code} · {people.length} {ws.audience === 'docente' ? 'docentes' : 'estudiantes'}
               </button>
             )}
             <TimerPill momentId={moment?.id} timers={timers} onToggle={toggle} />
@@ -212,7 +215,7 @@ export function Presenter({ screenId }: { screenId: string }) {
 
         <footer className="navbar">
           <div className="navbar__group">
-            <button type="button" className="btn btn--ghost btn--icon" onClick={() => goTo('inicio')} title="Inicio (Inicio)" aria-label="Inicio">
+            <button type="button" className="btn btn--ghost btn--icon" onClick={() => goTo(ws.introCover)} title="Inicio (Inicio)" aria-label="Inicio">
               <House />
             </button>
             <button type="button" className="btn btn--ghost btn--icon" onClick={() => setOverview(true)} title="Vista general (G)" aria-label="Vista general">
@@ -257,7 +260,7 @@ export function Presenter({ screenId }: { screenId: string }) {
                   <span className="progress__label">{m.short}</span>
                   <div className="progress__track">
                     {list.map((s) => {
-                      const i = screenIndex(s.id);
+                      const i = ws.screenIndex(s.id);
                       return (
                         <button
                           key={s.id}
@@ -308,8 +311,9 @@ function TimerPill({
 }: {
   momentId: string | undefined;
   timers: ReturnType<typeof useTimers>['timers'];
-  onToggle: (id: (typeof MOMENTS)[number]['id']) => void;
+  onToggle: (id: string) => void;
 }) {
+  const { moments: MOMENTS, total: TOTAL_MINUTES } = useWorkshop();
   const moment = MOMENTS.find((m) => m.id === momentId);
   if (!moment) {
     const total = MOMENTS.reduce((s, m) => s + elapsedOf(timers[m.id]), 0);

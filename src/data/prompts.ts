@@ -181,3 +181,70 @@ export const REFINEMENTS: { title: string; prompt: string }[] = [
       'Hay un error: [DESCRIBE QUÉ HICISTE Y QUÉ PASÓ]. Corrígelo sin cambiar el resto del diseño y explícame qué modificaste.',
   },
 ];
+
+/* ───────── Taller de estudiantes ───────── */
+export interface StudentFields {
+  idea: string;
+  tipo: string;
+  usuarios: string;
+  funciona: string;
+  estilo: string;
+}
+
+export const EMPTY_STUDENT: StudentFields = { idea: '', tipo: 'Juego', usuarios: '', funciona: '', estilo: '' };
+export const STUDENT_TYPES = ['Juego', 'Quiz o trivia', 'Simulador', 'Historia interactiva', 'Herramienta para estudiar', 'Asistente creativo'];
+
+export function buildStudentPrompt(raw: Partial<StudentFields>): string {
+  const f = { ...EMPTY_STUDENT, ...raw };
+  const idea = f.idea.trim() || '[TU IDEA]';
+  const usuarios = f.usuarios.trim() || '[PARA QUIÉN ES]';
+  const funciona = f.funciona.trim() || '[CÓMO SE JUEGA O SE USA]';
+  const estilo = f.estilo.trim() || '[ESTILO VISUAL: colores, ambiente, personajes]';
+  return (
+    `Actúa como un desarrollador web experto y creativo. Crea una aplicación web de tipo "${f.tipo}": ${idea}. ` +
+    `Va dirigida a ${usuarios}. ` +
+    `Así debe funcionar: ${funciona}. ` +
+    `Estilo visual: ${estilo}. ` +
+    `Incluye una pantalla de inicio, instrucciones claras, puntos o progreso visibles, retroalimentación inmediata y una pantalla final. ` +
+    `Debe funcionar bien en celular y en computador, con botones grandes y buen contraste. ` +
+    `Quiero que sea divertida y funcional, no solo un diseño. ` +
+    `Cuando termines, explícame en tres frases sencillas cómo la construiste.`
+  );
+}
+
+export function missingStudent(raw: Partial<StudentFields>): string[] {
+  const f = { ...EMPTY_STUDENT, ...raw };
+  return (['idea', 'usuarios', 'funciona', 'estilo'] as const).filter((k) => !f[k].trim());
+}
+
+export const STUDENT_REFINEMENTS: { title: string; prompt: string }[] = [
+  {
+    title: 'Agrega IA con Gemini',
+    prompt:
+      'Agrega una función de inteligencia artificial con Gemini dentro de mi aplicación: [QUÉ DEBE HACER, por ejemplo inventar preguntas nuevas, dar pistas o conversar con un personaje]. Si necesita una clave o permiso, explícame cómo configurarlo de forma segura.',
+  },
+  {
+    title: 'Más niveles y puntos',
+    prompt: 'Agrega 3 niveles que se vayan poniendo más difíciles, un sistema de puntos y una pantalla final con mi mejor puntaje.',
+  },
+  {
+    title: 'Cambia el estilo',
+    prompt: 'Cambia el diseño a un estilo [DESCRIBE: espacial, selva, retro, caricatura…] con colores llamativos, sin cambiar cómo funciona.',
+  },
+  {
+    title: 'Ajusta la dificultad',
+    prompt: 'Haz la aplicación [MÁS FÁCIL / MÁS DIFÍCIL] y agrega un botón para elegir la dificultad al empezar.',
+  },
+  {
+    title: 'Animaciones y sonido',
+    prompt: 'Agrega animaciones suaves y efectos de sonido sencillos, con un botón para silenciar.',
+  },
+  {
+    title: 'Corregir un error',
+    prompt: 'Hay un error: [DESCRIBE QUÉ HICISTE Y QUÉ PASÓ]. Corrígelo sin cambiar el resto y explícame qué modificaste.',
+  },
+  {
+    title: 'Explícame el código',
+    prompt: 'Explícame con palabras sencillas cómo funciona mi aplicación y qué parte controla [LO QUE QUIERO ENTENDER].',
+  },
+];

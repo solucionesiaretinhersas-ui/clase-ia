@@ -1,3 +1,4 @@
+import { joinRoute } from '../data/workshops';
 import { useState } from 'react';
 import { CircleAlert, CircleCheck, Download, Users, Wifi } from 'lucide-react';
 import { CopyButton, Modal } from '../components/ui';
@@ -14,7 +15,7 @@ export function JoinModal({ onClose }: { onClose: () => void }) {
   const people = useParticipants(LIVE_SYNC_AVAILABLE ? code : '');
   const [draft, setDraft] = useState(override ?? '');
   const toast = useToast();
-  const url = internalUrl(base, `/m/vivo?s=${code}`);
+  const url = internalUrl(base, joinRoute(code));
 
   function apply(value: string) {
     if (!value.trim()) return setOverride(null);

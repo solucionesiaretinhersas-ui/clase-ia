@@ -1,15 +1,17 @@
-import { Check, ChevronLeft, ChevronRight, ExternalLink, Lightbulb, WandSparkles } from 'lucide-react';
+import { Check, ShieldCheck, ChevronLeft, ChevronRight, ExternalLink, Lightbulb, WandSparkles } from 'lucide-react';
 import { QRCode } from '../components/QRCode';
 import { BrandLogo } from '../components/BrandLogo';
 import { STUDIO_STEPS } from '../data/studioSteps';
 import { usePersistentState } from '../lib/storage';
 import { AI_STUDIO_URL } from '../lib/urls';
 import { usePresenter } from '../presenter/context';
+import { useWorkshop } from '../data/workshops';
 
 export function StudioStation() {
   const [step, setStep] = usePersistentState('station:step', 0);
   const [done, setDone] = usePersistentState<number[]>('station:done', []);
   const { goTo } = usePresenter();
+  const ws = useWorkshop();
   const s = STUDIO_STEPS[step];
   const isDone = done.includes(step);
 
@@ -28,6 +30,11 @@ export function StudioStation() {
         </a>
       </header>
 
+      {ws.audience === 'estudiante' && (
+        <p className="station__safe" role="note">
+          <ShieldCheck /> Antes de empezar: usa la cuenta que tu docente indique, trabaja en pareja si hace falta y nunca compartas datos personales (tuyos ni de otros).
+        </p>
+      )}
       <div className="station__body">
         <ol className="stepper">
           {STUDIO_STEPS.map((it, i) => (
@@ -61,7 +68,7 @@ export function StudioStation() {
                 <Check /> {isDone ? 'Paso completado por el grupo' : 'Marcar paso completado'}
               </button>
               {step === 3 && (
-                <button type="button" className="btn" onClick={() => goTo('laboratorio')}>
+                <button type="button" className="btn" onClick={() => goTo(ws.labScreen)}>
                   <WandSparkles /> Ir al laboratorio
                 </button>
               )}

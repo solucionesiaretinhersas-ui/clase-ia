@@ -1,10 +1,12 @@
-import { useEffect, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
 import { Check, ChevronLeft, ChevronRight, ExternalLink, FileText, Gamepad2, Hand, Presentation, Radio, Rocket, Sparkles } from 'lucide-react';
-import { MOMENTS, SCREENS } from '../data/workshop';
+import { getWorkshopId, setWorkshopId, useWorkshop, workshopFromParam } from '../data/workshops';
+import { CertificateCard } from '../components/CertificateCard';
+import { StudentLab } from '../screens/StudentLab';
 import { CopyButton } from '../components/ui';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { ANSWER_KEYS } from '../data/answers';
-import { REFINEMENTS } from '../data/prompts';
+import { REFINEMENTS, STUDENT_REFINEMENTS } from '../data/prompts';
 import { STUDIO_STEPS } from '../data/studioSteps';
 import { navigate, queryParam, segments } from '../lib/router';
 import { LIVE_SYNC_AVAILABLE, registerParticipant, sendIdea, sendResponse, useLiveState, type LiveAct } from '../lib/sync';
@@ -37,8 +39,15 @@ function Shell({ title, children, back = true, wide = false }: { title: string; 
   );
 }
 
+const STUDENT_GRADES = ['Sexto', 'Séptimo', 'Octavo', 'Noveno', 'Décimo', 'Undécimo', 'Otro'];
+
 export function Mobile({ path }: { path: string }) {
   const [, page] = segments(path);
+  // El enlace del QR indica a qué taller pertenece (w=d docentes, w=e estudiantes).
+  const wParam = workshopFromParam(queryParam(path, 'w'));
+  useLayoutEffect(() => {
+    if (wParam && getWorkshopId() !== wParam) setWorkshopId(wParam);
+  }, [wParam]);
   switch (page) {
     case 'vivo':
       return <Live session={queryParam(path, 's')} />;
@@ -46,9 +55,7 @@ export function Mobile({ path }: { path: string }) {
       return <Respond session={queryParam(path, 's')} />;
     case 'prompt':
       return (
-        <Shell title="Prompt del taller" wide>
-          <PromptLab compact />
-        </Shell>
+        <PromptPage />
       );
     case 'guia':
       return <Guide />;
@@ -153,20 +160,26 @@ function Participate({ session, act }: { session: string; act: LiveAct }) {
   );
 }
 
-/** Registro: cada docente escribe su nombre al entrar. Con él se arma la ruleta. */
+/** Registro obligatorio: nombre y grado (o área). Con ellos se arma la ruleta, la asistencia y el certificado. */
 function Register({ session, onDone }: { session: string; onDone: () => void }) {
+  const ws = useWorkshop();
+  const isStudent = ws.audience === 'estudiante';
   const [savedName, setSavedName] = usePersistentState('mobile:name', '');
+  const [savedGrade, setSavedGrade] = usePersistentState('mobile:grade', '');
   const [name, setName] = useState(savedName);
+  const [grade, setGrade] = useState(savedGrade);
   const [state, setState] = useState<SendState>('idle');
 
   async function submit(e: FormEvent) {
     e.preventDefault();
     const n = name.trim();
-    if (!n) return;
+    const g = grade.trim();
+    if (!n || !g) return;
     setState('sending');
     try {
-      await registerParticipant(session, n);
+      await registerParticipant(session, n, g);
       setSavedName(n);
+      setSavedGrade(g);
       onDone();
     } catch {
       setState('error');
@@ -175,27 +188,49 @@ function Register({ session, onDone }: { session: string; onDone: () => void }) 
 
   return (
     <Shell title="Bienvenido al taller" back={false}>
-      <p className="mob__lead">Escribe tu nombre para entrar. Lo usaremos en la ruleta de participación.</p>
+      <p className="mob__lead">
+        {isStudent ? 'Escribe tu nombre y tu grado para entrar.' : 'Escribe tu nombre y el área o grado en que enseñas para entrar.'} Los usaremos en la ruleta, la asistencia y tu
+        certificado.
+      </p>
       <form className="mob__form" onSubmit={submit}>
         <label className="field">
-          <span>Tu nombre</span>
+          <span>Nombre completo</span>
           <input className="input input--xl" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ej.: Marta Rodríguez" maxLength={40} autoComplete="name" required />
         </label>
-        <button type="submit" className="btn btn--primary btn--lg" disabled={!name.trim() || state === 'sending'}>
+        {isStudent ? (
+          <label className="field">
+            <span>Grado</span>
+            <select className="input input--xl" value={grade} onChange={(e) => setGrade(e.target.value)} required>
+              <option value="">Elige tu grado</option>
+              {STUDENT_GRADES.map((g) => (
+                <option key={g}>{g}</option>
+              ))}
+            </select>
+          </label>
+        ) : (
+          <label className="field">
+            <span>Área o grado en que enseñas</span>
+            <input className="input input--xl" value={grade} onChange={(e) => setGrade(e.target.value)} placeholder="Ej.: Matemáticas · grado sexto" maxLength={40} required />
+          </label>
+        )}
+        <button type="submit" className="btn btn--primary btn--lg" disabled={!name.trim() || !grade.trim() || state === 'sending'}>
           {state === 'sending' ? 'Entrando…' : 'Entrar al taller'}
         </button>
       </form>
       {state === 'error' && <p className="note-warn">No se pudo registrar. Revisa tu conexión e inténtalo de nuevo.</p>}
-      <p className="note-muted">Sesión {session}. Solo se guarda tu nombre para este taller.</p>
+      <p className="note-muted">Sesión {session}. Solo se guardan estos datos para este taller.</p>
     </Shell>
   );
 }
 
 /** Seguimiento en vivo: refleja la pantalla que el facilitador proyecta. Es el único punto de entrada del taller. */
 function Live({ session: fromUrl }: { session: string }) {
+  const ws = useWorkshop();
   const [saved, setSaved] = usePersistentState('mobile:session', '');
   const [registered, setRegistered] = usePersistentState('mobile:registered', '');
   const [name] = usePersistentState('mobile:name', '');
+  const [grade] = usePersistentState('mobile:grade', '');
+  const [certOpen, setCertOpen] = usePersistentState('mobile:cert', false);
   const [draft, setDraft] = useState('');
   const session = (fromUrl || saved).trim().toUpperCase();
   const { state, status } = useLiveState(LIVE_SYNC_AVAILABLE && registered === session ? session : '');
@@ -204,15 +239,20 @@ function Live({ session: fromUrl }: { session: string }) {
   useEffect(() => {
     const incoming = fromUrl.trim().toUpperCase();
     if (incoming && incoming !== saved) {
-      clearStored((k) => k.startsWith('mobile:') && k !== 'mobile:name');
+      clearStored((k) => k.startsWith('mobile:') && k !== 'mobile:name' && k !== 'mobile:grade');
       setSaved(incoming);
     }
   }, [fromUrl, saved, setSaved]);
 
-  const current = state ? SCREENS.find((s) => s.id === state.screenId) : undefined;
-  const curIdx = current ? SCREENS.indexOf(current) : -1;
-  const moment = current ? MOMENTS.find((m) => m.id === current.moment) : undefined;
-  const links = current ? unlockedLinks(current.id) : [];
+  const current = state ? ws.screens.find((s) => s.id === state.screenId) : undefined;
+  const curIdx = current ? ws.screens.indexOf(current) : -1;
+  const moment = current ? ws.moments.find((m) => m.id === current.moment) : undefined;
+  const links = current ? unlockedLinks(ws.screens, current.id) : [];
+  const certUnlocked = certOpen || (curIdx >= 0 && curIdx >= ws.screenIndex(ws.certificateScreen));
+
+  useEffect(() => {
+    if (certUnlocked && !certOpen) setCertOpen(true);
+  }, [certUnlocked, certOpen, setCertOpen]);
 
   if (!LIVE_SYNC_AVAILABLE) return <Hub />;
 
@@ -231,72 +271,91 @@ function Live({ session: fromUrl }: { session: string }) {
   if (registered !== session) return <Register session={session} onDone={() => setRegistered(session)} />;
 
   return (
-    <Shell title={`Hola, ${name.split(' ')[0] || 'docente'}`} back={false} wide>
+    <Shell title={`Hola, ${name.split(' ')[0] || (ws.audience === 'estudiante' ? 'estudiante' : 'docente')}`} back={false} wide>
       <span className={`chip ${status === 'live' ? 'chip--live' : status === 'error' ? 'chip--warn' : 'chip--muted'}`}>
         {status === 'live' && <span className="dot dot--pulse" />}
         {status === 'live' ? 'Conectado' : status === 'error' ? 'Sin conexión' : 'Conectando…'} · sesión {session}
       </span>
 
       <div className="mob__cols">
-      <div className="mob__col">
-      {current ? (
-        <article className="live-now glass" style={{ '--accent': moment?.accent ?? 'var(--violet)' } as CSSProperties}>
-          <span className="kicker">{moment ? `Momento ${moment.index} · ${moment.title}` : 'Introducción'}</span>
-          <h2>{current.title}</h2>
-          <p className="live-now__label">Qué hacemos ahora</p>
-          <p className="live-now__text">{current.notes.participant}</p>
-          {current.id === 'cierre' && (
-            <div className="live-now__links">
-              <button type="button" className="btn btn--primary" onClick={() => navigate(`/m/cierre?s=${session}`)}>Escribir mi compromiso</button>
-            </div>
+        <div className="mob__col">
+          {certUnlocked && (
+            <section className="part glass" aria-label="Tu certificado">
+              <span className="kicker">Tu certificado</span>
+              <h3>¡Gracias por participar, {name.split(' ')[0]}!</h3>
+              <CertificateCard
+                data={{
+                  name,
+                  grade,
+                  audience: ws.audience,
+                  title: ws.certificate.title,
+                  text: ws.certificate.text,
+                  minutes: ws.total,
+                  facilitator: state?.fac,
+                }}
+              />
+            </section>
           )}
-        </article>
-      ) : (
-        <p className="mob__lead">{status === 'live' ? 'Esperando a que el facilitador inicie el taller…' : 'Conectando con el taller…'}</p>
-      )}
 
-      {state?.act && <Participate session={session} act={state.act} />}
-      </div>
-      <div className="mob__col">
-      {links.length > 0 && (
-        <section className="links-card glass" aria-label="Enlaces del taller">
-          <h3>Enlaces del taller</h3>
-          <ul>
-            {links.map((l) => {
-              const body = (
-                <>
-                  <span>
-                    <strong>{l.label}</strong>
-                    <small>{l.description}</small>
-                  </span>
-                  {l.url ? <ExternalLink /> : <ChevronRight />}
-                </>
-              );
-              return (
-                <li key={l.id}>
-                  {l.url ? (
-                    <a className="links-card__item" href={l.url} target="_blank" rel="noopener noreferrer">{body}</a>
-                  ) : (
-                    <button type="button" className="links-card__item" onClick={() => navigate(l.route ?? '/m/vivo')}>{body}</button>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-          <p className="note-muted">Los enlaces aparecen aquí a medida que el facilitador avanza.</p>
-        </section>
-      )}
+          {current ? (
+            <article className="live-now glass" style={{ '--accent': moment?.accent ?? 'var(--violet)' } as CSSProperties}>
+              <span className="kicker">{moment ? `Momento ${moment.index} · ${moment.title}` : 'Introducción'}</span>
+              <h2>{current.title}</h2>
+              <p className="live-now__label">Qué hacemos ahora</p>
+              <p className="live-now__text">{current.notes.participant}</p>
+              {(current.id === 'cierre') && (
+                <div className="live-now__links">
+                  <button type="button" className="btn btn--primary" onClick={() => navigate(`/m/cierre?s=${session}`)}>Escribir mi compromiso</button>
+                </div>
+              )}
+            </article>
+          ) : (
+            <p className="mob__lead">{status === 'live' ? 'Esperando a que el facilitador inicie el taller…' : 'Conectando con el taller…'}</p>
+          )}
 
-      <h3 className="mob__h">Recorrido del taller</h3>
-      <ol className="timeline">
-        {SCREENS.map((s, i) => (
-          <li key={s.id} className={i === curIdx ? 'is-now' : i < curIdx ? 'is-past' : ''}>
-            <i />
-            {s.title}
-          </li>
-        ))}
-      </ol>
-      </div>
+          {state?.act && <Participate session={session} act={state.act} />}
+        </div>
+
+        <div className="mob__col">
+          {links.length > 0 && (
+            <section className="links-card glass" aria-label="Enlaces del taller">
+              <h3>Enlaces del taller</h3>
+              <ul>
+                {links.map((l) => {
+                  const body = (
+                    <>
+                      <span>
+                        <strong>{l.label}</strong>
+                        <small>{l.description}</small>
+                      </span>
+                      {l.url ? <ExternalLink /> : <ChevronRight />}
+                    </>
+                  );
+                  return (
+                    <li key={l.id}>
+                      {l.url ? (
+                        <a className="links-card__item" href={l.url} target="_blank" rel="noopener noreferrer">{body}</a>
+                      ) : (
+                        <button type="button" className="links-card__item" onClick={() => navigate(l.route ?? '/m/vivo')}>{body}</button>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+              <p className="note-muted">Los enlaces aparecen aquí a medida que el facilitador avanza.</p>
+            </section>
+          )}
+
+          <h3 className="mob__h">Recorrido del taller</h3>
+          <ol className="timeline">
+            {ws.screens.map((s, i) => (
+              <li key={s.id} className={i === curIdx ? 'is-now' : i < curIdx ? 'is-past' : ''}>
+                <i />
+                {s.title}
+              </li>
+            ))}
+          </ol>
+        </div>
       </div>
     </Shell>
   );
@@ -429,7 +488,18 @@ function Respond({ session }: { session: string }) {
   );
 }
 
+function PromptPage() {
+  const ws = useWorkshop();
+  const student = ws.audience === 'estudiante';
+  return (
+    <Shell title={student ? 'Tu prompt' : 'Prompt del taller'} wide>
+      {student ? <StudentLab compact /> : <PromptLab compact />}
+    </Shell>
+  );
+}
+
 function Guide() {
+  const ws = useWorkshop();
   const [done, setDone] = usePersistentState<number[]>('mobile:guide', []);
   return (
     <Shell title="Guía de creación">
@@ -450,7 +520,7 @@ function Guide() {
         Abrir Google AI Studio <ExternalLink />
       </a>
       <h3 className="mob__h">Prompts de mejora</h3>
-      {REFINEMENTS.map((r) => (
+      {(ws.audience === 'estudiante' ? STUDENT_REFINEMENTS : REFINEMENTS).map((r) => (
         <article key={r.title} className="refine__card glass">
           <strong>{r.title}</strong>
           <p>{r.prompt}</p>

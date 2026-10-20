@@ -8,6 +8,7 @@ import './styles/mobile.css';
 import './styles/extra.css';
 import './styles/whiteboard.css';
 import './styles/join.css';
+import './styles/student.css';
 import App from './App';
 
 createRoot(document.getElementById('root')!).render(

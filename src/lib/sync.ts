@@ -100,13 +100,16 @@ export interface LiveState {
   screenId: string;
   at: number;
   act?: LiveAct;
+  /** Nombre del facilitador, para el certificado. */
+  fac?: string;
 }
 
 /** El facilitador publica la pantalla que proyecta y la actividad abierta (si la hay). */
-export async function publishLive(session: string, screenId: string, act?: LiveAct | null): Promise<void> {
+export async function publishLive(session: string, screenId: string, act?: LiveAct | null, fac?: string): Promise<void> {
   if (!db) return;
   const data: LiveState = { screenId, at: Date.now() };
   if (act) data.act = act;
+  if (fac?.trim()) data.fac = fac.trim().slice(0, 60);
   await setDoc(doc(db, 'sessions', session.toUpperCase(), 'live', 'state'), data);
 }
 
@@ -177,17 +180,20 @@ export function useLiveResponses(session: string, activityId: string) {
 export interface Participant {
   id: string;
   name: string;
+  /** Grado (estudiantes) o área/grado que enseña (docentes). */
+  grade?: string;
   at: number;
 }
 
 /** El docente se registra al entrar con su nombre (un documento por dispositivo). */
-export async function registerParticipant(session: string, name: string): Promise<void> {
+export async function registerParticipant(session: string, name: string, grade: string): Promise<void> {
   if (!db) throw new Error('Sincronización en vivo no configurada');
   const clean = session.trim().toUpperCase();
   if (!/^[A-Z0-9]{3,12}$/.test(clean)) throw new Error('Código de sesión inválido');
   const n = name.trim().slice(0, 40);
-  if (!n) throw new Error('Nombre vacío');
-  await setDoc(doc(db, 'sessions', clean, 'participants', deviceId()), { name: n, at: Date.now() });
+  const g = grade.trim().slice(0, 40);
+  if (!n || !g) throw new Error('Nombre y grado obligatorios');
+  await setDoc(doc(db, 'sessions', clean, 'participants', deviceId()), { name: n, grade: g, at: Date.now() });
 }
 
 /** Docentes registrados en la sesión, en tiempo real. */

@@ -1,3 +1,4 @@
+import { joinRoute } from '../data/workshops';
 import { useMemo, useState, type FormEvent } from 'react';
 import { ArrowRight, Plus, Smartphone, Star, X } from 'lucide-react';
 import { ActivityControls, ActivityGate, useActivityStatus } from '../components/ActivityShell';
@@ -112,7 +113,7 @@ export function PedagogicalChallenge() {
               <span className="vote__phone-head">
                 <Smartphone /> Desde tu celular
               </span>
-              <QRCode value={internalUrl(base, `/m/vivo?s=${code}`)} size={110} />
+              <QRCode value={internalUrl(base, joinRoute(code))} size={110} />
             </div>
           )}
         </div>

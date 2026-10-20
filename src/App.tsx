@@ -4,11 +4,12 @@ import { ToastProvider } from './components/Toast';
 import { Mission } from './demo/Mission';
 import { Mobile } from './mobile/Mobile';
 import { Presenter } from './presenter/Presenter';
-import { SCREENS } from './data/workshop';
+import { useWorkshop } from './data/workshops';
 import { navigate, segments, useRoute } from './lib/router';
 
 export default function App() {
   const path = useRoute();
+  const ws = useWorkshop();
   const [first, second] = segments(path);
 
   let view;
@@ -23,7 +24,7 @@ export default function App() {
       </div>
     );
   else {
-    const id = first === 's' && SCREENS.some((s) => s.id === second) ? second : 'inicio';
+    const id = first === 's' && ws.screens.some((s) => s.id === second) ? second : ws.introCover;
     view = <Presenter screenId={id} />;
   }
 
