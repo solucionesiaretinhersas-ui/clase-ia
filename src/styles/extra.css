@@ -36,11 +36,11 @@
 .ethics__foot { display: flex; gap: 0.7rem; flex-wrap: wrap; justify-content: space-between; }
 
 /* Laboratorio con pestañas */
-.lab__tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; padding: 0.3rem; border-radius: 999px; background: rgba(0,0,0,0.3); border: 1px solid var(--line); }
+.lab__tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; padding: 0.3rem; border-radius: 999px; background: rgb(var(--k-rgb) / 0.3); border: 1px solid var(--line); }
 .lab__tabs button { display: flex; align-items: center; justify-content: center; gap: 0.5em; min-height: 2.6rem; padding: 0.4em 0.8em; border: 0; border-radius: 999px; background: none; color: var(--text-2); font-weight: 600; font-size: 0.88rem; }
-.lab__tabs button b { display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: rgba(255,255,255,0.1); font-family: var(--font-display); }
+.lab__tabs button b { display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: rgb(var(--fg-rgb) / 0.1); font-family: var(--font-display); }
 .lab__tabs button.is-active { background: linear-gradient(135deg, #8b5cf6, #3b6dff); color: #fff; }
-.lab__tabs button.is-active b { background: rgba(255,255,255,0.25); }
+.lab__tabs button.is-active b { background: rgb(var(--fg-rgb) / 0.25); }
 .lab__human { padding: 0.6rem 0.8rem; border-left: 3px solid var(--violet); background: rgba(167,139,250,0.08); border-radius: 0 var(--r-sm) var(--r-sm) 0; }
 
 /* Taller: nota humana */

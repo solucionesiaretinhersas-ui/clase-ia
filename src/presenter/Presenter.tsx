@@ -24,6 +24,7 @@ import { AnnounceCtx, type AnnounceApi } from './announce';
 import { Whiteboard } from './Whiteboard';
 import { JoinModal } from './JoinModal';
 import { Wheel } from './Wheel';
+import { ThemeToggle } from '../components/ThemeToggle';
 import { elapsedOf, useTimers } from './timers';
 import { FacilitatorDrawer } from './FacilitatorDrawer';
 import { Overview } from './Overview';
@@ -192,6 +193,7 @@ export function Presenter({ screenId }: { screenId: string }) {
               </button>
             )}
             <TimerPill momentId={moment?.id} timers={timers} onToggle={toggle} />
+            <ThemeToggle />
             <button
               type="button"
               className="btn btn--ghost btn--icon"

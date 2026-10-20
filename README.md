@@ -26,6 +26,12 @@ npm run preview    # sirve dist/ localmente
 | 5 | Socialización | 7 | Uno o dos docentes presentan su recurso |
 | 6 | Cierre ético y humano | 8 | Ética, docencia humanizada, inteligencia aumentada y evaluación distinta; compromiso final |
 
+## Modo claro y oscuro · estilo Apple
+
+El botón de sol/luna (barra superior del tablero y barra del celular) alterna entre modo **claro** y **oscuro**. La elección se recuerda en cada dispositivo; la primera vez se usa la del sistema. Los tokens de color están en `src/styles/global.css` (`:root[data-theme='dark' | 'light']`) con la paleta de iOS/macOS, tipografía del sistema (SF Pro en Apple, Inter de respaldo en Windows/Android), barras translúcidas y listas agrupadas.
+
+La interfaz del docente (`#/m/vivo`) se adapta a celular (una columna con título grande) y a computador (dos columnas: lo que pasa ahora y participar a la izquierda; enlaces y recorrido a la derecha).
+
 ## Un solo QR, registro con nombre y enlaces que se abren a medida que avanzas
 
 - **Un único QR de ingreso** (pantalla “La ruta de hoy”, botón QR de la barra inferior o tecla **J** para verlo a pantalla completa). Al escanearlo, cada docente escribe su **nombre** y entra al taller (`#/m/vivo`).

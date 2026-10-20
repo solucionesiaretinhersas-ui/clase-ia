@@ -1,23 +1,78 @@
-.mob { position: relative; min-height: 100dvh; display: grid; grid-template-rows: auto 1fr; max-width: 34rem; margin: 0 auto; font-size: 16px; }
-.mob__head { display: flex; align-items: center; gap: 0.8rem; padding: max(0.8rem, env(safe-area-inset-top)) 1rem 0.8rem; position: sticky; top: 0; z-index: 5; background: rgba(7,7,13,0.8); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
-.mob__head div { display: grid; line-height: 1.2; } .mob__head strong { font-family: var(--font-display); font-size: 1.15rem; } .mob__head small { color: var(--text-3); font-size: 0.72rem; }
-.mob__head .brand__mark { flex: none; }
-.mob__main { display: grid; gap: 1rem; align-content: start; padding: 1.2rem 1rem max(2rem, env(safe-area-inset-bottom)); }
+/* ───────── Interfaz del docente (celular y computador) · estilo iOS / macOS ───────── */
+.mob { position: relative; min-height: 100dvh; font-size: 16px; }
+
+/* Barra superior translúcida */
+.mob__bar { position: sticky; top: 0; z-index: 10; padding-top: env(safe-area-inset-top); background: rgb(var(--panel-rgb) / 0.72); backdrop-filter: saturate(180%) blur(22px); -webkit-backdrop-filter: saturate(180%) blur(22px); border-bottom: 1px solid var(--line); }
+.mob__bar-in { display: flex; align-items: center; gap: 0.5rem; height: 3.1rem; width: min(100%, 72rem); margin: 0 auto; padding: 0 0.75rem; }
+.mob__bar-title { flex: 1; text-align: center; font-weight: 600; font-size: 0.95rem; letter-spacing: -0.01em; }
+.mob__bar .brand__mark { flex: none; width: 1.9rem; height: 1.9rem; border-radius: 0.55rem; font-size: 0.95rem; }
+.mob__back { display: inline-flex; align-items: center; min-width: 4.5rem; padding: 0.4rem 0.4rem 0.4rem 0; border: 0; background: none; color: var(--blue); font-size: 1.05rem; }
+.mob__back svg { width: 1.5rem; height: 1.5rem; margin-left: -0.3rem; }
+.mob__bar-spacer { min-width: 4.5rem; display: flex; }
+.mob__bar .btn--icon { margin-left: auto; }
+
+/* Contenido: columna en celular, hasta dos columnas en computador */
+.mob__main { display: grid; gap: 1rem; align-content: start; width: min(100%, 44rem); margin: 0 auto; padding: 0.4rem 1rem max(2.5rem, env(safe-area-inset-bottom)); }
+.mob--wide .mob__main { width: min(100%, 72rem); }
+.mob__title { font-size: 2.15rem; line-height: 1.08; letter-spacing: -0.035em; margin: 0.5rem 0 0.2rem; }
 .mob__lead { font-size: 1.1rem; color: var(--text-2); }
-.mob__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem; }
-.mob__item { width: 100%; display: flex; align-items: center; gap: 1rem; padding: 1rem; text-align: left; text-decoration: none; border-radius: var(--r-md); min-height: 4.5rem; }
-.mob__item > svg:first-child { flex: none; width: 2.6rem; height: 2.6rem; padding: 0.6rem; border-radius: 14px; background: var(--grad-soft); color: var(--cyan); }
+.mob__h { font-size: 1.25rem; margin-top: 0.4rem; }
+.mob__cols { display: grid; gap: 1rem; }
+.mob__col { display: grid; gap: 1rem; align-content: start; min-width: 0; }
+
+/* Listas agrupadas (inset grouped) */
+.mob__list, .links-card ul { list-style: none; margin: 0; padding: 0; overflow: hidden; border-radius: var(--r-lg); background: var(--bg-2); border: 1px solid var(--line); }
+.mob__list li + li, .links-card li + li { border-top: 1px solid var(--line); }
+.mob__item { width: 100%; display: flex; align-items: center; gap: 0.9rem; min-height: 4rem; padding: 0.7rem 1rem; text-align: left; text-decoration: none; border: 0; border-radius: 0; background: none; box-shadow: none; backdrop-filter: none; color: inherit; transition: background 0.15s; }
+.mob__item:active, .links-card__item:active { background: var(--surface-2); }
+.mob__item > svg:first-child { flex: none; width: 2.4rem; height: 2.4rem; padding: 0.55rem; border-radius: 0.6rem; background: var(--blue); color: #fff; }
 .mob__item > svg:last-child { flex: none; margin-left: auto; color: var(--text-3); }
-.mob__item span { display: grid; } .mob__item strong { font-family: var(--font-display); font-size: 1.1rem; } .mob__item small { color: var(--text-3); }
+.mob__item span { display: grid; } .mob__item strong { font-weight: 600; font-size: 1.02rem; } .mob__item small { color: var(--text-3); }
+
+/* Tarjetas */
+.live-now, .part, .links-card { border-radius: var(--r-lg); }
+.links-card { background: none; border: 0; box-shadow: none; backdrop-filter: none; padding: 0; gap: 0.5rem; }
+.links-card h3 { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); padding: 0 0.3rem; }
+.links-card__item { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.85rem 1rem; text-align: left; text-decoration: none; border: 0; border-radius: 0; background: none; animation: rise 0.5s var(--ease) both; }
+.links-card__item strong { font-weight: 600; } .links-card__item > svg { color: var(--blue); }
+.links-card .note-muted { padding: 0 0.3rem; }
+
+/* Formularios estilo iOS */
+.mob .input { font-size: 1rem; min-height: 3.1rem; border: 0; border-radius: var(--r-sm); background: var(--field-bg); }
+.mob .input:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 35%, transparent); }
+.mob .input--xl { font-size: 1.15rem; min-height: 3.4rem; }
+.mob__form { display: grid; gap: 1rem; }
+.mob .field > span { text-transform: none; letter-spacing: 0; font-size: 0.85rem; font-weight: 500; color: var(--text-2); }
+.mob .btn { min-height: 3rem; border: 0; }
+.mob .btn--lg { min-height: 3.3rem; font-size: 1.05rem; }
+
+/* Tarjeta de respuesta */
 .mob__keys { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
-.mob__keys button { aspect-ratio: 1; border: 0; border-radius: var(--r-lg); background: var(--c); color: #fff; font-family: var(--font-display); font-size: 5rem; font-weight: 700; box-shadow: 0 14px 40px -14px var(--c); } .mob__keys button:active { transform: scale(0.96); }
-.card-up { display: grid; justify-items: center; gap: 1.2rem; padding: 2rem 1rem; text-align: center; border-radius: var(--r-xl); background: var(--c); color: #fff; } .card-up span { font-family: var(--font-display); font-size: 12rem; line-height: 1; font-weight: 700; } .card-up p { font-size: 1.2rem; font-weight: 600; } .card-up .btn { color: var(--text); }
-.mob__steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.8rem; }
-.mob__steps li { display: flex; gap: 0.9rem; align-items: flex-start; } .mob__steps li > button { flex: none; display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 50%; border: 1px solid var(--line-strong); background: var(--surface); font-family: var(--font-display); font-weight: 700; } .mob__steps li.is-done > button { background: var(--mint); border-color: transparent; color: #05140e; }
-.mob__steps strong { font-family: var(--font-display); } .mob__steps p { color: var(--text-2); font-size: 0.92rem; margin-top: 0.2rem; }
-.mob__cta { width: 100%; } .mob__h { font-size: 1.3rem; margin-top: 0.6rem; }
-.mob__form { display: grid; gap: 1rem; } .mob__form .input { font-size: 1rem; }
-.exit-done { display: grid; gap: 1rem; justify-items: start; } .exit-done > svg { width: 3rem; height: 3rem; padding: 0.7rem; border-radius: 50%; background: var(--mint); color: #05140e; } .exit-done h2 { font-size: 1.6rem; }
-.exit-done pre { width: 100%; margin: 0; padding: 1rem; white-space: pre-wrap; font-family: var(--font-body); border-radius: var(--r-md); background: var(--surface-2); line-height: 1.5; }
+.mob__keys button { aspect-ratio: 1; border: 0; border-radius: var(--r-xl); background: var(--c); color: #fff; font-family: var(--font-display); font-size: 5rem; font-weight: 700; box-shadow: 0 14px 40px -14px var(--c); }
+.mob__keys button:active { transform: scale(0.96); }
+.card-up { display: grid; justify-items: center; gap: 1.2rem; padding: 2rem 1rem; text-align: center; border-radius: var(--r-xl); background: var(--c); color: #fff; }
+.card-up span { font-family: var(--font-display); font-size: 12rem; line-height: 1; font-weight: 700; } .card-up p { font-size: 1.2rem; font-weight: 600; } .card-up .btn { color: var(--text); }
+
+/* Pasos */
+.mob__steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; overflow: hidden; border-radius: var(--r-lg); background: var(--bg-2); border: 1px solid var(--line); }
+.mob__steps li { display: flex; gap: 0.9rem; align-items: flex-start; padding: 0.9rem 1rem; } .mob__steps li + li { border-top: 1px solid var(--line); }
+.mob__steps li > button { flex: none; display: grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: 50%; border: 0; background: var(--surface-2); font-family: var(--font-display); font-weight: 700; color: var(--text); }
+.mob__steps li.is-done > button { background: var(--mint); color: #fff; }
+.mob__steps strong { font-weight: 600; } .mob__steps p { color: var(--text-2); font-size: 0.92rem; margin-top: 0.2rem; }
+.mob__cta { width: 100%; }
+
+.exit-done { display: grid; gap: 1rem; justify-items: start; } .exit-done > svg { width: 3rem; height: 3rem; padding: 0.7rem; border-radius: 50%; background: var(--mint); color: #fff; } .exit-done h2 { font-size: 1.6rem; }
+.exit-done pre { width: 100%; margin: 0; padding: 1rem; white-space: pre-wrap; font-family: var(--font-body); border-radius: var(--r-md); background: var(--bg-2); border: 1px solid var(--line); line-height: 1.5; }
 .mob .lab__textarea { min-height: 12rem; } .mob .lab__row { grid-template-columns: 1fr; }
+
 @media (max-width: 480px) { .mob .btn--lg { width: 100%; } .mob .lab__actions .btn { width: 100%; } }
+
+/* Computador: dos columnas y tipografía más amplia */
+@media (min-width: 900px) {
+  .mob__title { font-size: 2.6rem; margin-top: 1.2rem; }
+  .mob__main { padding-top: 0.8rem; }
+  .mob__cols { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 1.6rem; align-items: start; }
+  .mob--wide .lab__grid { grid-template-columns: 0.9fr 1.1fr; }
+  .mob .btn--lg { min-width: 12rem; }
+}
+.mob__main > .chip { justify-self: start; }

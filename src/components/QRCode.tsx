@@ -42,7 +42,7 @@ export async function downloadQR(value: string, title: string, filename: string)
   ctx.drawImage(img, pad, pad);
   ctx.fillStyle = '#0a0a14';
   ctx.textAlign = 'center';
-  ctx.font = '600 52px "Space Grotesk Variable", "Segoe UI", sans-serif';
+  ctx.font = '600 52px "Inter Variable", "Segoe UI", sans-serif';
   ctx.fillText(title, canvas.width / 2, 1024 + pad + 70);
   ctx.fillStyle = '#4a4a63';
   ctx.font = '400 28px "Inter Variable", "Segoe UI", sans-serif';

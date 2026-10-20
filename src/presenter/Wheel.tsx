@@ -3,6 +3,7 @@ import { MessageCircleQuestion, Plus, RotateCcw, Shuffle, Trash2 } from 'lucide-
 import { Modal } from '../components/ui';
 import { usePersistentState } from '../lib/storage';
 import { LIVE_SYNC_AVAILABLE, useParticipants, useSessionCode } from '../lib/sync';
+import { useTheme } from '../lib/theme';
 
 const COLORS = ['#8b5cf6', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#f43f5e', '#a855f7', '#0ea5e9'];
 const SIZE = 560;
@@ -24,6 +25,7 @@ const easeOut = (t: number) => 1 - Math.pow(1 - t, 4);
 
 /** Ruleta de docentes: se arma con los registrados desde el celular (y nombres añadidos a mano). */
 export function Wheel({ onClose }: { onClose: () => void }) {
+  const [theme] = useTheme();
   const { code } = useSessionCode();
   const registered = useParticipants(LIVE_SYNC_AVAILABLE ? code : '');
   const [manual, setManual] = usePersistentState<string[]>('wheel:manual', []);
@@ -64,12 +66,12 @@ export function Wheel({ onClose }: { onClose: () => void }) {
     const cx = SIZE / 2;
     const r = SIZE / 2 - 14;
     if (list.length === 0) {
-      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      ctx.fillStyle = theme === 'light' ? 'rgba(60,60,67,0.08)' : 'rgba(255,255,255,0.06)';
       ctx.beginPath();
       ctx.arc(cx, cx, r, 0, TAU);
       ctx.fill();
-      ctx.fillStyle = '#b9bad0';
-      ctx.font = '600 22px "Space Grotesk Variable", sans-serif';
+      ctx.fillStyle = theme === 'light' ? '#6e6e73' : '#b9bad0';
+      ctx.font = '600 22px "Inter Variable", sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('Sin docentes en la ruleta', cx, cx);
       return;
@@ -91,7 +93,7 @@ export function Wheel({ onClose }: { onClose: () => void }) {
       ctx.translate(cx, cx);
       ctx.rotate(start + a / 2);
       ctx.fillStyle = '#fff';
-      ctx.font = `600 ${fs}px "Space Grotesk Variable", "Segoe UI", sans-serif`;
+      ctx.font = `600 ${fs}px "Inter Variable", "Segoe UI", sans-serif`;
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
       const label = n.length > 16 ? n.slice(0, 15) + '…' : n;
@@ -100,9 +102,9 @@ export function Wheel({ onClose }: { onClose: () => void }) {
     });
     ctx.beginPath();
     ctx.arc(cx, cx, 34, 0, TAU);
-    ctx.fillStyle = '#0b0b16';
+    ctx.fillStyle = theme === 'light' ? '#ffffff' : '#1c1c1e';
     ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    ctx.strokeStyle = theme === 'light' ? 'rgba(60,60,67,0.35)' : 'rgba(255,255,255,0.4)';
     ctx.lineWidth = 3;
     ctx.stroke();
   };

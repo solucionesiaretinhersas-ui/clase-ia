@@ -19,8 +19,8 @@
 /* Ruleta */
 .wheel { display: grid; grid-template-columns: auto minmax(18rem, 26rem); gap: 2rem; align-items: center; max-width: 76rem; }
 .wheel__stage { position: relative; display: grid; place-items: center; }
-.wheel__canvas { width: min(70vh, 86vw) !important; height: auto !important; aspect-ratio: 1; max-width: 100%; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6)); }
-.wheel__pointer { position: absolute; top: -6px; left: 50%; z-index: 2; width: 0; height: 0; transform: translateX(-50%); border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 36px solid #fff; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6)); }
+.wheel__canvas { width: min(70vh, 86vw) !important; height: auto !important; aspect-ratio: 1; max-width: 100%; filter: drop-shadow(0 20px 40px rgb(var(--k-rgb) / 0.6)); }
+.wheel__pointer { position: absolute; top: -6px; left: 50%; z-index: 2; width: 0; height: 0; transform: translateX(-50%); border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 36px solid var(--text); filter: drop-shadow(0 4px 8px rgb(var(--k-rgb) / 0.6)); }
 .wheel__panel { display: grid; gap: 1rem; }
 .wheel__result { display: grid; gap: 0.2rem; min-height: 6.5rem; align-content: center; padding: 1rem 1.2rem; border-radius: var(--r-lg); background: var(--grad-soft); border: 1px solid var(--line-strong); color: var(--text-2); }
 .wheel__result strong { font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1.05; color: var(--text); animation: pop 0.6s var(--ease) both; overflow-wrap: anywhere; }

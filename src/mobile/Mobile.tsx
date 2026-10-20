@@ -1,7 +1,8 @@
 import { useEffect, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
-import { ArrowLeft, Check, ChevronRight, ExternalLink, FileText, Gamepad2, Hand, Presentation, Radio, Rocket, Sparkles } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, ExternalLink, FileText, Gamepad2, Hand, Presentation, Radio, Rocket, Sparkles } from 'lucide-react';
 import { MOMENTS, SCREENS } from '../data/workshop';
 import { CopyButton } from '../components/ui';
+import { ThemeToggle } from '../components/ThemeToggle';
 import { ANSWER_KEYS } from '../data/answers';
 import { REFINEMENTS } from '../data/prompts';
 import { STUDIO_STEPS } from '../data/studioSteps';
@@ -12,23 +13,26 @@ import { unlockedLinks } from '../data/links';
 import { AI_STUDIO_URL, CHATGPT_URL } from '../lib/urls';
 import { PromptLab } from '../screens/PromptLab';
 
-function Shell({ title, children, back = true }: { title: string; children: ReactNode; back?: boolean }) {
+function Shell({ title, children, back = true, wide = false }: { title: string; children: ReactNode; back?: boolean; wide?: boolean }) {
   return (
-    <div className="mob">
-      <header className="mob__head">
-        {back ? (
-          <button type="button" className="btn btn--ghost btn--icon" onClick={() => navigate(LIVE_SYNC_AVAILABLE ? '/m/vivo' : '/m')} aria-label="Volver">
-            <ArrowLeft />
-          </button>
-        ) : (
-          <span className="brand__mark" aria-hidden="true">A</span>
-        )}
-        <div>
-          <strong>{title}</strong>
-          <small>Aula IA · Santa Rosa de Lima</small>
+    <div className={`mob ${wide ? 'mob--wide' : ''}`}>
+      <header className="mob__bar">
+        <div className="mob__bar-in">
+          {back ? (
+            <button type="button" className="mob__back" onClick={() => navigate(LIVE_SYNC_AVAILABLE ? '/m/vivo' : '/m')} aria-label="Volver">
+              <ChevronLeft /> Taller
+            </button>
+          ) : (
+            <span className="brand__mark" aria-hidden="true">A</span>
+          )}
+          <span className="mob__bar-title">Aula IA · Santa Rosa de Lima</span>
+          <ThemeToggle />
         </div>
       </header>
-      <main className="mob__main">{children}</main>
+      <main className="mob__main">
+        <h1 className="mob__title">{title}</h1>
+        {children}
+      </main>
     </div>
   );
 }
@@ -42,7 +46,7 @@ export function Mobile({ path }: { path: string }) {
       return <Respond session={queryParam(path, 's')} />;
     case 'prompt':
       return (
-        <Shell title="Prompt del taller">
+        <Shell title="Prompt del taller" wide>
           <PromptLab compact />
         </Shell>
       );
@@ -227,12 +231,14 @@ function Live({ session: fromUrl }: { session: string }) {
   if (registered !== session) return <Register session={session} onDone={() => setRegistered(session)} />;
 
   return (
-    <Shell title={`Hola, ${name.split(' ')[0] || 'docente'}`} back={false}>
+    <Shell title={`Hola, ${name.split(' ')[0] || 'docente'}`} back={false} wide>
       <span className={`chip ${status === 'live' ? 'chip--live' : status === 'error' ? 'chip--warn' : 'chip--muted'}`}>
         {status === 'live' && <span className="dot dot--pulse" />}
         {status === 'live' ? 'Conectado' : status === 'error' ? 'Sin conexión' : 'Conectando…'} · sesión {session}
       </span>
 
+      <div className="mob__cols">
+      <div className="mob__col">
       {current ? (
         <article className="live-now glass" style={{ '--accent': moment?.accent ?? 'var(--violet)' } as CSSProperties}>
           <span className="kicker">{moment ? `Momento ${moment.index} · ${moment.title}` : 'Introducción'}</span>
@@ -250,7 +256,8 @@ function Live({ session: fromUrl }: { session: string }) {
       )}
 
       {state?.act && <Participate session={session} act={state.act} />}
-
+      </div>
+      <div className="mob__col">
       {links.length > 0 && (
         <section className="links-card glass" aria-label="Enlaces del taller">
           <h3>Enlaces del taller</h3>
@@ -289,6 +296,8 @@ function Live({ session: fromUrl }: { session: string }) {
           </li>
         ))}
       </ol>
+      </div>
+      </div>
     </Shell>
   );
 }

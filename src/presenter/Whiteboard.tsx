@@ -17,6 +17,8 @@ import {
   X,
 } from 'lucide-react';
 
+import { useTheme } from '../lib/theme';
+
 type Tool = 'cursor' | 'pen' | 'marker' | 'eraser' | 'text' | 'arrow' | 'rect' | 'ellipse' | 'laser' | 'spot';
 interface Pt {
   x: number;
@@ -73,6 +75,7 @@ export function Whiteboard({ screenId, open, onClose }: { screenId: string; open
   const [sizeIdx, setSizeIdx] = useState(1);
   const [bg, setBg] = useState<Bg>('none');
   const [dockTop, setDockTop] = useState(false);
+  const [theme] = useTheme();
   const [rect, setRect] = useState({ left: 0, top: 0, width: 0, height: 0 });
   const [textBox, setTextBox] = useState<{ pt: Pt; px: Pt } | null>(null);
   const [, bump] = useReducer((n: number) => n + 1, 0);
@@ -163,7 +166,7 @@ export function Whiteboard({ screenId, open, onClose }: { screenId: string; open
         ctx.stroke();
       } else {
         const p = px(it.at);
-        ctx.font = `600 ${textMetrics(it.size)}px "Space Grotesk Variable", "Segoe UI", sans-serif`;
+        ctx.font = `600 ${textMetrics(it.size)}px "Inter Variable", "Segoe UI", sans-serif`;
         ctx.textBaseline = 'top';
         ctx.fillText(it.text, p.x, p.y);
       }
@@ -327,6 +330,11 @@ export function Whiteboard({ screenId, open, onClose }: { screenId: string; open
   useEffect(() => {
     setTextBox(null);
   }, [boardKey, open, tool]);
+
+  // El color de tinta por defecto sigue al tema: blanco en oscuro, grafito en claro.
+  useEffect(() => {
+    if (bg === 'none') setColor((c) => (c === '#ffffff' || c === '#111827' ? (theme === 'light' ? '#111827' : '#ffffff') : c));
+  }, [theme, bg]);
 
   // Un taller nuevo empieza con la pizarra limpia.
   useEffect(() => {
