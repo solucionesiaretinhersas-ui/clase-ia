@@ -11,11 +11,13 @@ export function CertificateCard({ data }: { data: CertificateData }) {
   const key = JSON.stringify(data);
 
   useEffect(() => {
-    try {
-      setPreview(renderCertificate(data, 1400).toDataURL('image/jpeg', 0.85));
-    } catch {
-      setPreview('');
-    }
+    let cancelled = false;
+    renderCertificate(data, 1200)
+      .then((c) => !cancelled && setPreview(c.toDataURL('image/jpeg', 0.88)))
+      .catch(() => !cancelled && setPreview(''));
+    return () => {
+      cancelled = true;
+    };
     // data se resume en `key`
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
@@ -23,7 +25,7 @@ export function CertificateCard({ data }: { data: CertificateData }) {
   async function download(kind: 'png' | 'pdf') {
     setBusy(kind);
     try {
-      const canvas = renderCertificate(data, 2400);
+      const canvas = await renderCertificate(data);
       const base = `certificado-${fileSlug(data.name)}`;
       if (kind === 'png') downloadBlob(await canvasBlob(canvas, 'image/png'), `${base}.png`);
       else downloadBlob(await certificatePdf(canvas), `${base}.pdf`);

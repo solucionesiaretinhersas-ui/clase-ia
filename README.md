@@ -69,7 +69,7 @@ En la portada hay un selector: **Taller para docentes** (90 min, 6 momentos) y *
 
 - Todos los participantes deben escribir **nombre y grado** (docentes: área o grado en que enseñan) al entrar desde el celular.
 - Pantalla final **“Asistencia y certificados”**: lista de registrados, descarga de la **lista de asistencia en CSV** (se abre en Excel con tildes) y vista previa del certificado de cualquier participante. Escribe tu nombre de facilitador para que aparezca en la firma.
-- Cada participante, desde su celular, descarga su **certificado tipo diploma** de la I.E. Santa Rosa de Lima como **imagen (PNG)** o **PDF**, sin servidor: se genera en el propio dispositivo. Se habilita cuando llegas a la pantalla de certificados.
+- Cada participante, desde su celular, descarga su **certificado tipo diploma** de la I.E. Santa Rosa de Lima como **imagen (PNG)** o **PDF**, sin servidor: se genera en el propio dispositivo sobre la plantilla ilustrada public/brand/certificado.png (reemplázala por otra del mismo tamaño, 1491×1055, para cambiar el diseño; si no carga, se usa un diploma vectorial de respaldo). Se escriben el nombre y grado, el nombre del taller, la fecha, la duración y el facilitador. Se habilita cuando llegas a la pantalla de certificados.
 ## Participación desde los celulares
 
 Con Firebase activo, el celular (`#/m/vivo`) muestra un cuadro **“Tu turno”** cada vez que el facilitador abre una actividad, y lo que envían aparece en el tablero al instante:

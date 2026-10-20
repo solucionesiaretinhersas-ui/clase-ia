@@ -76,7 +76,8 @@ function corner(ctx: CanvasRenderingContext2D, x: number, y: number, sx: number,
   ctx.restore();
 }
 
-export function renderCertificate(d: CertificateData, width = 2000): HTMLCanvasElement {
+/** Diseño vectorial de respaldo, por si la plantilla no carga. */
+function renderVectorCertificate(d: CertificateData, width = 2000): HTMLCanvasElement {
   const W = width;
   const H = Math.round(width / 1.4142);
   const k = W / 2000;
@@ -235,6 +236,121 @@ export function renderCertificate(d: CertificateData, width = 2000): HTMLCanvasE
   return canvas;
 }
 
+/* ───────── Plantilla ilustrada (public/brand/certificado.png) ───────── */
+const TPL = { w: 1491, h: 1055 };
+const TEMPLATE_URL = `${import.meta.env.BASE_URL}brand/certificado.png`;
+let templatePromise: Promise<HTMLImageElement> | null = null;
+
+function loadTemplate(): Promise<HTMLImageElement> {
+  if (!templatePromise) {
+    templatePromise = new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => {
+        templatePromise = null;
+        reject(new Error('plantilla'));
+      };
+      img.src = TEMPLATE_URL;
+    });
+  }
+  return templatePromise;
+}
+
+/** Borra un texto de la plantilla repintando el fondo con un degradado muestreado de los bordes. */
+function patch(ctx: CanvasRenderingContext2D, src: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number) {
+  const left = src.getImageData(x0 - 3, y0, 1, y1 - y0).data;
+  const right = src.getImageData(x1 + 3, y0, 1, y1 - y0).data;
+  for (let y = 0; y < y1 - y0; y++) {
+    const g = ctx.createLinearGradient(x0, 0, x1, 0);
+    g.addColorStop(0, `rgb(${left[y * 4]},${left[y * 4 + 1]},${left[y * 4 + 2]})`);
+    g.addColorStop(1, `rgb(${right[y * 4]},${right[y * 4 + 1]},${right[y * 4 + 2]})`);
+    ctx.fillStyle = g;
+    ctx.fillRect(x0 - 1, y0 + y, x1 - x0 + 2, 1);
+  }
+}
+
+function fit(ctx: CanvasRenderingContext2D, text: string, maxW: number, start: number, min: number, style: string): number {
+  let size = start;
+  ctx.font = `${style} ${size}px ${SERIF}`;
+  while (ctx.measureText(text).width > maxW && size > min) {
+    size -= 2;
+    ctx.font = `${style} ${size}px ${SERIF}`;
+  }
+  return size;
+}
+
+/**
+ * Certificado a partir de la plantilla ilustrada: escribe el nombre y el taller en los recuadros,
+ * rehace el texto central (fecha y duración reales) y el nombre del facilitador.
+ * `width` limita el ancho de salida (por defecto, el tamaño original de la plantilla).
+ */
+export async function renderCertificate(d: CertificateData, width = TPL.w): Promise<HTMLCanvasElement> {
+  let img: HTMLImageElement;
+  try {
+    img = await loadTemplate();
+  } catch {
+    return renderVectorCertificate(d, Math.max(width, 1600));
+  }
+  const W = Math.min(width, img.naturalWidth);
+  const k = W / TPL.w;
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(TPL.w * k);
+  canvas.height = Math.round(TPL.h * k);
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  if (!ctx) throw new Error('canvas');
+
+  // Copia sin escalar para muestrear colores del fondo.
+  const base = document.createElement('canvas');
+  base.width = TPL.w;
+  base.height = TPL.h;
+  const bctx = base.getContext('2d', { willReadFrequently: true });
+  if (!bctx) throw new Error('canvas');
+  bctx.drawImage(img, 0, 0, TPL.w, TPL.h);
+
+  // Se borran los textos fijos a resolución nativa (sin costuras) y luego se escala.
+  patch(bctx, bctx, 292, 552, 1214, 682);
+  if (d.facilitator?.trim()) patch(bctx, bctx, 388, 868, 612, 897);
+  ctx.scale(k, k);
+  ctx.drawImage(base, 0, 0);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  const NAVY_T = '#0f2347';
+
+  // Texto central (se rehace con la fecha y la duración reales)
+  const date = (d.date ?? new Date()).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+  ctx.fillStyle = '#1f2a44';
+  ctx.font = `400 29px ${SERIF}`;
+  const lines = wrap(ctx, `${d.text}, realizado el ${date}, con una intensidad de ${d.minutes} minutos.`, 900);
+  lines.slice(0, 3).forEach((l, i) => ctx.fillText(l, TPL.w / 2 - 2, 578 + i * 39));
+
+  // Nombre (recuadro superior)
+  const name = d.name.trim();
+  ctx.fillStyle = NAVY_T;
+  const hasRole = Boolean(d.grade?.trim());
+  const ns = fit(ctx, name, 840, hasRole ? 62 : 70, 30, 'italic 700');
+  ctx.fillText(name, 748, hasRole ? 477 : 492);
+  void ns;
+  if (hasRole) {
+    ctx.fillStyle = '#4a5670';
+    ctx.font = `500 25px ${SERIF}`;
+    const role = d.audience === 'estudiante' ? 'Estudiante' : 'Docente';
+    ctx.fillText(`${role} · ${d.grade!.trim()}`, 748, 516);
+  }
+
+  // Nombre del taller (recuadro inferior)
+  ctx.fillStyle = NAVY_T;
+  fit(ctx, d.title, 740, 38, 22, 'italic 700');
+  ctx.fillText(d.title, 746, 740);
+
+  // Facilitador
+  if (d.facilitator?.trim()) {
+    ctx.fillStyle = '#10244a';
+    fit(ctx, d.facilitator.trim(), 230, 25, 15, '700');
+    ctx.fillText(d.facilitator.trim(), 500, 889);
+  }
+
+  return canvas;
+}
 export function canvasBlob(canvas: HTMLCanvasElement, type: 'image/png' | 'image/jpeg', quality = 0.92): Promise<Blob> {
   return new Promise((resolve, reject) => canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('blob'))), type, quality));
 }
