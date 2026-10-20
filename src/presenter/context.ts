@@ -5,6 +5,10 @@ export interface PresenterApi {
   next: () => void;
   prev: () => void;
   current: string;
+  /** Muestra el QR de ingreso a pantalla grande. */
+  openJoin: () => void;
+  /** Abre la ruleta de docentes. */
+  openWheel: () => void;
 }
 
 export const PresenterCtx = createContext<PresenterApi>({
@@ -12,6 +16,8 @@ export const PresenterCtx = createContext<PresenterApi>({
   next: () => {},
   prev: () => {},
   current: 'inicio',
+  openJoin: () => {},
+  openWheel: () => {},
 });
 
 export const usePresenter = () => useContext(PresenterCtx);

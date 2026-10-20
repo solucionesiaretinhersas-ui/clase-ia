@@ -1,6 +1,6 @@
 import { Clock, Flag, Keyboard, ListChecks, MessageSquareText, RotateCcw, Smartphone, Users, X } from 'lucide-react';
 import { MOMENTS, momentOf, type ScreenMeta } from '../data/workshop';
-import { clearStored } from '../lib/storage';
+import { resetWorkshop } from '../lib/storage';
 import { fmt } from '../components/ui';
 import { elapsedOf, useTimers } from './timers';
 
@@ -12,6 +12,9 @@ const SHORTCUTS: [string, string][] = [
   ['N', 'Notas'],
   ['G', 'Vista general'],
   ['T', 'Cronómetro'],
+  ['D', 'Pizarra'],
+  ['J', 'QR de ingreso'],
+  ['R', 'Ruleta'],
 ];
 
 export function FacilitatorDrawer({ screen, onClose }: { screen: ScreenMeta; onClose: () => void }) {
@@ -119,13 +122,13 @@ export function FacilitatorDrawer({ screen, onClose }: { screen: ScreenMeta; onC
         type="button"
         className="btn btn--danger"
         onClick={() => {
-          if (window.confirm('¿Preparar un taller nuevo? Se borrarán votos, tableros, galería y cronómetros guardados en este navegador.')) {
-            clearStored((k) => k !== 'publicBase');
+          if (window.confirm('¿Preparar un taller nuevo? Se borrarán votos, ideas, tableros, galería, cronómetros, ruleta y pizarra, y se creará un código de sesión nuevo: los celulares empezarán de cero.')) {
+            resetWorkshop();
             resetAll();
           }
         }}
       >
-        <RotateCcw /> Reiniciar todo el taller
+        <RotateCcw /> Nuevo taller: limpiar todo
       </button>
     </aside>
   );

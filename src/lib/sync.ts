@@ -13,7 +13,7 @@
  */
 import { initializeApp, type FirebaseApp } from 'firebase/app';
 import { collection, doc, getFirestore, onSnapshot, setDoc, type Firestore } from 'firebase/firestore';
-import { usePersistentState } from './storage';
+import { usePersistentState, writeStored } from './storage';
 import { useEffect, useMemo, useState } from 'react';
 
 const env = import.meta.env;
@@ -66,7 +66,10 @@ function newCode(): string {
 export function useSessionCode() {
   const [code, setCode] = usePersistentState<string>('session:code', '');
   useEffect(() => {
-    if (!code) setCode(newCode());
+    if (!code) {
+      setCode(newCode());
+      writeStored('session:started', Date.now());
+    }
   }, [code, setCode]);
   return { code, renew: () => setCode(newCode()) };
 }
@@ -170,4 +173,35 @@ export function useLiveResponses(session: string, activityId: string) {
 
   const responses = useMemo(() => all.filter((r) => r.activityId === activityId).sort((a, b) => a.at - b.at), [all, activityId]);
   return { responses, status };
+}
+export interface Participant {
+  id: string;
+  name: string;
+  at: number;
+}
+
+/** El docente se registra al entrar con su nombre (un documento por dispositivo). */
+export async function registerParticipant(session: string, name: string): Promise<void> {
+  if (!db) throw new Error('Sincronización en vivo no configurada');
+  const clean = session.trim().toUpperCase();
+  if (!/^[A-Z0-9]{3,12}$/.test(clean)) throw new Error('Código de sesión inválido');
+  const n = name.trim().slice(0, 40);
+  if (!n) throw new Error('Nombre vacío');
+  await setDoc(doc(db, 'sessions', clean, 'participants', deviceId()), { name: n, at: Date.now() });
+}
+
+/** Docentes registrados en la sesión, en tiempo real. */
+export function useParticipants(session: string) {
+  const [list, setList] = useState<Participant[]>([]);
+  useEffect(() => {
+    if (!db || !session) return;
+    setList([]);
+    const unsub = onSnapshot(
+      collection(db, 'sessions', session.toUpperCase(), 'participants'),
+      (snap) => setList(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Participant, 'id'>) })).sort((a, b) => a.at - b.at)),
+      () => {},
+    );
+    return unsub;
+  }, [session]);
+  return list;
 }

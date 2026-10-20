@@ -328,6 +328,16 @@ export function Whiteboard({ screenId, open, onClose }: { screenId: string; open
     setTextBox(null);
   }, [boardKey, open, tool]);
 
+  // Un taller nuevo empieza con la pizarra limpia.
+  useEffect(() => {
+    const clear = () => {
+      boards.current = {};
+      bump();
+    };
+    window.addEventListener('aula-ia:reset', clear);
+    return () => window.removeEventListener('aula-ia:reset', clear);
+  }, []);
+
   function commitText(value: string) {
     const t = value.trim();
     if (t && textBox) commit([...board.items, { k: 'text', color, size, at: textBox.pt, text: t }]);

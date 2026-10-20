@@ -66,13 +66,13 @@ export const SCREENS: ScreenMeta[] = [
     kind: 'content',
     notes: {
       minutes: 1,
-      participant: 'Escanea el QR “Sigue el taller”: tu celular mostrará siempre lo que está pasando en el tablero.',
+      participant: 'Escanea el QR, escribe tu nombre y entra: tu celular te acompañará todo el taller con los enlaces que vayamos abriendo.',
       objective: 'Mostrar el recorrido de 90 minutos y conectar a los docentes con el seguimiento en vivo.',
       explanation:
         'Seis momentos: abrir con la charla, conocer AI Studio, planear con ChatGPT, crear y perfeccionar, compartir y cerrar. Más de un tercio del tiempo es práctica.',
       steps: [
         'Recorre los seis momentos señalando el tiempo de cada uno.',
-        'Pide que escaneen el QR para seguir el taller en vivo desde el celular.',
+        'Pide que escaneen el único QR del taller y escriban su nombre: con él se arma la ruleta de participación.',
         'Inicia el cronómetro del Momento 1 desde la barra superior (tecla T).',
       ],
     },
@@ -177,35 +177,17 @@ export const SCREENS: ScreenMeta[] = [
     title: 'Estación AI Studio',
     kind: 'tool',
     notes: {
-      minutes: 5,
+      minutes: 7,
       participant: 'Sigue los pasos de la guía hasta llegar a Build. Marca cada paso cuando lo completes.',
       objective: 'Guiar paso a paso el acceso a Google AI Studio y a la sección Build.',
       explanation:
         'Cada docente debe llegar a la pantalla de Build antes de terminar este momento. La interfaz de Google puede cambiar: guíate por los nombres de las secciones.',
       steps: [
-        'Proyecta el QR de AI Studio desde el Centro QR o desde esta pantalla.',
+        'Pide que abran Google AI Studio desde el enlace que ya aparece en su celular.',
         'Avanza paso a paso y pide una mano arriba cuando cada docente complete el paso.',
         'Ayuda primero a quienes tengan problemas para iniciar sesión.',
       ],
       activity: 'Checklist grupal: los docentes marcan cada paso completado.',
-    },
-  },
-  {
-    id: 'qr',
-    moment: 'm2',
-    title: 'Centro de códigos QR',
-    kind: 'tool',
-    notes: {
-      minutes: 2,
-      participant: 'Escanea los QR que necesites: seguir el taller, ChatGPT, AI Studio, el prompt y la guía.',
-      objective: 'Distribuir a los participantes los enlaces que usarán durante el taller.',
-      explanation:
-        'Con la web publicada, los QR abren desde cualquier celular. Quien se pierda puede volver a escanear el de “Seguir el taller”.',
-      steps: [
-        'Verifica que el estado superior diga que los QR pueden abrirse desde otros dispositivos.',
-        'Toca “Ampliar” para proyectar el QR de seguimiento en vivo.',
-        'Descarga los QR como imagen si quieres compartirlos por WhatsApp.',
-      ],
     },
   },
   {

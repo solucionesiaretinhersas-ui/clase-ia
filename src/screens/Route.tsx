@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import { ArrowRight, Hammer, HeartHandshake, Layers, MessagesSquare, ShieldCheck, Smartphone, Telescope } from 'lucide-react';
 import { QRCode } from '../components/QRCode';
 import { MOMENTS, SCREENS, TOTAL_MINUTES } from '../data/workshop';
-import { useSessionCode } from '../lib/sync';
+import { LIVE_SYNC_AVAILABLE, useParticipants, useSessionCode } from '../lib/sync';
 import { internalUrl } from '../lib/urls';
 import { usePublicBase } from '../lib/usePublicBase';
 import { usePresenter } from '../presenter/context';
@@ -18,9 +18,10 @@ const OUTCOMES = [
 ];
 
 export function Route() {
-  const { goTo } = usePresenter();
+  const { goTo, openJoin } = usePresenter();
   const { base, reachable } = usePublicBase();
   const { code } = useSessionCode();
+  const people = useParticipants(LIVE_SYNC_AVAILABLE ? code : '');
   return (
     <section className="route enter">
       <header className="screen-head">
@@ -58,9 +59,11 @@ export function Route() {
           <QRCode value={internalUrl(base, `/m/vivo?s=${code}`)} size={120} />
           <div>
             <span>
-              <Smartphone /> Sigue el taller
+              <Smartphone /> Únete con tu nombre
             </span>
-            <small>{reachable ? 'Escanea y verás en tu celular lo que está pasando en el tablero.' : 'Disponible al abrir la web publicada.'}</small>
+            <small>{reachable ? 'Un solo QR: registra tu nombre y recibe aquí todos los enlaces del taller.' : 'Disponible al abrir la web publicada.'}</small>
+            {LIVE_SYNC_AVAILABLE && <small><b>{people.length}</b> docentes conectados</small>}
+            <button type="button" className="btn" onClick={openJoin}>Ampliar QR</button>
           </div>
         </div>
         <strong>Cada docente sale con un recurso educativo interactivo, creado con su criterio.</strong>

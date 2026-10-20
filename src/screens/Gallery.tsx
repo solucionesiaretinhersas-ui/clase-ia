@@ -4,6 +4,7 @@ import { ActivityControls, ActivityGate } from '../components/ActivityShell';
 import { QRCode } from '../components/QRCode';
 import { AREAS } from '../data/prompts';
 import { usePersistentState } from '../lib/storage';
+import { usePresenter } from '../presenter/context';
 import { fmt, useTicker } from '../components/ui';
 
 const ID = 'galeria';
@@ -28,6 +29,7 @@ function safeLink(v: string): string {
 }
 
 export function Gallery() {
+  const { openWheel } = usePresenter();
   const [entries, setEntries] = usePersistentState<Entry[]>('gallery:entries', []);
   const [focusId, setFocusId] = usePersistentState<string | null>('gallery:focus', null);
   const [form, setForm] = useState({ teacher: '', title: '', area: '', link: '' });
@@ -81,7 +83,10 @@ export function Gallery() {
           <span className="kicker">Momento 5 · Socialización</span>
           <h2 className="h-lg">Galería de recursos creados</h2>
         </div>
+        <div className="activity-controls">
+        <button type="button" className="btn btn--primary" onClick={openWheel}><Dices /> Ruleta de docentes</button>
         <ActivityControls id={ID} onReset={() => { setEntries([]); setFocusId(null); setTimer({ elapsed: 0, since: null }); }} openLabel="Abrir galería" />
+        </div>
       </header>
 
       <ActivityGate id={ID}>

@@ -78,3 +78,13 @@ export function usePersistentState<T>(key: string, initial: T) {
 
   return [value, update] as const;
 }
+
+/**
+ * Deja la aplicación como nueva para un taller distinto: borra votos, tableros,
+ * ideas, cronómetros, galería, compromisos y el código de sesión (se genera uno
+ * nuevo). Conserva solo la dirección pública configurada.
+ */
+export function resetWorkshop() {
+  clearStored((k) => k !== 'publicBase');
+  window.dispatchEvent(new Event('aula-ia:reset'));
+}

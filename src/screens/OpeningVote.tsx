@@ -105,7 +105,7 @@ export function OpeningVote() {
           ) : (
             <p className="note-muted">Sincronización en vivo no configurada. Los celulares muestran una tarjeta para levantar y el facilitador suma con +.</p>
           )}
-          {!reachable && <p className="note-warn">Este QR necesita una dirección pública o de red local. Revisa el Centro QR.</p>}
+          {!reachable && <p className="note-warn">Este QR necesita una dirección pública o de red local. Toca el botón del QR de la barra inferior (J) para ver el estado y cambiar la dirección.</p>}
         </aside>
       </div>
     </section>

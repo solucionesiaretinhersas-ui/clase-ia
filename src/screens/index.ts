@@ -11,7 +11,6 @@ import { PedagogicalChallenge } from './PedagogicalChallenge';
 import { PracticalWorkshop } from './PracticalWorkshop';
 import { PromptBuilder } from './PromptBuilder';
 import { PromptLab } from './PromptLab';
-import { QrCenter } from './QrCenter';
 import { Route } from './Route';
 import { StudioStation } from './StudioStation';
 import { TraditionalVsInteractive } from './TraditionalVsInteractive';
@@ -29,7 +28,6 @@ export const SCREEN_COMPONENTS: Record<string, ComponentType> = {
   'humano-ia': HumanVsAI,
   'ai-studio': AIStudioIntro,
   estacion: StudioStation,
-  qr: QrCenter,
   reto: PedagogicalChallenge,
   tradicional: TraditionalVsInteractive,
   construir: PromptBuilder,

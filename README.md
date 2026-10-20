@@ -26,10 +26,23 @@ npm run preview    # sirve dist/ localmente
 | 5 | Socialización | 7 | Uno o dos docentes presentan su recurso |
 | 6 | Cierre ético y humano | 8 | Ética, docencia humanizada, inteligencia aumentada y evaluación distinta; compromiso final |
 
-## Seguimiento en vivo en los celulares
+## Un solo QR, registro con nombre y enlaces que se abren a medida que avanzas
 
-Con Firebase configurado, el celular de cada docente (`#/m/vivo`) muestra en tiempo real el momento y la pantalla que el facilitador proyecta, qué hacer ahora, accesos directos (ChatGPT, AI Studio, sus prompts) y el recorrido completo. El QR “Sigue el taller” está en la pantalla de la ruta y en el Centro QR. La etiqueta superior del facilitador indica si la conexión está activa (“En vivo”) o falló (“Sin conexión”).
+- **Un único QR de ingreso** (pantalla “La ruta de hoy”, botón QR de la barra inferior o tecla **J** para verlo a pantalla completa). Al escanearlo, cada docente escribe su **nombre** y entra al taller (`#/m/vivo`).
+- El celular muestra en tiempo real el momento y la pantalla que proyectas, qué hacer ahora, el cuadro de participación y el recorrido completo.
+- **Los enlaces se desbloquean solos** en el celular según la pantalla: Google AI Studio, la guía de creación, ChatGPT, los prompts y el recurso de demostración. No hay que volver a escanear nada.
+- La etiqueta superior del facilitador muestra el código de sesión, cuántos docentes están conectados y si la conexión está activa (“En vivo”) o falló (“Sin conexión”).
 
+## Ruleta de docentes
+
+Tecla **R** (o el botón de dados): la ruleta se arma con los docentes que se registraron desde el celular (y nombres añadidos a mano). Gira con animación, anuncia a quién le toca, puede **sacar una pregunta** de un banco pensado para compartir recursos (“¿qué le pediste a la IA?”, “¿qué aportaste tú?”…) y, por defecto, **no repite** a quien ya participó. El ganador queda visible hasta el siguiente giro.
+
+## Cada taller empieza limpio
+
+- Botón **“Nuevo taller: limpiar todo”** (panel del facilitador, tecla N) y “Empezar un taller nuevo” en la portada: borra votos, ideas, tableros, galería, compromisos, cronómetros, ruleta y pizarra, y crea un **código de sesión nuevo**.
+- Los celulares que entran con el código nuevo borran automáticamente lo guardado del taller anterior y vuelven a pedir el nombre.
+- Si la sesión guardada tiene más de 12 horas, se reinicia sola al abrir la app.
+- Los datos antiguos en Firebase quedan bajo el código anterior, sin ningún enlace que los muestre. Para borrarlos de la nube, elimina la colección `sessions` desde la consola de Firebase.
 ## Participación desde los celulares
 
 Con Firebase activo, el celular (`#/m/vivo`) muestra un cuadro **“Tu turno”** cada vez que el facilitador abre una actividad, y lo que envían aparece en el tablero al instante:
@@ -84,10 +97,10 @@ Rutas (`#/…`): `/s/<pantalla>` presentación · `/m`, `/m/responder`, `/m/prom
 
 Los QR **internos** (prompt, guía, demo, cierre, tarjeta de respuesta) solo abren desde otro celular si la app es accesible:
 
-1. **Misma red Wi-Fi:** con `npm run dev`, el Centro QR detecta la IP de red local; pulsa el botón con la IP y los QR se regeneran. (Puede requerir permitir Node en el firewall de Windows.)
-2. **Publicada:** sube `dist/` a Netlify, Vercel, GitHub Pages o similar, y escribe esa URL en "Dirección base" del Centro QR. El enlace a Google AI Studio funciona siempre.
+1. **Misma red Wi-Fi:** con `npm run dev`, la ventana del QR de ingreso (tecla J) detecta la IP de red local; pulsa el botón con la IP y el QR se regenera. (Puede requerir permitir Node en el firewall de Windows.)
+2. **Publicada:** sube `dist/` a Netlify, Vercel, GitHub Pages o similar, y escribe esa URL en "Dirección base" de la ventana del QR (J). El enlace a Google AI Studio funciona siempre.
 
-El Centro QR avisa en pantalla cuando la dirección actual (localhost) no sirve para otros dispositivos.
+La ventana del QR avisa en pantalla cuando la dirección actual (localhost) no sirve para otros dispositivos.
 
 ## Sincronización en vivo con Firebase (opcional)
 
@@ -112,7 +125,7 @@ git remote add origin https://github.com/<usuario>/aula-ia.git
 git push -u origin main
 ```
 
-Luego en [vercel.com/new](https://vercel.com/new) importa el repositorio (Vite se detecta solo; `vercel.json` ya está listo), agrega las variables de Firebase y despliega. Pega la URL resultante en el campo "Dirección base" del Centro QR si los QR no la detectan automáticamente (se detecta sola al abrir la web publicada).
+Luego en [vercel.com/new](https://vercel.com/new) importa el repositorio (Vite se detecta solo; `vercel.json` ya está listo), agrega las variables de Firebase y despliega. Pega la URL resultante en el campo "Dirección base" de la ventana del QR (J) si no se detecta automáticamente (se detecta sola al abrir la web publicada).
 
 ## Logos
 

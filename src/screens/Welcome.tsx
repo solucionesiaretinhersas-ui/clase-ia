@@ -1,5 +1,6 @@
 import { ArrowRight, Lightbulb, Sparkles, WandSparkles } from 'lucide-react';
 import { usePresenter } from '../presenter/context';
+import { resetWorkshop } from '../lib/storage';
 import { BrandLogo } from '../components/BrandLogo';
 import { TOTAL_MINUTES } from '../data/workshop';
 
@@ -24,6 +25,15 @@ export function Welcome() {
             Taller docente · {TOTAL_MINUTES} minutos
           </span>
           <BrandLogo label="con Google AI Studio" />
+          <button
+            type="button"
+            className="btn btn--ghost welcome__reset"
+            onClick={() => {
+              if (window.confirm('¿Empezar un taller nuevo? Se borrará todo lo del taller anterior (votos, ideas, ruleta, pizarra) y los celulares recibirán un código de sesión nuevo.')) resetWorkshop();
+            }}
+          >
+            Empezar un taller nuevo (limpiar todo)
+          </button>
         </div>
       </div>
 

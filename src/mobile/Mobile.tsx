@@ -6,8 +6,9 @@ import { ANSWER_KEYS } from '../data/answers';
 import { REFINEMENTS } from '../data/prompts';
 import { STUDIO_STEPS } from '../data/studioSteps';
 import { navigate, queryParam, segments } from '../lib/router';
-import { LIVE_SYNC_AVAILABLE, sendIdea, sendResponse, useLiveState, type LiveAct } from '../lib/sync';
-import { usePersistentState } from '../lib/storage';
+import { LIVE_SYNC_AVAILABLE, registerParticipant, sendIdea, sendResponse, useLiveState, type LiveAct } from '../lib/sync';
+import { clearStored, usePersistentState } from '../lib/storage';
+import { unlockedLinks } from '../data/links';
 import { AI_STUDIO_URL, CHATGPT_URL } from '../lib/urls';
 import { PromptLab } from '../screens/PromptLab';
 
@@ -16,7 +17,7 @@ function Shell({ title, children, back = true }: { title: string; children: Reac
     <div className="mob">
       <header className="mob__head">
         {back ? (
-          <button type="button" className="btn btn--ghost btn--icon" onClick={() => navigate('/m')} aria-label="Volver al menú">
+          <button type="button" className="btn btn--ghost btn--icon" onClick={() => navigate(LIVE_SYNC_AVAILABLE ? '/m/vivo' : '/m')} aria-label="Volver">
             <ArrowLeft />
           </button>
         ) : (
@@ -50,7 +51,7 @@ export function Mobile({ path }: { path: string }) {
     case 'cierre':
       return <Exit session={queryParam(path, 's')} />;
     default:
-      return <Hub />;
+      return LIVE_SYNC_AVAILABLE ? <Live session={queryParam(path, 's')} /> : <Hub />;
   }
 }
 
@@ -148,33 +149,72 @@ function Participate({ session, act }: { session: string; act: LiveAct }) {
   );
 }
 
-/** Seguimiento en vivo: refleja la pantalla que el facilitador proyecta. */
+/** Registro: cada docente escribe su nombre al entrar. Con él se arma la ruleta. */
+function Register({ session, onDone }: { session: string; onDone: () => void }) {
+  const [savedName, setSavedName] = usePersistentState('mobile:name', '');
+  const [name, setName] = useState(savedName);
+  const [state, setState] = useState<SendState>('idle');
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    const n = name.trim();
+    if (!n) return;
+    setState('sending');
+    try {
+      await registerParticipant(session, n);
+      setSavedName(n);
+      onDone();
+    } catch {
+      setState('error');
+    }
+  }
+
+  return (
+    <Shell title="Bienvenido al taller" back={false}>
+      <p className="mob__lead">Escribe tu nombre para entrar. Lo usaremos en la ruleta de participación.</p>
+      <form className="mob__form" onSubmit={submit}>
+        <label className="field">
+          <span>Tu nombre</span>
+          <input className="input input--xl" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ej.: Marta Rodríguez" maxLength={40} autoComplete="name" required />
+        </label>
+        <button type="submit" className="btn btn--primary btn--lg" disabled={!name.trim() || state === 'sending'}>
+          {state === 'sending' ? 'Entrando…' : 'Entrar al taller'}
+        </button>
+      </form>
+      {state === 'error' && <p className="note-warn">No se pudo registrar. Revisa tu conexión e inténtalo de nuevo.</p>}
+      <p className="note-muted">Sesión {session}. Solo se guarda tu nombre para este taller.</p>
+    </Shell>
+  );
+}
+
+/** Seguimiento en vivo: refleja la pantalla que el facilitador proyecta. Es el único punto de entrada del taller. */
 function Live({ session: fromUrl }: { session: string }) {
   const [saved, setSaved] = usePersistentState('mobile:session', '');
+  const [registered, setRegistered] = usePersistentState('mobile:registered', '');
+  const [name] = usePersistentState('mobile:name', '');
   const [draft, setDraft] = useState('');
   const session = (fromUrl || saved).trim().toUpperCase();
-  const { state, status } = useLiveState(LIVE_SYNC_AVAILABLE ? session : '');
+  const { state, status } = useLiveState(LIVE_SYNC_AVAILABLE && registered === session ? session : '');
 
+  // Un taller nuevo (otro código de sesión) empieza limpio en este celular.
   useEffect(() => {
-    if (fromUrl && fromUrl.toUpperCase() !== saved) setSaved(fromUrl.toUpperCase());
+    const incoming = fromUrl.trim().toUpperCase();
+    if (incoming && incoming !== saved) {
+      clearStored((k) => k.startsWith('mobile:') && k !== 'mobile:name');
+      setSaved(incoming);
+    }
   }, [fromUrl, saved, setSaved]);
 
   const current = state ? SCREENS.find((s) => s.id === state.screenId) : undefined;
   const curIdx = current ? SCREENS.indexOf(current) : -1;
   const moment = current ? MOMENTS.find((m) => m.id === current.moment) : undefined;
+  const links = current ? unlockedLinks(current.id) : [];
 
-  if (!LIVE_SYNC_AVAILABLE) {
-    return (
-      <Shell title="Taller en vivo">
-        <p className="mob__lead">El seguimiento en vivo no está activado en esta web.</p>
-        <p className="note-muted">El facilitador debe configurar la sincronización (Firebase). Mientras tanto, usa el menú del taller.</p>
-      </Shell>
-    );
-  }
+  if (!LIVE_SYNC_AVAILABLE) return <Hub />;
 
   if (!session) {
     return (
-      <Shell title="Taller en vivo">
+      <Shell title="Taller en vivo" back={false}>
         <p className="mob__lead">Escribe el código de sesión que aparece en el tablero.</p>
         <form className="mob__form" onSubmit={(e) => { e.preventDefault(); setSaved(draft.trim().toUpperCase()); }}>
           <input className="input" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Código, p. ej. K7M2Q" maxLength={12} autoCapitalize="characters" aria-label="Código de sesión" />
@@ -184,8 +224,10 @@ function Live({ session: fromUrl }: { session: string }) {
     );
   }
 
+  if (registered !== session) return <Register session={session} onDone={() => setRegistered(session)} />;
+
   return (
-    <Shell title="Taller en vivo">
+    <Shell title={`Hola, ${name.split(' ')[0] || 'docente'}`} back={false}>
       <span className={`chip ${status === 'live' ? 'chip--live' : status === 'error' ? 'chip--warn' : 'chip--muted'}`}>
         {status === 'live' && <span className="dot dot--pulse" />}
         {status === 'live' ? 'Conectado' : status === 'error' ? 'Sin conexión' : 'Conectando…'} · sesión {session}
@@ -197,31 +239,46 @@ function Live({ session: fromUrl }: { session: string }) {
           <h2>{current.title}</h2>
           <p className="live-now__label">Qué hacemos ahora</p>
           <p className="live-now__text">{current.notes.participant}</p>
-          <div className="live-now__links">
-            {['laboratorio', 'taller', 'construir', 'reto'].includes(current.id) && (
-              <button type="button" className="btn btn--primary" onClick={() => navigate('/m/prompt')}>
-                Mis prompts
-              </button>
-            )}
-            {['laboratorio', 'taller'].includes(current.id) && (
-              <a className="btn" href={CHATGPT_URL} target="_blank" rel="noopener noreferrer">ChatGPT <ExternalLink /></a>
-            )}
-            {['estacion', 'taller'].includes(current.id) && (
-              <a className="btn" href={AI_STUDIO_URL} target="_blank" rel="noopener noreferrer">AI Studio <ExternalLink /></a>
-            )}
-            {current.id === 'votacion' && (
-              <button type="button" className="btn btn--primary" onClick={() => navigate(`/m/responder?s=${session}`)}>Votar</button>
-            )}
-            {current.id === 'cierre' && (
+          {current.id === 'cierre' && (
+            <div className="live-now__links">
               <button type="button" className="btn btn--primary" onClick={() => navigate(`/m/cierre?s=${session}`)}>Escribir mi compromiso</button>
-            )}
-          </div>
+            </div>
+          )}
         </article>
       ) : (
         <p className="mob__lead">{status === 'live' ? 'Esperando a que el facilitador inicie el taller…' : 'Conectando con el taller…'}</p>
       )}
 
       {state?.act && <Participate session={session} act={state.act} />}
+
+      {links.length > 0 && (
+        <section className="links-card glass" aria-label="Enlaces del taller">
+          <h3>Enlaces del taller</h3>
+          <ul>
+            {links.map((l) => {
+              const body = (
+                <>
+                  <span>
+                    <strong>{l.label}</strong>
+                    <small>{l.description}</small>
+                  </span>
+                  {l.url ? <ExternalLink /> : <ChevronRight />}
+                </>
+              );
+              return (
+                <li key={l.id}>
+                  {l.url ? (
+                    <a className="links-card__item" href={l.url} target="_blank" rel="noopener noreferrer">{body}</a>
+                  ) : (
+                    <button type="button" className="links-card__item" onClick={() => navigate(l.route ?? '/m/vivo')}>{body}</button>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+          <p className="note-muted">Los enlaces aparecen aquí a medida que el facilitador avanza.</p>
+        </section>
+      )}
 
       <h3 className="mob__h">Recorrido del taller</h3>
       <ol className="timeline">

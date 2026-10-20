@@ -9,17 +9,21 @@ import {
   Pause,
   PenTool,
   Play,
+  QrCode,
+  Dices,
   Shrink,
   Smartphone,
 } from 'lucide-react';
 import { MOMENTS, SCREENS, TOTAL_MINUTES, momentOf, screenIndex } from '../data/workshop';
 import { navigate } from '../lib/router';
-import { writeStored } from '../lib/storage';
-import { LIVE_SYNC_AVAILABLE, publishLive, useSessionCode, type LiveAct } from '../lib/sync';
+import { readStored, resetWorkshop, writeStored } from '../lib/storage';
+import { LIVE_SYNC_AVAILABLE, publishLive, useParticipants, useSessionCode, type LiveAct } from '../lib/sync';
 import { fmt, useTicker } from '../components/ui';
 import { PresenterCtx } from './context';
 import { AnnounceCtx, type AnnounceApi } from './announce';
 import { Whiteboard } from './Whiteboard';
+import { JoinModal } from './JoinModal';
+import { Wheel } from './Wheel';
 import { elapsedOf, useTimers } from './timers';
 import { FacilitatorDrawer } from './FacilitatorDrawer';
 import { Overview } from './Overview';
@@ -36,6 +40,8 @@ export function Presenter({ screenId }: { screenId: string }) {
   const moment = momentOf(screen.moment);
   const [notesOpen, setNotesOpen] = useState(false);
   const [overview, setOverview] = useState(false);
+  const [joinOpen, setJoinOpen] = useState(false);
+  const [wheelOpen, setWheelOpen] = useState(false);
   const [isFull, setIsFull] = useState(() => Boolean(document.fullscreenElement));
   const { timers, toggle, running } = useTimers();
   useTicker(running !== null);
@@ -44,6 +50,13 @@ export function Presenter({ screenId }: { screenId: string }) {
 
   // Seguimiento en vivo: publica la pantalla actual para los celulares.
   const { code } = useSessionCode();
+  const people = useParticipants(LIVE_SYNC_AVAILABLE ? code : '');
+
+  // Un taller nuevo siempre empieza limpio: si la sesión guardada es de hace más de 12 horas, se reinicia.
+  useEffect(() => {
+    const started = readStored<number>('session:started', 0);
+    if (started && Date.now() - started > 12 * 3600 * 1000) resetWorkshop();
+  }, []);
   const [liveState, setLiveState] = useState<'pending' | 'ok' | 'error'>('pending');
   // La pantalla activa anuncia qué actividad deben mostrar los celulares.
   const [announced, setAnnounced] = useState<{ screenId: string; act: LiveAct } | null>(null);
@@ -117,6 +130,10 @@ export function Presenter({ screenId }: { screenId: string }) {
         setOverview(true);
       } else if (k === 'd' || k === 'D') {
         setBoardOpen((v) => !v);
+      } else if (k === 'j' || k === 'J') {
+        setJoinOpen(true);
+      } else if (k === 'r' || k === 'R') {
+        setWheelOpen(true);
       } else if (k === 'Escape') {
         setNotesOpen(false);
         setBoardOpen(false);
@@ -128,7 +145,10 @@ export function Presenter({ screenId }: { screenId: string }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [next, prev, goTo, toggleFull, toggle, moment]);
 
-  const api = useMemo(() => ({ goTo, next, prev, current: screen.id }), [goTo, next, prev, screen.id]);
+  const api = useMemo(
+    () => ({ goTo, next, prev, current: screen.id, openJoin: () => setJoinOpen(true), openWheel: () => setWheelOpen(true) }),
+    [goTo, next, prev, screen.id],
+  );
   const Screen = SCREEN_COMPONENTS[screen.id];
   const isCover = screen.kind === 'cover';
   const accent = moment?.accent ?? 'var(--violet)';
@@ -164,11 +184,11 @@ export function Presenter({ screenId }: { screenId: string }) {
               <button
                 type="button"
                 className={`chip chip--btn ${liveState === 'ok' ? 'chip--live' : liveState === 'error' ? 'chip--warn' : 'chip--muted'}`}
-                onClick={() => goTo('qr')}
-                title={liveState === 'error' ? 'No se pudo conectar con Firebase: revisa que Firestore esté activo y las reglas publicadas' : 'Sesión en vivo: abre el Centro QR'}
+                onClick={() => setJoinOpen(true)}
+                title={liveState === 'error' ? 'No se pudo conectar con Firebase: revisa que Firestore esté activo y las reglas publicadas' : 'Sesión en vivo: muestra el QR de ingreso (J)'}
               >
                 {liveState === 'ok' && <span className="dot dot--pulse" />}
-                {liveState === 'ok' ? 'En vivo' : liveState === 'error' ? 'Sin conexión' : 'Conectando'} · {code}
+                {liveState === 'ok' ? 'En vivo' : liveState === 'error' ? 'Sin conexión' : 'Conectando'} · {code} · {people.length} docentes
               </button>
             )}
             <TimerPill momentId={moment?.id} timers={timers} onToggle={toggle} />
@@ -205,6 +225,12 @@ export function Presenter({ screenId }: { screenId: string }) {
               aria-pressed={notesOpen}
             >
               <NotebookPen />
+            </button>
+            <button type="button" className="btn btn--ghost btn--icon" onClick={() => setJoinOpen(true)} title="QR de ingreso (J)" aria-label="QR de ingreso">
+              <QrCode />
+            </button>
+            <button type="button" className="btn btn--ghost btn--icon" onClick={() => setWheelOpen(true)} title="Ruleta de docentes (R)" aria-label="Ruleta de docentes">
+              <Dices />
             </button>
             <button
               type="button"
@@ -263,6 +289,8 @@ export function Presenter({ screenId }: { screenId: string }) {
         </footer>
 
         <Whiteboard screenId={screen.id} open={boardOpen} onClose={() => setBoardOpen(false)} />
+        {joinOpen && <JoinModal onClose={() => setJoinOpen(false)} />}
+        {wheelOpen && <Wheel onClose={() => setWheelOpen(false)} />}
         {notesOpen && <FacilitatorDrawer screen={screen} onClose={() => setNotesOpen(false)} />}
         {overview && <Overview currentId={screen.id} onPick={(id) => { goTo(id); setOverview(false); }} onClose={() => setOverview(false)} />}
       </div>
