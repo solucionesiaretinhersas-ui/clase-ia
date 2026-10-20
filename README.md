@@ -3,6 +3,8 @@
 Taller docente de 90 minutos sobre Google AI Studio (Build) — I.E. Santa Rosa de Lima.
 React + TypeScript + Vite. Sin backend.
 
+**Sitio publicado:** https://clase-ia-theta.vercel.app/ · **Repositorio:** https://github.com/solucionesiaretinhersas-ui/clase-ia
+
 ## Ejecutar
 
 ```bash
@@ -60,7 +62,9 @@ El Centro QR avisa en pantalla cuando la dirección actual (localhost) no sirve 
 
 Con Firebase configurado, los votos y compromisos enviados desde los celulares aparecen en la pantalla del facilitador en tiempo real. Sin configurarlo, la app funciona en modo local.
 
-1. Crea un proyecto en la [consola de Firebase](https://console.firebase.google.com/) (se recomienda uno exclusivo para el taller) y activa **Firestore Database**.
+> **Importante:** usa un proyecto de Firebase **exclusivo para este taller**. Publicar `firestore.rules` reemplaza las reglas existentes del proyecto y dejaría sin protección (o rompería) cualquier otra aplicación que lo use.
+
+1. Crea un proyecto nuevo en la [consola de Firebase](https://console.firebase.google.com/), registra una app web y activa **Firestore Database**.
 2. Copia `.env.example` a `.env.local` y completa las variables `VITE_FIREBASE_*`.
 3. En Firestore → **Reglas**, pega el contenido de `firestore.rules` y publica.
 4. En Vercel, agrega las mismas variables en *Settings → Environment Variables*.

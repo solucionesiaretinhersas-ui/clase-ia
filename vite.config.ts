@@ -26,6 +26,7 @@ export default defineConfig(({ command }) => ({
   define: {
     __LAN_URLS__: JSON.stringify(command === 'serve' ? lanUrls() : []),
   },
+  build: { chunkSizeWarningLimit: 900 },
   server: { host: true, port: PORT },
   preview: { host: true, port: 4173 },
 }));
