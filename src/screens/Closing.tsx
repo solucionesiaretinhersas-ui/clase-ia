@@ -18,10 +18,10 @@ export interface Commitment {
 }
 
 const LEARNED = [
-  { icon: Compass, title: 'Interactivo es decidir', text: 'Una clase interactiva da voz, error y retroalimentación.' },
-  { icon: Wand2, title: 'Un buen prompt es pedagogía', text: 'Rol, tema, grado, objetivo y experiencia.' },
-  { icon: Puzzle, title: 'Build crea y mejora', text: 'Describe, prueba y pide cambios, uno a la vez.' },
-  { icon: Sparkles, title: 'La IA propone, tú dispones', text: 'Revisa siempre el contenido antes de usarlo.' },
+  { icon: Compass, title: 'La IA es copiloto', text: 'Tú diriges; ella propone. La parte humana no se delega.' },
+  { icon: Wand2, title: 'Dos prompts, un recurso', text: 'ChatGPT estructura la clase; AI Studio la construye.' },
+  { icon: Puzzle, title: 'Tu contexto marca la diferencia', text: 'Perfecciona con ejemplos y criterio de tu comunidad.' },
+  { icon: Sparkles, title: 'Ética y evaluación nueva', text: 'Verifica, sé transparente y evalúa cómo crean tus estudiantes.' },
 ];
 
 export function Closing() {

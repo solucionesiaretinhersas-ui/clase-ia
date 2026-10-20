@@ -1,9 +1,11 @@
 import type { ComponentType } from 'react';
 import { AIStudioIntro } from './AIStudioIntro';
 import { Closing } from './Closing';
+import { Copilot } from './Copilot';
 import { DemoScreen } from './DemoScreen';
+import { Ethics } from './Ethics';
 import { Gallery } from './Gallery';
-import { Inspiration } from './Inspiration';
+import { HumanVsAI } from './HumanVsAI';
 import { OpeningVote } from './OpeningVote';
 import { PedagogicalChallenge } from './PedagogicalChallenge';
 import { PracticalWorkshop } from './PracticalWorkshop';
@@ -18,17 +20,19 @@ import { Welcome } from './Welcome';
 export const SCREEN_COMPONENTS: Record<string, ComponentType> = {
   inicio: Welcome,
   ruta: Route,
-  inspiracion: Inspiration,
   votacion: OpeningVote,
-  tradicional: TraditionalVsInteractive,
+  copiloto: Copilot,
+  'humano-ia': HumanVsAI,
   'ai-studio': AIStudioIntro,
   estacion: StudioStation,
+  qr: QrCenter,
   reto: PedagogicalChallenge,
+  tradicional: TraditionalVsInteractive,
   construir: PromptBuilder,
   laboratorio: PromptLab,
   demo: DemoScreen,
   taller: PracticalWorkshop,
-  qr: QrCenter,
   galeria: Gallery,
+  etica: Ethics,
   cierre: Closing,
 };

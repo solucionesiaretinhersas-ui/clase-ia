@@ -1,4 +1,4 @@
-export type MomentId = 'm0' | 'm1' | 'm2' | 'm3' | 'm4' | 'm5';
+export type MomentId = 'm0' | 'm1' | 'm2' | 'm3' | 'm4' | 'm5' | 'm6';
 
 export interface Moment {
   id: MomentId;
@@ -11,11 +11,12 @@ export interface Moment {
 }
 
 export const MOMENTS: Moment[] = [
-  { id: 'm1', index: 1, title: 'Activación e inspiración', short: 'Activar', minutes: 10, accent: 'var(--violet)' },
-  { id: 'm2', index: 2, title: 'Conociendo Google AI Studio', short: 'Conocer', minutes: 15, accent: 'var(--blue)' },
-  { id: 'm3', index: 3, title: 'Del prompt al recurso interactivo', short: 'Diseñar', minutes: 20, accent: 'var(--cyan)' },
-  { id: 'm4', index: 4, title: 'Taller práctico de creación', short: 'Crear', minutes: 35, accent: 'var(--mint)' },
-  { id: 'm5', index: 5, title: 'Socialización y cierre', short: 'Compartir', minutes: 10, accent: 'var(--rose)' },
+  { id: 'm1', index: 1, title: 'Apertura: la IA como copiloto', short: 'Abrir', minutes: 12, accent: 'var(--violet)' },
+  { id: 'm2', index: 2, title: 'Conociendo Google AI Studio', short: 'Conocer', minutes: 10, accent: 'var(--blue)' },
+  { id: 'm3', index: 3, title: 'Diseña tu clase con ChatGPT', short: 'Planear', minutes: 18, accent: 'var(--cyan)' },
+  { id: 'm4', index: 4, title: 'Construye y perfecciona en AI Studio', short: 'Crear', minutes: 35, accent: 'var(--mint)' },
+  { id: 'm5', index: 5, title: 'Socialización de recursos', short: 'Compartir', minutes: 7, accent: 'var(--amber)' },
+  { id: 'm6', index: 6, title: 'Cierre ético y humano', short: 'Cerrar', minutes: 8, accent: 'var(--rose)' },
 ];
 
 export const TOTAL_MINUTES = MOMENTS.reduce((s, m) => s + m.minutes, 0);
@@ -25,6 +26,8 @@ export interface FacilitatorNotes {
   explanation: string;
   steps: string[];
   activity?: string;
+  /** Qué ven y hacen los docentes en su celular mientras esta pantalla está proyectada */
+  participant: string;
   /** Minutos sugeridos para esta pantalla dentro del momento */
   minutes: number;
 }
@@ -45,9 +48,10 @@ export const SCREENS: ScreenMeta[] = [
     kind: 'cover',
     notes: {
       minutes: 1,
+      participant: 'Escanea el QR de la siguiente pantalla para seguir el taller desde tu celular.',
       objective: 'Dar la bienvenida y generar expectativa sobre lo que se va a construir hoy.',
       explanation:
-        'Hoy no venimos a ver una presentación sobre IA: venimos a salir con un recurso interactivo creado por cada docente.',
+        'Hoy no venimos a ver una presentación sobre IA: venimos a salir con un recurso interactivo creado por cada docente, con su criterio y su contexto.',
       steps: [
         'Proyecta esta portada mientras llegan los participantes.',
         'Pide que tengan a mano su celular o computador y su cuenta de Google.',
@@ -62,30 +66,14 @@ export const SCREENS: ScreenMeta[] = [
     kind: 'content',
     notes: {
       minutes: 1,
-      objective: 'Mostrar el recorrido completo de 90 minutos y el producto final esperado.',
+      participant: 'Escanea el QR “Sigue el taller”: tu celular mostrará siempre lo que está pasando en el tablero.',
+      objective: 'Mostrar el recorrido de 90 minutos y conectar a los docentes con el seguimiento en vivo.',
       explanation:
-        'Cinco momentos: activar, conocer la herramienta, diseñar el prompt, crear y compartir. El 40 % del tiempo es práctica.',
+        'Seis momentos: abrir con la charla, conocer AI Studio, planear con ChatGPT, crear y perfeccionar, compartir y cerrar. Más de un tercio del tiempo es práctica.',
       steps: [
-        'Recorre los cinco momentos señalando el tiempo de cada uno.',
-        'Enfatiza el producto final: un recurso educativo funcional por docente.',
-        'Inicia el cronómetro del Momento 1 desde la barra superior.',
-      ],
-    },
-  },
-  {
-    id: 'inspiracion',
-    moment: 'm1',
-    title: '¿Y si tu clase se pudiera jugar?',
-    kind: 'content',
-    notes: {
-      minutes: 3,
-      objective: 'Provocar la reflexión sobre la diferencia entre mostrar contenido y diseñar experiencias.',
-      explanation:
-        'La IA no reemplaza al docente: reduce el tiempo entre una buena idea pedagógica y un recurso que los estudiantes pueden usar.',
-      steps: [
-        'Lee la pregunta central en voz alta y deja 10 segundos de silencio.',
-        'Pregunta: ¿qué recurso han querido crear y nunca tuvieron tiempo de hacer?',
-        'Recoge dos o tres respuestas orales y avanza a la votación.',
+        'Recorre los seis momentos señalando el tiempo de cada uno.',
+        'Pide que escaneen el QR para seguir el taller en vivo desde el celular.',
+        'Inicia el cronómetro del Momento 1 desde la barra superior (tecla T).',
       ],
     },
   },
@@ -96,32 +84,54 @@ export const SCREENS: ScreenMeta[] = [
     kind: 'activity',
     notes: {
       minutes: 3,
-      objective: 'Diagnosticar la experiencia previa del grupo con la IA.',
+      participant: 'Vota desde tu celular: escanea el QR de la votación y toca tu letra.',
+      objective: 'Diagnosticar cuánta experiencia tiene el grupo con la IA y romper el hielo.',
       explanation: 'El resultado ajusta el ritmo: si la mayoría nunca ha usado IA, dedica más tiempo al Momento 2.',
       steps: [
-        'Activa la actividad con el botón “Abrir votación”.',
-        'Invita a los docentes a pasar al tablero y tocar su opción, o a levantar su tarjeta de respuesta desde el celular.',
-        'Oculta los resultados mientras votan; muéstralos al cerrar.',
+        'Activa la actividad con “Abrir votación”.',
+        'Los docentes votan desde el celular (en vivo) o pasan al tablero.',
+        'Muestra los resultados y comenta el punto de partida del grupo.',
       ],
-      activity: 'Votación en el tablero o con tarjetas de respuesta en el celular (QR en pantalla).',
+      activity: 'Votación en vivo desde los celulares, o conteo manual en el tablero.',
     },
   },
   {
-    id: 'tradicional',
+    id: 'copiloto',
     moment: 'm1',
-    title: 'Tradicional o interactiva',
+    title: 'La IA es tu copiloto',
+    kind: 'content',
+    notes: {
+      minutes: 5,
+      participant: 'Escucha la charla. Idea clave: tú diriges, la IA propone. La sabiduría sigue siendo humana.',
+      objective: 'Instalar la idea de docencia aumentada: la IA llegó para ayudar, no para reemplazar.',
+      explanation:
+        'Piloto y copiloto: el docente decide el rumbo; la IA acelera borradores, ejemplos y simuladores. Lo que ella no tiene: conocer a tus estudiantes, empatía, criterio y vínculo.',
+      steps: [
+        'Cuenta cómo se está usando hoy la IA en las clases (planeación, materiales, retroalimentación).',
+        'Explica “docencia aumentada”: la suma del docente y la IA vale más que cada uno por separado.',
+        'Insiste: la parte humana —sabiduría, contexto, cuidado— no se delega.',
+        'Cierra con la pregunta: ¿qué te gustaría que la IA hiciera por ti para tener más tiempo con tus estudiantes?',
+      ],
+      activity: 'Charla breve con una pregunta abierta al grupo.',
+    },
+  },
+  {
+    id: 'humano-ia',
+    moment: 'm1',
+    title: '¿La IA ayuda o solo tú?',
     kind: 'activity',
     notes: {
       minutes: 4,
-      objective: 'Identificar rasgos de una clase interactiva frente a una clase centrada en la exposición.',
+      participant: 'Mira el tablero: ¿la IA te ayuda o solo tú puedes hacerlo? Opina con tu mano levantada.',
+      objective: 'Distinguir qué tareas puede acelerar la IA y cuáles solo puede hacer el docente.',
       explanation:
-        'Una experiencia interactiva le pide al estudiante decidir, equivocarse y recibir retroalimentación inmediata.',
+        'La IA ayuda con borradores y variantes; la decisión pedagógica, el cuidado de los estudiantes y la verificación son responsabilidad humana.',
       steps: [
-        'Abre la actividad y llama a un docente por cada situación.',
-        'El docente toca “Tradicional” o “Interactiva”; comenta la retroalimentación con el grupo.',
-        'Cierra mostrando el puntaje grupal.',
+        'Abre la actividad y llama a un docente por situación.',
+        'Pide que justifique su elección antes de tocar el botón.',
+        'Comenta la retroalimentación y cierra con el resumen de lo humano.',
       ],
-      activity: 'Clasificación de 8 situaciones de aula con retroalimentación inmediata.',
+      activity: 'Clasificación de 8 tareas docentes: la IA ayuda / solo tú.',
     },
   },
   {
@@ -130,7 +140,8 @@ export const SCREENS: ScreenMeta[] = [
     title: 'Google AI Studio',
     kind: 'content',
     notes: {
-      minutes: 4,
+      minutes: 3,
+      participant: 'Conoce Google AI Studio y su sección Build: describes una aplicación y la IA la construye.',
       objective: 'Presentar Google AI Studio y su modo Build como un taller para construir aplicaciones con lenguaje natural.',
       explanation:
         'En Build se describe la aplicación con palabras; Gemini genera el código, lo muestra funcionando y permite pedir cambios conversando.',
@@ -147,12 +158,13 @@ export const SCREENS: ScreenMeta[] = [
     title: 'Estación AI Studio',
     kind: 'tool',
     notes: {
-      minutes: 6,
+      minutes: 5,
+      participant: 'Sigue los pasos de la guía hasta llegar a Build. Marca cada paso cuando lo completes.',
       objective: 'Guiar paso a paso el acceso a Google AI Studio y a la sección Build.',
       explanation:
         'Cada docente debe llegar a la pantalla de Build antes de terminar este momento. La interfaz de Google puede cambiar: guíate por los nombres de las secciones.',
       steps: [
-        'Proyecta el QR “Abrir Google AI Studio” desde el Centro QR o desde esta pantalla.',
+        'Proyecta el QR de AI Studio desde el Centro QR o desde esta pantalla.',
         'Avanza paso a paso y pide una mano arriba cuando cada docente complete el paso.',
         'Ayuda primero a quienes tengan problemas para iniciar sesión.',
       ],
@@ -160,15 +172,34 @@ export const SCREENS: ScreenMeta[] = [
     },
   },
   {
-    id: 'reto',
+    id: 'qr',
     moment: 'm2',
+    title: 'Centro de códigos QR',
+    kind: 'tool',
+    notes: {
+      minutes: 2,
+      participant: 'Escanea los QR que necesites: seguir el taller, ChatGPT, AI Studio, el prompt y la guía.',
+      objective: 'Distribuir a los participantes los enlaces que usarán durante el taller.',
+      explanation:
+        'Con la web publicada, los QR abren desde cualquier celular. Quien se pierda puede volver a escanear el de “Seguir el taller”.',
+      steps: [
+        'Verifica que el estado superior diga que los QR pueden abrirse desde otros dispositivos.',
+        'Toca “Ampliar” para proyectar el QR de seguimiento en vivo.',
+        'Descarga los QR como imagen si quieres compartirlos por WhatsApp.',
+      ],
+    },
+  },
+  {
+    id: 'reto',
+    moment: 'm3',
     title: 'Reto pedagógico',
     kind: 'activity',
     notes: {
-      minutes: 5,
-      objective: 'Conectar la herramienta con un problema de aprendizaje real de los docentes.',
+      minutes: 4,
+      participant: 'Piensa qué tema te cuesta más enseñar: de ahí saldrá tu recurso.',
+      objective: 'Conectar la herramienta con un problema de aprendizaje real de cada docente.',
       explanation:
-        'Los mejores recursos nacen de una dificultad concreta, no de la herramienta. Este tablero será la materia prima del laboratorio.',
+        'Los mejores recursos nacen de una dificultad concreta, no de la herramienta. Este tablero es la materia prima del laboratorio.',
       steps: [
         'Abre el tablero y pide a 4 o 5 docentes que pasen a escribir el tema que más les cuesta enseñar.',
         'Agrupa por área y pregunta qué tienen en común.',
@@ -178,15 +209,35 @@ export const SCREENS: ScreenMeta[] = [
     },
   },
   {
+    id: 'tradicional',
+    moment: 'm3',
+    title: 'Tradicional o interactiva',
+    kind: 'activity',
+    notes: {
+      minutes: 4,
+      participant: 'Mira cada situación y decide: ¿clase tradicional o interactiva? Esto te ayudará a pedirle lo correcto a la IA.',
+      objective: 'Identificar qué hace interactiva una clase para pedírselo después a la IA: simuladores, decisiones, retroalimentación.',
+      explanation:
+        'Una experiencia interactiva le pide al estudiante decidir, equivocarse y recibir retroalimentación inmediata. Eso es lo que vamos a solicitar.',
+      steps: [
+        'Abre la actividad y llama a un docente por cada situación.',
+        'El docente toca “Tradicional” o “Interactiva”; comenta la retroalimentación.',
+        'Cierra pidiendo ideas de simuladores que serían útiles en sus áreas.',
+      ],
+      activity: 'Clasificación de 8 situaciones de aula con retroalimentación inmediata.',
+    },
+  },
+  {
     id: 'construir',
     moment: 'm3',
     title: 'Construye el prompt',
     kind: 'activity',
     notes: {
-      minutes: 6,
+      minutes: 4,
+      participant: 'Observa qué piezas hacen un buen prompt: rol, tema, objetivo, experiencia y requisitos técnicos.',
       objective: 'Comprender las partes de un prompt efectivo para generar un recurso educativo.',
       explanation:
-        'Un prompt efectivo tiene rol, tarea, público, objetivo, experiencia y requisitos técnicos. La metodología ROCAS ayuda a recordarlo.',
+        'Un prompt efectivo tiene rol, tema y público, objetivo, experiencia y requisitos técnicos. Cuanto más concreto tu contexto, mejor el resultado.',
       steps: [
         'Abre la actividad. Para cada pieza, pide a un docente que elija el bloque más preciso.',
         'Lee la retroalimentación en voz alta y discute por qué los bloques vagos fallan.',
@@ -201,31 +252,34 @@ export const SCREENS: ScreenMeta[] = [
     title: 'Laboratorio de prompts',
     kind: 'tool',
     notes: {
-      minutes: 7,
-      objective: 'Personalizar el prompt maestro para un tema, grado y objetivo concretos.',
+      minutes: 6,
+      participant: 'Completa tus datos, copia el Prompt 1 y pégalo en ChatGPT para que estructure tu clase.',
+      objective: 'Definir los parámetros de la clase y obtener la estructura con ChatGPT (Prompt 1).',
       explanation:
-        'El prompt se adapta con cuatro datos. Copiado con un clic, se pega en Build y genera la primera versión del recurso.',
+        'Primero se pregunta a ChatGPT qué debe tener cada parte de la clase. Esa estructura será la base del Prompt 2 para AI Studio.',
       steps: [
         'Carga el tema marcado en el reto pedagógico o uno de los tres ejemplos.',
-        'Completa grado, área y objetivo con aportes del grupo.',
-        'Copia el prompt y genera en vivo el recurso en Google AI Studio (si hay conexión).',
+        'Los docentes completan tema, grado, área, objetivo y contexto de su aula.',
+        'Copian el Prompt 1, lo pegan en ChatGPT y guardan la estructura que les devuelve.',
+        'Recuerda: describan cosas puntuales de su contexto. Esa es la parte humana que la IA no puede inventar.',
       ],
-      activity: 'Personalización colectiva del prompt y demostración en vivo.',
+      activity: 'Personalización del prompt y consulta a ChatGPT en vivo.',
     },
   },
   {
     id: 'demo',
-    moment: 'm3',
+    moment: 'm4',
     title: 'Recurso de demostración',
     kind: 'content',
     notes: {
-      minutes: 7,
+      minutes: 5,
+      participant: 'Mira el ejemplo terminado: así puede verse el recurso que vas a crear.',
       objective: 'Mostrar un ejemplo terminado del tipo de recurso que van a crear.',
       explanation:
-        '“Misión: salvar el planeta” tiene introducción, tres retos, puntos, progreso y resultados: todos los elementos que pide el prompt.',
+        '“Misión: salvar el planeta” tiene introducción, tres retos, puntos, progreso y resultados: lo que pide el prompt para AI Studio.',
       steps: [
         'Abre la misión en pantalla completa y juega el primer reto con el grupo.',
-        'Pide a un voluntario que resuelva el reto de clasificación en el tablero.',
+        'Pide a un voluntario que resuelva un reto en el tablero.',
         'Señala qué partes del prompt produjeron cada elemento de la aplicación.',
       ],
       activity: 'Un voluntario juega un reto frente al grupo.',
@@ -238,33 +292,18 @@ export const SCREENS: ScreenMeta[] = [
     kind: 'tool',
     notes: {
       minutes: 30,
-      objective: 'Cada docente crea, prueba y mejora su propio recurso educativo interactivo.',
+      participant: 'Pega el Prompt 2 con tu estructura en AI Studio (Build), prueba el resultado y perfecciónalo con tus mejoras.',
+      objective: 'Cada docente genera su recurso en AI Studio, lo humaniza con su contexto y lo perfecciona.',
       explanation:
-        'Producción guiada en cuatro fases: preparar el prompt, generar, probar como estudiante y pedir mejoras.',
+        'Cuatro fases: estructura (ya con ChatGPT), generar en Build, humanizar con contexto propio y perfeccionar probando como estudiante.',
       steps: [
         'Inicia el temporizador de 35 minutos del Momento 4.',
-        'Proyecta el QR del prompt para que lo abran en el celular o computador.',
+        'Pide que incluyan siempre interactividad: simuladores y actividades para que un estudiante pase al tablero proyectado.',
         'Recorre las mesas. Avanza las fases en pantalla para marcar el ritmo del grupo.',
-        'A los 30 minutos, pide que guarden o compartan su recurso desde AI Studio.',
+        'Recuerda en voz alta la parte humana: contexto, ejemplos de su comunidad, criterio para revisar.',
+        'A los 30 minutos, pide que guarden o preparen su recurso para presentarlo.',
       ],
       activity: 'Reto de creación con fases y prompts de mejora listos para copiar.',
-    },
-  },
-  {
-    id: 'qr',
-    moment: 'm4',
-    title: 'Centro de códigos QR',
-    kind: 'tool',
-    notes: {
-      minutes: 5,
-      objective: 'Distribuir a los participantes los enlaces del taller.',
-      explanation:
-        'Los QR internos solo funcionan desde otros dispositivos si la app está publicada o se sirve en la misma red Wi-Fi.',
-      steps: [
-        'Verifica el estado de la dirección base en la parte superior de la pantalla.',
-        'Toca “Ampliar” para proyectar un QR a pantalla completa.',
-        'Descarga los QR como imagen si quieres compartirlos por WhatsApp.',
-      ],
     },
   },
   {
@@ -273,33 +312,54 @@ export const SCREENS: ScreenMeta[] = [
     title: 'Galería de recursos',
     kind: 'activity',
     notes: {
-      minutes: 6,
-      objective: 'Socializar los recursos creados y recibir retroalimentación entre pares.',
+      minutes: 7,
+      participant: 'Uno o dos docentes presentan su recurso. Prepárate para dar retroalimentación.',
+      objective: 'Socializar uno o dos recursos creados y recibir retroalimentación entre pares.',
       explanation:
-        'Cada presentación dura máximo 2 minutos: qué problema resuelve, para qué grado, y qué mejorarían.',
+        'Cada presentación dura máximo 2 minutos: qué problema resuelve, cómo lo hicieron y qué les pareció el proceso.',
       steps: [
-        'Registra en el tablero cada recurso que se va a presentar.',
-        'Usa “Elegir al azar” para sortear el orden.',
-        'Activa el foco: muestra el recurso en grande y su QR si el docente compartió un enlace.',
+        'Registra en el tablero los recursos que se van a presentar.',
+        'Usa “Elegir al azar” o invita a voluntarios.',
+        'Pregunta al docente: ¿qué mejoró después de la primera versión? ¿qué aportó usted que la IA no sabía?',
       ],
       activity: 'Galería con sorteo, foco de presentación y temporizador de 2 minutos.',
     },
   },
   {
+    id: 'etica',
+    moment: 'm6',
+    title: 'Ética y docencia humanizada',
+    kind: 'content',
+    notes: {
+      minutes: 4,
+      participant: 'Cierre: uso ético de la IA, docencia humanizada y cómo evaluar de otra manera.',
+      objective: 'Cerrar con el uso ético de la IA, la docencia humanizada y una evaluación que amplíe el conocimiento.',
+      explanation:
+        'La IA llegó para ayudarnos, no para reemplazarnos. Ya no basta con pedir “investiga y entrega”: hay que evaluar cómo el estudiante crea, decide y mejora con la IA.',
+      steps: [
+        'Recorre los cuatro ejes tocando cada uno.',
+        'Invita a motivar a los estudiantes a crear recursos con IA, con acompañamiento y transparencia.',
+        'Cierra con la frase: tú diriges, la IA acompaña.',
+      ],
+      activity: 'Charla final con los cuatro ejes.',
+    },
+  },
+  {
     id: 'cierre',
-    moment: 'm5',
+    moment: 'm6',
     title: 'Cierre y compromiso',
     kind: 'activity',
     notes: {
       minutes: 4,
+      participant: 'Escribe tu compromiso desde el celular: qué recurso vas a crear y cómo lo aplicarás.',
       objective: 'Consolidar aprendizajes y concretar un compromiso de aplicación en el aula.',
       explanation: 'La IA propone, el docente dispone: el criterio pedagógico sigue siendo humano.',
       steps: [
         'Repasa el resumen visual de los aprendizajes.',
-        'Proyecta el QR de la actividad de salida para que respondan en el celular.',
-        'Invita a 3 docentes a escribir su compromiso en el muro.',
+        'Los docentes envían su compromiso desde el celular y aparece en el muro.',
+        'Invita a 3 docentes a leer el suyo y agradece su participación.',
       ],
-      activity: 'Ticket de salida en el celular y muro de compromisos en el tablero.',
+      activity: 'Muro de compromisos alimentado desde los celulares.',
     },
   },
 ];

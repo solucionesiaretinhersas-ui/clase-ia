@@ -3,6 +3,9 @@ declare const __LAN_URLS__: string[];
 /** Enlace externo verificado: página oficial de Google AI Studio. */
 export const AI_STUDIO_URL = 'https://aistudio.google.com/';
 
+/** Enlace externo: sitio oficial de ChatGPT. */
+export const CHATGPT_URL = 'https://chatgpt.com/';
+
 export type HostKind = 'local' | 'lan' | 'public' | 'file';
 
 export function lanUrls(): string[] {

@@ -1,13 +1,14 @@
-import { useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
-import { ArrowLeft, Check, ChevronRight, ExternalLink, FileText, Gamepad2, Hand, Presentation, Rocket, Sparkles } from 'lucide-react';
+import { useEffect, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
+import { ArrowLeft, Check, ChevronRight, ExternalLink, FileText, Gamepad2, Hand, Presentation, Radio, Rocket, Sparkles } from 'lucide-react';
+import { MOMENTS, SCREENS } from '../data/workshop';
 import { CopyButton } from '../components/ui';
 import { ANSWER_KEYS } from '../data/answers';
 import { REFINEMENTS } from '../data/prompts';
 import { STUDIO_STEPS } from '../data/studioSteps';
 import { navigate, queryParam, segments } from '../lib/router';
-import { LIVE_SYNC_AVAILABLE, sendResponse } from '../lib/sync';
+import { LIVE_SYNC_AVAILABLE, sendResponse, useLiveState } from '../lib/sync';
 import { usePersistentState } from '../lib/storage';
-import { AI_STUDIO_URL } from '../lib/urls';
+import { AI_STUDIO_URL, CHATGPT_URL } from '../lib/urls';
 import { PromptLab } from '../screens/PromptLab';
 
 function Shell({ title, children, back = true }: { title: string; children: ReactNode; back?: boolean }) {
@@ -34,6 +35,8 @@ function Shell({ title, children, back = true }: { title: string; children: Reac
 export function Mobile({ path }: { path: string }) {
   const [, page] = segments(path);
   switch (page) {
+    case 'vivo':
+      return <Live session={queryParam(path, 's')} />;
     case 'responder':
       return <Respond session={queryParam(path, 's')} />;
     case 'prompt':
@@ -51,8 +54,95 @@ export function Mobile({ path }: { path: string }) {
   }
 }
 
+/** Seguimiento en vivo: refleja la pantalla que el facilitador proyecta. */
+function Live({ session: fromUrl }: { session: string }) {
+  const [saved, setSaved] = usePersistentState('mobile:session', '');
+  const [draft, setDraft] = useState('');
+  const session = (fromUrl || saved).trim().toUpperCase();
+  const { state, status } = useLiveState(LIVE_SYNC_AVAILABLE ? session : '');
+
+  useEffect(() => {
+    if (fromUrl && fromUrl.toUpperCase() !== saved) setSaved(fromUrl.toUpperCase());
+  }, [fromUrl, saved, setSaved]);
+
+  const current = state ? SCREENS.find((s) => s.id === state.screenId) : undefined;
+  const curIdx = current ? SCREENS.indexOf(current) : -1;
+  const moment = current ? MOMENTS.find((m) => m.id === current.moment) : undefined;
+
+  if (!LIVE_SYNC_AVAILABLE) {
+    return (
+      <Shell title="Taller en vivo">
+        <p className="mob__lead">El seguimiento en vivo no está activado en esta web.</p>
+        <p className="note-muted">El facilitador debe configurar la sincronización (Firebase). Mientras tanto, usa el menú del taller.</p>
+      </Shell>
+    );
+  }
+
+  if (!session) {
+    return (
+      <Shell title="Taller en vivo">
+        <p className="mob__lead">Escribe el código de sesión que aparece en el tablero.</p>
+        <form className="mob__form" onSubmit={(e) => { e.preventDefault(); setSaved(draft.trim().toUpperCase()); }}>
+          <input className="input" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Código, p. ej. K7M2Q" maxLength={12} autoCapitalize="characters" aria-label="Código de sesión" />
+          <button type="submit" className="btn btn--primary btn--lg" disabled={!draft.trim()}>Conectar</button>
+        </form>
+      </Shell>
+    );
+  }
+
+  return (
+    <Shell title="Taller en vivo">
+      <span className={`chip ${status === 'live' ? 'chip--live' : status === 'error' ? 'chip--warn' : 'chip--muted'}`}>
+        {status === 'live' && <span className="dot dot--pulse" />}
+        {status === 'live' ? 'Conectado' : status === 'error' ? 'Sin conexión' : 'Conectando…'} · sesión {session}
+      </span>
+
+      {current ? (
+        <article className="live-now glass" style={{ '--accent': moment?.accent ?? 'var(--violet)' } as CSSProperties}>
+          <span className="kicker">{moment ? `Momento ${moment.index} · ${moment.title}` : 'Introducción'}</span>
+          <h2>{current.title}</h2>
+          <p className="live-now__label">Qué hacemos ahora</p>
+          <p className="live-now__text">{current.notes.participant}</p>
+          <div className="live-now__links">
+            {['laboratorio', 'taller', 'construir', 'reto'].includes(current.id) && (
+              <button type="button" className="btn btn--primary" onClick={() => navigate('/m/prompt')}>
+                Mis prompts
+              </button>
+            )}
+            {['laboratorio', 'taller'].includes(current.id) && (
+              <a className="btn" href={CHATGPT_URL} target="_blank" rel="noopener noreferrer">ChatGPT <ExternalLink /></a>
+            )}
+            {['estacion', 'taller'].includes(current.id) && (
+              <a className="btn" href={AI_STUDIO_URL} target="_blank" rel="noopener noreferrer">AI Studio <ExternalLink /></a>
+            )}
+            {current.id === 'votacion' && (
+              <button type="button" className="btn btn--primary" onClick={() => navigate(`/m/responder?s=${session}`)}>Votar</button>
+            )}
+            {current.id === 'cierre' && (
+              <button type="button" className="btn btn--primary" onClick={() => navigate(`/m/cierre?s=${session}`)}>Escribir mi compromiso</button>
+            )}
+          </div>
+        </article>
+      ) : (
+        <p className="mob__lead">{status === 'live' ? 'Esperando a que el facilitador inicie el taller…' : 'Conectando con el taller…'}</p>
+      )}
+
+      <h3 className="mob__h">Recorrido del taller</h3>
+      <ol className="timeline">
+        {SCREENS.map((s, i) => (
+          <li key={s.id} className={i === curIdx ? 'is-now' : i < curIdx ? 'is-past' : ''}>
+            <i />
+            {s.title}
+          </li>
+        ))}
+      </ol>
+    </Shell>
+  );
+}
+
 function Hub() {
   const items = [
+    { to: '/m/vivo', icon: Radio, title: 'Seguir el taller en vivo', text: 'Lo que pasa en el tablero, ahora' },
     { to: '/m/responder', icon: Hand, title: 'Tarjeta de respuesta', text: 'Elige tu letra y levanta el celular' },
     { to: '/m/prompt', icon: Sparkles, title: 'Prompt del taller', text: 'Personaliza y copia tu prompt' },
     { to: '/m/guia', icon: FileText, title: 'Guía de creación', text: 'Pasos y prompts de mejora' },
@@ -75,6 +165,16 @@ function Hub() {
             </button>
           </li>
         ))}
+        <li>
+          <a className="mob__item glass" href={CHATGPT_URL} target="_blank" rel="noopener noreferrer">
+            <ExternalLink />
+            <span>
+              <strong>ChatGPT</strong>
+              <small>Para estructurar tu clase</small>
+            </span>
+            <ChevronRight />
+          </a>
+        </li>
         <li>
           <a className="mob__item glass" href={AI_STUDIO_URL} target="_blank" rel="noopener noreferrer">
             <ExternalLink />

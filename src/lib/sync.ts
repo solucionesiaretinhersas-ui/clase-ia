@@ -83,6 +83,39 @@ export async function sendResponse(session: string, activityId: string, value: s
 
 export type LiveStatus = 'off' | 'connecting' | 'live' | 'error';
 
+export interface LiveState {
+  screenId: string;
+  at: number;
+}
+
+/** El facilitador publica la pantalla que está proyectando. */
+export async function publishLive(session: string, screenId: string): Promise<void> {
+  if (!db) return;
+  await setDoc(doc(db, 'sessions', session.toUpperCase(), 'live', 'state'), { screenId, at: Date.now() });
+}
+
+/** Los celulares siguen en tiempo real la pantalla del facilitador. */
+export function useLiveState(session: string) {
+  const [state, setState] = useState<LiveState | null>(null);
+  const [status, setStatus] = useState<LiveStatus>(LIVE_SYNC_AVAILABLE ? 'connecting' : 'off');
+
+  useEffect(() => {
+    if (!db || !session) return;
+    setStatus('connecting');
+    const unsub = onSnapshot(
+      doc(db, 'sessions', session.toUpperCase(), 'live', 'state'),
+      (snap) => {
+        setStatus('live');
+        setState(snap.exists() ? (snap.data() as LiveState) : null);
+      },
+      () => setStatus('error'),
+    );
+    return unsub;
+  }, [session]);
+
+  return { state, status };
+}
+
 /** Suscripción en tiempo real a las respuestas de una actividad. */
 export function useLiveResponses(session: string, activityId: string) {
   const [responses, setResponses] = useState<LiveResponse[]>([]);

@@ -15,6 +15,21 @@ npm run build      # genera dist/ para publicar en cualquier hosting estático
 npm run preview    # sirve dist/ localmente
 ```
 
+## Guion del taller (90 min)
+
+| # | Momento | Min | Qué ocurre |
+|---|---|---|---|
+| 1 | Apertura: la IA como copiloto | 12 | Votación, charla sobre docencia aumentada (la IA ayuda, no reemplaza; la parte humana no se delega) y actividad “¿la IA ayuda o solo tú?” |
+| 2 | Conociendo Google AI Studio | 10 | Qué es Build, guía de acceso y QR del taller |
+| 3 | Diseña tu clase con ChatGPT | 18 | Tema difícil, “interactivo vs. tradicional” y **Prompt 1**: ChatGPT devuelve la estructura de la clase |
+| 4 | Construye y perfecciona en AI Studio | 35 | Demo, **Prompt 2** con la estructura (siempre simuladores y actividades para el tablero), humanizar con contexto propio y perfeccionar |
+| 5 | Socialización | 7 | Uno o dos docentes presentan su recurso |
+| 6 | Cierre ético y humano | 8 | Ética, docencia humanizada, inteligencia aumentada y evaluación distinta; compromiso final |
+
+## Seguimiento en vivo en los celulares
+
+Con Firebase configurado, el celular de cada docente (`#/m/vivo`) muestra en tiempo real el momento y la pantalla que el facilitador proyecta, qué hacer ahora, accesos directos (ChatGPT, AI Studio, sus prompts) y el recorrido completo. El QR “Sigue el taller” está en la pantalla de la ruta y en el Centro QR. La etiqueta superior del facilitador indica si la conexión está activa (“En vivo”) o falló (“Sin conexión”).
+
 ## Atajos del facilitador
 
 | Tecla | Acción | | Tecla | Acción |

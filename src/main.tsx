@@ -6,6 +6,7 @@ import './styles/global.css';
 import './styles/presenter.css';
 import './styles/screens.css';
 import './styles/mobile.css';
+import './styles/extra.css';
 import App from './App';
 
 createRoot(document.getElementById('root')!).render(

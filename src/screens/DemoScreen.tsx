@@ -13,7 +13,7 @@ export function DemoScreen() {
     <section className="demo enter">
       <header className="screen-head screen-head--row">
         <div>
-          <span className="kicker">Momento 3 · Recurso de demostración</span>
+          <span className="kicker">Momento 4 · Recurso de demostración</span>
           <h2 className="h-lg">Esto es lo que vas a poder construir</h2>
         </div>
         <a className="btn btn--lg" href="#/demo" target="_blank" rel="noopener noreferrer">

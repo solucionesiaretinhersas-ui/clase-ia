@@ -1,12 +1,13 @@
 rules_version = '2';
 
 // Reglas para Aula IA. Publícalas en: Consola de Firebase → Firestore → Reglas
-// (o con `firebase deploy --only firestore:rules`).
+// (o con `firebase deploy --only firestore:rules`). Úsalas solo en un proyecto
+// exclusivo del taller: reemplazan las reglas existentes.
 //
-// Cualquiera con el código de sesión puede leer y escribir respuestas, pero:
+// Cualquiera con el código de sesión puede leer y escribir, pero:
 //  - solo con la forma esperada y tamaño limitado,
 //  - sin borrar nada,
-//  - y únicamente dentro de sessions/{código}/responses.
+//  - y únicamente dentro de sessions/{código}/responses y sessions/{código}/live/state.
 service cloud.firestore {
   match /databases/{database}/documents {
     match /sessions/{session}/responses/{response} {
@@ -16,6 +17,18 @@ service cloud.firestore {
                             && request.resource.data.activityId.size() <= 40
                             && request.resource.data.value is string
                             && request.resource.data.value.size() <= 900
+                            && request.resource.data.at is number
+                            && session.size() <= 12;
+      allow delete: if false;
+    }
+
+    // Pantalla que el facilitador está proyectando (seguimiento en vivo).
+    match /sessions/{session}/live/{docId} {
+      allow read: if true;
+      allow create, update: if docId == 'state'
+                            && request.resource.data.keys().hasOnly(['screenId', 'at'])
+                            && request.resource.data.screenId is string
+                            && request.resource.data.screenId.size() <= 30
                             && request.resource.data.at is number
                             && session.size() <= 12;
       allow delete: if false;

@@ -14,6 +14,7 @@ import {
 import { MOMENTS, SCREENS, TOTAL_MINUTES, momentOf, screenIndex } from '../data/workshop';
 import { navigate } from '../lib/router';
 import { writeStored } from '../lib/storage';
+import { LIVE_SYNC_AVAILABLE, publishLive, useSessionCode } from '../lib/sync';
 import { fmt, useTicker } from '../components/ui';
 import { PresenterCtx } from './context';
 import { elapsedOf, useTimers } from './timers';
@@ -37,6 +38,21 @@ export function Presenter({ screenId }: { screenId: string }) {
   useTicker(running !== null);
 
   useEffect(() => writeStored('presenter:last', screen.id), [screen.id]);
+
+  // Seguimiento en vivo: publica la pantalla actual para los celulares.
+  const { code } = useSessionCode();
+  const [liveState, setLiveState] = useState<'pending' | 'ok' | 'error'>('pending');
+  useEffect(() => {
+    if (!LIVE_SYNC_AVAILABLE || !code) return;
+    let cancelled = false;
+    publishLive(code, screen.id).then(
+      () => !cancelled && setLiveState('ok'),
+      () => !cancelled && setLiveState('error'),
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [code, screen.id]);
 
   const goTo = useCallback((id: string) => navigate(`/s/${id}`), []);
   const next = useCallback(() => {
@@ -120,6 +136,17 @@ export function Presenter({ screenId }: { screenId: string }) {
           </div>
 
           <div className="topbar__tools">
+            {LIVE_SYNC_AVAILABLE && code && (
+              <button
+                type="button"
+                className={`chip chip--btn ${liveState === 'ok' ? 'chip--live' : liveState === 'error' ? 'chip--warn' : 'chip--muted'}`}
+                onClick={() => goTo('qr')}
+                title={liveState === 'error' ? 'No se pudo conectar con Firebase: revisa que Firestore esté activo y las reglas publicadas' : 'Sesión en vivo: abre el Centro QR'}
+              >
+                {liveState === 'ok' && <span className="dot dot--pulse" />}
+                {liveState === 'ok' ? 'En vivo' : liveState === 'error' ? 'Sin conexión' : 'Conectando'} · {code}
+              </button>
+            )}
             <TimerPill momentId={moment?.id} timers={timers} onToggle={toggle} />
             <button
               type="button"

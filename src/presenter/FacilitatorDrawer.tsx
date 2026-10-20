@@ -1,4 +1,4 @@
-import { Clock, Flag, Keyboard, ListChecks, MessageSquareText, RotateCcw, Users, X } from 'lucide-react';
+import { Clock, Flag, Keyboard, ListChecks, MessageSquareText, RotateCcw, Smartphone, Users, X } from 'lucide-react';
 import { MOMENTS, momentOf, type ScreenMeta } from '../data/workshop';
 import { clearStored } from '../lib/storage';
 import { fmt } from '../components/ui';
@@ -59,6 +59,12 @@ export function FacilitatorDrawer({ screen, onClose }: { screen: ScreenMeta; onC
             <li key={s}>{s}</li>
           ))}
         </ol>
+      </section>
+      <section className="drawer__block">
+        <h4>
+          <Smartphone /> En el celular de los docentes
+        </h4>
+        <p>{n.participant}</p>
       </section>
       {n.activity && (
         <section className="drawer__block drawer__block--accent">

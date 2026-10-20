@@ -32,7 +32,7 @@ export const STUDIO_STEPS: StudioStep[] = [
   {
     title: 'Escribe tu prompt',
     action: 'Pega el prompt del laboratorio',
-    detail: 'Copia el prompt personalizado del Laboratorio de prompts, pégalo en el cuadro de texto de Build y envíalo.',
+    detail: 'Copia el Prompt 2 del laboratorio, reemplaza el marcador por la estructura que te dio ChatGPT, pégalo en Build y envíalo.',
     tip: 'La primera generación puede tardar uno o dos minutos. Es normal.',
   },
   {
