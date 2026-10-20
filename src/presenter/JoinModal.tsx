@@ -1,4 +1,4 @@
-import { joinRoute } from '../data/workshops';
+import { joinRoute, useWorkshop } from '../data/workshops';
 import { useState } from 'react';
 import { CircleAlert, CircleCheck, Download, Users, Wifi } from 'lucide-react';
 import { CopyButton, Modal } from '../components/ui';
@@ -12,7 +12,8 @@ import { usePublicBase } from '../lib/usePublicBase';
 export function JoinModal({ onClose }: { onClose: () => void }) {
   const { base, kind, reachable, override, setOverride, lan } = usePublicBase();
   const { code } = useSessionCode();
-  const people = useParticipants(LIVE_SYNC_AVAILABLE ? code : '');
+  const ws = useWorkshop();
+  const people = useParticipants(LIVE_SYNC_AVAILABLE ? code : '', ws.audience);
   const [draft, setDraft] = useState(override ?? '');
   const toast = useToast();
   const url = internalUrl(base, joinRoute(code));

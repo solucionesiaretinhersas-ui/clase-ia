@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
-import { Check, ChevronLeft, ChevronRight, ExternalLink, FileText, Gamepad2, Hand, Presentation, Radio, Rocket, Sparkles } from 'lucide-react';
-import { getWorkshopId, setWorkshopId, useWorkshop, workshopFromParam } from '../data/workshops';
+import { Award, Check, ChevronLeft, ChevronRight, ExternalLink, FileText, Gamepad2, Hand, Presentation, Radio, Rocket, Sparkles } from 'lucide-react';
+import { WORKSHOPS, getWorkshopId, setWorkshopId, useWorkshop, workshopFromParam } from '../data/workshops';
+import type { CertificateData } from '../lib/certificate';
 import { CertificateCard } from '../components/CertificateCard';
 import { StudentLab } from '../screens/StudentLab';
 import { CopyButton } from '../components/ui';
@@ -9,7 +10,7 @@ import { ANSWER_KEYS } from '../data/answers';
 import { REFINEMENTS, STUDENT_REFINEMENTS } from '../data/prompts';
 import { STUDIO_STEPS } from '../data/studioSteps';
 import { navigate, queryParam, segments } from '../lib/router';
-import { LIVE_SYNC_AVAILABLE, registerParticipant, sendIdea, sendResponse, useLiveState, type LiveAct } from '../lib/sync';
+import { LIVE_SYNC_AVAILABLE, lookupCertificate, registerParticipant, sendIdea, sendResponse, useLiveState, type IssuedCertificate, type LiveAct } from '../lib/sync';
 import { clearStored, usePersistentState } from '../lib/storage';
 import { unlockedLinks } from '../data/links';
 import { AI_STUDIO_URL, CHATGPT_URL } from '../lib/urls';
@@ -57,6 +58,8 @@ export function Mobile({ path }: { path: string }) {
       return (
         <PromptPage />
       );
+    case 'certificados':
+      return <MyCertificates />;
     case 'guia':
       return <Guide />;
     case 'cierre':
@@ -166,6 +169,7 @@ function Register({ session, onDone }: { session: string; onDone: () => void }) 
   const isStudent = ws.audience === 'estudiante';
   const [savedName, setSavedName] = usePersistentState('mobile:name', '');
   const [savedGrade, setSavedGrade] = usePersistentState('mobile:grade', '');
+  const [, setRegAt] = usePersistentState('mobile:regAt', 0);
   const [name, setName] = useState(savedName);
   const [grade, setGrade] = useState(savedGrade);
   const [state, setState] = useState<SendState>('idle');
@@ -177,7 +181,8 @@ function Register({ session, onDone }: { session: string; onDone: () => void }) 
     if (!n || !g) return;
     setState('sending');
     try {
-      await registerParticipant(session, n, g);
+      await registerParticipant(session, n, g, ws.audience);
+      setRegAt(Date.now());
       setSavedName(n);
       setSavedGrade(g);
       onDone();
@@ -219,6 +224,9 @@ function Register({ session, onDone }: { session: string; onDone: () => void }) 
       </form>
       {state === 'error' && <p className="note-warn">No se pudo registrar. Revisa tu conexión e inténtalo de nuevo.</p>}
       <p className="note-muted">Sesión {session}. Solo se guardan estos datos para este taller.</p>
+      <button type="button" className="btn btn--ghost" onClick={() => navigate('/m/certificados')}>
+        ¿Ya participaste? Consulta tu certificado
+      </button>
     </Shell>
   );
 }
@@ -231,6 +239,8 @@ function Live({ session: fromUrl }: { session: string }) {
   const [name] = usePersistentState('mobile:name', '');
   const [grade] = usePersistentState('mobile:grade', '');
   const [certOpen, setCertOpen] = usePersistentState('mobile:cert', false);
+  const [regAt] = usePersistentState('mobile:regAt', 0);
+  const [, setSavedCerts] = usePersistentState<IssuedCertificate[]>('cert:saved', []);
   const [draft, setDraft] = useState('');
   const session = (fromUrl || saved).trim().toUpperCase();
   const { state, status } = useLiveState(LIVE_SYNC_AVAILABLE && registered === session ? session : '');
@@ -253,6 +263,17 @@ function Live({ session: fromUrl }: { session: string }) {
   useEffect(() => {
     if (certUnlocked && !certOpen) setCertOpen(true);
   }, [certUnlocked, certOpen, setCertOpen]);
+
+  // El certificado queda guardado en este dispositivo para consultarlo después (no se borra al cambiar de taller).
+  useEffect(() => {
+    if (!certUnlocked || !name || registered !== session) return;
+    const issued: IssuedCertificate = { session, kind: ws.audience, name, grade, at: regAt || Date.now(), facilitator: state?.fac };
+    setSavedCerts((list) => {
+      const prev = list.find((c) => c.session === session);
+      if (prev && prev.name === issued.name && prev.grade === issued.grade && prev.facilitator === issued.facilitator) return list;
+      return [issued, ...list.filter((c) => c.session !== session)];
+    });
+  }, [certUnlocked, name, grade, registered, session, ws.audience, regAt, state?.fac, setSavedCerts]);
 
   if (!LIVE_SYNC_AVAILABLE) return <Hub />;
 
@@ -292,8 +313,12 @@ function Live({ session: fromUrl }: { session: string }) {
                   text: ws.certificate.text,
                   minutes: ws.total,
                   facilitator: state?.fac,
+                  date: new Date(regAt || Date.now()),
                 }}
               />
+              <button type="button" className="btn btn--ghost" onClick={() => navigate('/m/certificados')}>
+                Ver todos mis certificados
+              </button>
             </section>
           )}
 
@@ -369,6 +394,7 @@ function Hub() {
     { to: '/m/guia', icon: FileText, title: 'Guía de creación', text: 'Pasos y prompts de mejora' },
     { to: '/demo', icon: Gamepad2, title: 'Recurso de demostración', text: 'Misión: salvar el planeta' },
     { to: '/m/cierre', icon: Rocket, title: 'Actividad de cierre', text: 'Tu compromiso docente' },
+    { to: '/m/certificados', icon: Award, title: 'Mis certificados', text: 'Los que ya tienes guardados' },
   ];
   return (
     <Shell title="Modo participación" back={false}>
@@ -580,6 +606,85 @@ function Exit({ session }: { session: string }) {
           </button>
         </form>
       )}
+    </Shell>
+  );
+}
+
+/* ───────── Mis certificados: guardados en este dispositivo y consulta por código + nombre ───────── */
+function certData(c: IssuedCertificate): CertificateData {
+  const def = WORKSHOPS[c.kind === 'estudiante' ? 'estudiantes' : 'docentes'];
+  return {
+    name: c.name,
+    grade: c.grade,
+    audience: c.kind,
+    title: def.certificate.title,
+    text: def.certificate.text,
+    minutes: def.total,
+    facilitator: c.facilitator,
+    date: new Date(c.at),
+  };
+}
+
+function MyCertificates() {
+  const [saved, setSaved] = usePersistentState<IssuedCertificate[]>('cert:saved', []);
+  const [code, setCode] = useState('');
+  const [name, setName] = useState('');
+  const [state, setState] = useState<'idle' | 'loading' | 'notfound' | 'error'>('idle');
+  const list = [...saved].sort((a, b) => b.at - a.at);
+
+  async function find(e: FormEvent) {
+    e.preventDefault();
+    setState('loading');
+    try {
+      const c = await lookupCertificate(code, name);
+      if (!c) return setState('notfound');
+      setSaved((l) => [c, ...l.filter((x) => x.session !== c.session)]);
+      setCode('');
+      setName('');
+      setState('idle');
+    } catch {
+      setState('error');
+    }
+  }
+
+  return (
+    <Shell title="Mis certificados" wide>
+      <div className="mob__cols">
+        <div className="mob__col">
+          {list.length === 0 ? (
+            <p className="mob__lead">Aún no tienes certificados guardados en este dispositivo. Aparecen aquí cuando el facilitador cierra el taller, o puedes buscarlos con el código del taller.</p>
+          ) : (
+            list.map((c) => (
+              <section key={c.session} className="part glass" aria-label={`Certificado ${c.session}`}>
+                <span className="kicker">
+                  {c.kind === 'estudiante' ? 'Taller para estudiantes' : 'Taller para docentes'} · {new Date(c.at).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </span>
+                <CertificateCard data={certData(c)} />
+              </section>
+            ))
+          )}
+        </div>
+        <div className="mob__col">
+          <form className="part glass mob__form" onSubmit={find}>
+            <span className="kicker">Buscar un certificado</span>
+            <p className="note-muted">Escribe el código del taller (el que aparecía en el tablero) y tu nombre tal como lo registraste.</p>
+            <label className="field">
+              <span>Código del taller</span>
+              <input className="input" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="Ej.: K7M2Q" maxLength={12} autoCapitalize="characters" required />
+            </label>
+            <label className="field">
+              <span>Tu nombre</span>
+              <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ej.: Marta Rodríguez" maxLength={40} required />
+            </label>
+            <button type="submit" className="btn btn--primary btn--lg" disabled={state === 'loading' || !code.trim() || !name.trim()}>
+              {state === 'loading' ? 'Buscando…' : 'Buscar mi certificado'}
+            </button>
+            {state === 'notfound' && <p className="note-warn">No encontramos ese nombre en ese taller. Revisa el código y escribe el nombre igual que al registrarte.</p>}
+            {state === 'error' && <p className="note-warn">No se pudo consultar. Revisa tu conexión y el código.</p>}
+            {!LIVE_SYNC_AVAILABLE && <p className="note-warn">La consulta en línea no está disponible en esta web.</p>}
+          </form>
+        </div>
+      </div>
     </Shell>
   );
 }

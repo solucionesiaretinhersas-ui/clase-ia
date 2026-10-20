@@ -4,6 +4,7 @@ import { Modal } from '../components/ui';
 import { usePersistentState } from '../lib/storage';
 import { LIVE_SYNC_AVAILABLE, useParticipants, useSessionCode } from '../lib/sync';
 import { useTheme } from '../lib/theme';
+import { useWorkshop } from '../data/workshops';
 
 const COLORS = ['#8b5cf6', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#f43f5e', '#a855f7', '#0ea5e9'];
 const SIZE = 560;
@@ -27,7 +28,9 @@ const easeOut = (t: number) => 1 - Math.pow(1 - t, 4);
 export function Wheel({ onClose }: { onClose: () => void }) {
   const [theme] = useTheme();
   const { code } = useSessionCode();
-  const registered = useParticipants(LIVE_SYNC_AVAILABLE ? code : '');
+  const everyoneRegistered = useParticipants(LIVE_SYNC_AVAILABLE ? code : '');
+  const ws = useWorkshop();
+  const registered = useMemo(() => everyoneRegistered.filter((p) => !p.kind || p.kind === ws.audience), [everyoneRegistered, ws.audience]);
   const [manual, setManual] = usePersistentState<string[]>('wheel:manual', []);
   const [winners, setWinners] = usePersistentState<string[]>('wheel:winners', []);
   const [excludeWinners, setExcludeWinners] = usePersistentState<boolean>('wheel:exclude', true);

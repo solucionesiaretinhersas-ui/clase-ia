@@ -53,11 +53,11 @@ export function Presenter({ screenId }: { screenId: string }) {
 
   // Seguimiento en vivo: publica la pantalla actual para los celulares.
   const { code } = useSessionCode();
-  const people = useParticipants(LIVE_SYNC_AVAILABLE ? code : '');
+  const people = useParticipants(LIVE_SYNC_AVAILABLE ? code : '', ws.audience);
 
   // Un taller nuevo siempre empieza limpio: si la sesión guardada es de hace más de 12 horas, se reinicia.
   useEffect(() => {
-    const started = readStored<number>('session:started', 0);
+    const started = readStored<number>(`session:started:${ws.id}`, 0);
     if (started && Date.now() - started > 12 * 3600 * 1000) resetWorkshop();
   }, []);
   const [fac] = usePersistentState('cert:facilitator', '');

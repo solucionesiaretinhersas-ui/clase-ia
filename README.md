@@ -70,6 +70,14 @@ En la portada hay un selector: **Taller para docentes** (90 min, 6 momentos) y *
 - Todos los participantes deben escribir **nombre y grado** (docentes: área o grado en que enseñan) al entrar desde el celular.
 - Pantalla final **“Asistencia y certificados”**: lista de registrados, descarga de la **lista de asistencia en CSV** (se abre en Excel con tildes) y vista previa del certificado de cualquier participante. Escribe tu nombre de facilitador para que aparezca en la firma.
 - Cada participante, desde su celular, descarga su **certificado tipo diploma** de la I.E. Santa Rosa de Lima como **imagen (PNG)** o **PDF**, sin servidor: se genera en el propio dispositivo sobre la plantilla ilustrada public/brand/certificado.png (reemplázala por otra del mismo tamaño, 1491×1055, para cambiar el diseño; si no carga, se usa un diploma vectorial de respaldo). Se escriben el nombre y grado, el nombre del taller, la fecha, la duración y el facilitador. Se habilita cuando llegas a la pantalla de certificados.
+## Docentes y estudiantes nunca se mezclan · certificados que se conservan
+
+- **Una sesión por taller.** El taller de docentes y el de estudiantes tienen cada uno su propio código de sesión: sus registros, respuestas, ruleta, asistencia y certificados quedan separados. Además, cada registro guarda si es docente o estudiante y las listas filtran por ese dato.
+- **Historial de sesiones.** Las sesiones que inicias quedan guardadas en el equipo del facilitador (no se borran con “Nuevo taller”). En “Asistencia y certificados” puedes elegir una sesión anterior del mismo taller para volver a descargar su lista de asistencia o ver sus certificados. El nombre del facilitador también se conserva.
+- **En el celular del participante:** al llegar a la pantalla de certificados, el certificado queda **guardado en el dispositivo** (con la fecha de su registro) y se puede ver cuando quiera en **Mis certificados** (`#/m/certificados`), aunque cambie de taller o cierre el navegador. No se borra al cambiar de sesión.
+- **Si pierde el celular o borra los datos:** en la misma página puede **buscar su certificado con el código del taller y su nombre** desde cualquier dispositivo; se consulta lo registrado en Firebase (mientras esos datos se conserven en la base de datos).
+
+> Privacidad: la búsqueda funciona con el código de 5 caracteres del taller; cualquier persona que lo conozca podría consultar los nombres registrados en esa sesión. Si necesitas más control, activa Firebase Authentication y restringe la lectura en `firestore.rules`.
 ## Participación desde los celulares
 
 Con Firebase activo, el celular (`#/m/vivo`) muestra un cuadro **“Tu turno”** cada vez que el facilitador abre una actividad, y lo que envían aparece en el tablero al instante:

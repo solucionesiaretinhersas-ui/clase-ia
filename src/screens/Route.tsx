@@ -16,7 +16,7 @@ export function Route() {
   const { moments: MOMENTS, screens: SCREENS, total: TOTAL_MINUTES, outcomes: OUTCOMES } = ws;
   const { base, reachable } = usePublicBase();
   const { code } = useSessionCode();
-  const people = useParticipants(LIVE_SYNC_AVAILABLE ? code : '');
+  const people = useParticipants(LIVE_SYNC_AVAILABLE ? code : '', ws.audience);
   return (
     <section className="route enter">
       <header className="screen-head">

@@ -12,8 +12,9 @@
  * firestore.rules.
  */
 import { initializeApp, type FirebaseApp } from 'firebase/app';
-import { collection, doc, getFirestore, onSnapshot, setDoc, type Firestore } from 'firebase/firestore';
-import { usePersistentState, writeStored } from './storage';
+import { collection, doc, getDoc, getDocs, getFirestore, onSnapshot, setDoc, type Firestore } from 'firebase/firestore';
+import { readStored, usePersistentState, writeStored } from './storage';
+import { useWorkshop } from '../data/workshops';
 import { useEffect, useMemo, useState } from 'react';
 
 const env = import.meta.env;
@@ -62,18 +63,56 @@ function newCode(): string {
   return Array.from({ length: 5 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
 
-/** Código de la sesión del facilitador. Cambiarlo reinicia las respuestas en vivo. */
-export function useSessionCode() {
-  const [code, setCode] = usePersistentState<string>('session:code', '');
-  useEffect(() => {
-    if (!code) {
-      setCode(newCode());
-      writeStored('session:started', Date.now());
-    }
-  }, [code, setCode]);
-  return { code, renew: () => setCode(newCode()) };
+/** Tipo de participante de una sesión (cada taller tiene su propia sesión). */
+export type ParticipantKind = 'docente' | 'estudiante';
+
+export interface SessionRecord {
+  code: string;
+  kind: ParticipantKind;
+  startedAt: number;
 }
 
+const HISTORY_KEY = 'history:sessions';
+
+/** Sesiones que este equipo ha iniciado (no se borra al empezar un taller nuevo). */
+export function readHistory(): SessionRecord[] {
+  return readStored<SessionRecord[]>(HISTORY_KEY, []);
+}
+
+function remember(code: string, kind: ParticipantKind) {
+  const h = readHistory();
+  if (h.some((r) => r.code === code)) return;
+  writeStored(HISTORY_KEY, [...h, { code, kind, startedAt: Date.now() }].slice(-80));
+}
+
+/**
+ * Código de la sesión del facilitador. Cada taller (docentes / estudiantes) tiene
+ * su propia sesión, así que sus participantes, respuestas y certificados nunca se
+ * mezclan. Cambiarlo reinicia las respuestas en vivo.
+ */
+export function useSessionCode() {
+  const ws = useWorkshop();
+  const kind = ws.audience;
+  const [code, setCode] = usePersistentState<string>(`session:code:${ws.id}`, '');
+  useEffect(() => {
+    if (!code) {
+      // Si otra ejecución del efecto ya creó el código, se reutiliza (evita sesiones huérfanas).
+      const existing = readStored<string>(`session:code:${ws.id}`, '');
+      if (existing) return setCode(existing);
+      const c = newCode();
+      setCode(c);
+      writeStored(`session:started:${ws.id}`, Date.now());
+      remember(c, kind);
+    } else remember(code, kind);
+  }, [code, setCode, ws.id, kind]);
+  const renew = () => {
+    const c = newCode();
+    setCode(c);
+    writeStored(`session:started:${ws.id}`, Date.now());
+    remember(c, kind);
+  };
+  return { code, renew };
+}
 export async function sendResponse(session: string, activityId: string, value: string): Promise<void> {
   if (!db) throw new Error('Sincronización en vivo no configurada');
   const clean = session.trim().toUpperCase();
@@ -180,25 +219,27 @@ export function useLiveResponses(session: string, activityId: string) {
 export interface Participant {
   id: string;
   name: string;
+  /** Docente o estudiante: los certificados y listas no se mezclan. */
+  kind?: ParticipantKind;
   /** Grado (estudiantes) o área/grado que enseña (docentes). */
   grade?: string;
   at: number;
 }
 
 /** El docente se registra al entrar con su nombre (un documento por dispositivo). */
-export async function registerParticipant(session: string, name: string, grade: string): Promise<void> {
+export async function registerParticipant(session: string, name: string, grade: string, kind: ParticipantKind): Promise<void> {
   if (!db) throw new Error('Sincronización en vivo no configurada');
   const clean = session.trim().toUpperCase();
   if (!/^[A-Z0-9]{3,12}$/.test(clean)) throw new Error('Código de sesión inválido');
   const n = name.trim().slice(0, 40);
   const g = grade.trim().slice(0, 40);
   if (!n || !g) throw new Error('Nombre y grado obligatorios');
-  await setDoc(doc(db, 'sessions', clean, 'participants', deviceId()), { name: n, grade: g, at: Date.now() });
+  await setDoc(doc(db, 'sessions', clean, 'participants', deviceId()), { name: n, grade: g, kind, at: Date.now() });
 }
 
 /** Docentes registrados en la sesión, en tiempo real. */
-export function useParticipants(session: string) {
-  const [list, setList] = useState<Participant[]>([]);
+export function useParticipants(session: string, kind?: ParticipantKind) {
+  const [all, setList] = useState<Participant[]>([]);
   useEffect(() => {
     if (!db || !session) return;
     setList([]);
@@ -209,5 +250,44 @@ export function useParticipants(session: string) {
     );
     return unsub;
   }, [session]);
+  const list = useMemo(() => (kind ? all.filter((p) => !p.kind || p.kind === kind) : all), [all, kind]);
   return list;
+}
+/* ───────── Consulta de certificados (sin sesión activa) ───────── */
+export interface IssuedCertificate {
+  session: string;
+  kind: ParticipantKind;
+  name: string;
+  grade: string;
+  at: number;
+  facilitator?: string;
+}
+
+const norm = (s: string) =>
+  s
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+
+/** Busca a una persona registrada en una sesión por su nombre (sin importar tildes ni mayúsculas). */
+export async function lookupCertificate(session: string, name: string): Promise<IssuedCertificate | null> {
+  if (!db) throw new Error('Sincronización en vivo no configurada');
+  const code = session.trim().toUpperCase();
+  if (!/^[A-Z0-9]{3,12}$/.test(code)) throw new Error('Código de sesión inválido');
+  const snap = await getDocs(collection(db, 'sessions', code, 'participants'));
+  const want = norm(name);
+  const hit = snap.docs
+    .map((d) => d.data() as { name: string; grade?: string; kind?: ParticipantKind; at: number })
+    .find((p) => norm(p.name) === want);
+  if (!hit) return null;
+  let facilitator: string | undefined;
+  try {
+    const live = await getDoc(doc(db, 'sessions', code, 'live', 'state'));
+    facilitator = (live.data() as { fac?: string } | undefined)?.fac;
+  } catch {
+    /* el certificado se puede emitir sin el nombre del facilitador */
+  }
+  return { session: code, kind: hit.kind ?? 'docente', name: hit.name, grade: hit.grade ?? '', at: hit.at, facilitator };
 }

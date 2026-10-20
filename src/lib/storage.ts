@@ -45,15 +45,18 @@ export function clearStored(predicate: (key: string) => boolean = () => true) {
  * mantienen sincronizados (en la misma pestaña y entre pestañas).
  */
 export function usePersistentState<T>(key: string, initial: T) {
-  const [value, setValue] = useState<T>(() => readStored(key, initial));
+  const [state, setState] = useState<{ key: string; value: T }>(() => ({ key, value: readStored(key, initial) }));
+  // Si la clave cambia (p. ej. otro taller), el valor se relee de inmediato, sin mostrar el anterior.
+  const value = state.key === key ? state.value : readStored(key, initial);
 
   useEffect(() => {
+    const reload = () => setState({ key, value: readStored(key, initial) });
     const onLocal = (e: Event) => {
       const k = (e as CustomEvent<string>).detail;
-      if (k === key || k === '*') setValue(readStored(key, initial));
+      if (k === key || k === '*') reload();
     };
     const onOther = (e: StorageEvent) => {
-      if (e.key === null || e.key === PREFIX + key) setValue(readStored(key, initial));
+      if (e.key === null || e.key === PREFIX + key) reload();
     };
     window.addEventListener(EVENT, onLocal);
     window.addEventListener('storage', onOther);
@@ -70,7 +73,7 @@ export function usePersistentState<T>(key: string, initial: T) {
       const resolved =
         typeof next === 'function' ? (next as (p: T) => T)(readStored(key, initial)) : next;
       writeStored(key, resolved);
-      setValue(resolved);
+      setState({ key, value: resolved });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [key],
@@ -78,13 +81,15 @@ export function usePersistentState<T>(key: string, initial: T) {
 
   return [value, update] as const;
 }
-
 /**
  * Deja la aplicación como nueva para un taller distinto: borra votos, tableros,
  * ideas, cronómetros, galería, compromisos y el código de sesión (se genera uno
  * nuevo). Conserva solo la dirección pública configurada.
  */
+/** Datos que sobreviven a un taller nuevo: ajustes, historial de sesiones y certificados ya emitidos. */
+const KEEP_ON_RESET = ['publicBase', 'theme', 'workshop:mode', 'history:sessions', 'cert:facilitator', 'cert:saved', 'device'];
+
 export function resetWorkshop() {
-  clearStored((k) => k !== 'publicBase' && k !== 'theme' && k !== 'workshop:mode');
+  clearStored((k) => !KEEP_ON_RESET.includes(k));
   window.dispatchEvent(new Event('aula-ia:reset'));
 }
