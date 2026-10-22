@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import { sfx } from '../lib/sfx';
+
+let lastChime = 0;
 
 /** Número que sube o baja con animación hasta su valor (sin animar si se prefiere menos movimiento). */
 export function CountUp({ value, ms = 650 }: { value: number; ms?: number }) {
@@ -13,6 +16,11 @@ export function CountUp({ value, ms = 650 }: { value: number; ms?: number }) {
       return;
     }
     const start = from.current;
+    // Suena cuando el número sube (alguien entró o respondió); no más de uno cada 0,6 s
+    if (value > start && Date.now() - lastChime > 600) {
+      lastChime = Date.now();
+      sfx.join();
+    }
     const t0 = performance.now();
     let raf = 0;
     const step = (now: number) => {

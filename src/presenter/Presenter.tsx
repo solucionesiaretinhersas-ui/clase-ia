@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import {
   ChevronDown,
   ChevronLeft,
@@ -39,6 +39,7 @@ import { elapsedOf, useTimers } from './timers';
 import { FacilitatorDrawer } from './FacilitatorDrawer';
 import { Overview } from './Overview';
 import { SCREEN_COMPONENTS } from '../screens';
+import { useUiSounds } from '../lib/uiSounds';
 
 function isTyping(el: EventTarget | null) {
   if (!(el instanceof HTMLElement)) return false;
@@ -58,9 +59,27 @@ export function Presenter({ screenId }: { screenId: string }) {
   const [teamsOpen, setTeamsOpen] = useState(false);
   const [dockOpen, setDockOpen] = useState(false);
   const [barHidden, setBarHidden] = usePersistentState('ui:bar-hidden', false);
+  useUiSounds();
+
   const [isFull, setIsFull] = useState(() => Boolean(document.fullscreenElement));
   const { timers, toggle, running } = useTimers();
   useTicker(running !== null);
+  // Avisos sonoros del cronómetro del momento: a 1 minuto del final y al terminar
+  const lastWarn = useRef('');
+  const runMoment = running ? ws.moments.find((m) => m.id === running) : undefined;
+  const secsLeft = runMoment ? Math.floor((runMoment.minutes * 60000 - elapsedOf(timers[runMoment.id])) / 1000) : null;
+  useEffect(() => {
+    if (!runMoment || secsLeft === null) return;
+    const k = `:`;
+    if (k === lastWarn.current) return;
+    if (secsLeft === 60) {
+      lastWarn.current = k;
+      sfx.open();
+    } else if (secsLeft === 0) {
+      lastWarn.current = k;
+      sfx.ding();
+    }
+  }, [runMoment, secsLeft]);
 
   useEffect(() => writeStored('presenter:last', screen.id), [screen.id]);
 

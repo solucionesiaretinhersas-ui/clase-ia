@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Check, Copy, X } from 'lucide-react';
 import { copyText } from '../lib/clipboard';
+import { sfx } from '../lib/sfx';
 import { useToast } from './Toast';
 import { NeuralBg } from './NeuralBg';
 
@@ -35,6 +36,7 @@ export function CopyButton({
     const ok = await copyText(text);
     if (ok) {
       setDone(true);
+      sfx.ok();
       toast('Copiado al portapapeles');
       window.clearTimeout(timer.current);
       timer.current = window.setTimeout(() => setDone(false), 1800);
@@ -52,6 +54,11 @@ export function CopyButton({
 }
 
 export function Modal({ onClose, children, label }: { onClose: () => void; children: ReactNode; label: string }) {
+  // Sonido al abrir y al cerrar la ventana
+  useEffect(() => {
+    sfx.open();
+    return () => sfx.close();
+  }, []);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {

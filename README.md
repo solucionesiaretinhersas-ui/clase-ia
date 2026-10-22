@@ -205,3 +205,7 @@ La app solo abre `https://aistudio.google.com/` en una pestaña nueva. No simula
 ## Video de la portada
 
 La pantalla de inicio reproduce `public/brand/inicio.mp4` como fondo, en bucle sin cortes: dos copias del video se alternan con un fundido de imagen y de volumen justo antes del final. El navegador puede exigir un toque antes de permitir el sonido: se inicia mudo y se activa solo al primer toque. Hay un botón para apagar el sonido del video y respeta el silencio general de la barra. Para cambiar el video, reemplaza ese archivo (mejor MP4 H.264, 1280x720).
+
+## Sonidos de la interfaz
+
+En los dos talleres, el tablero suena al tocar cualquier botón, enlace, pestaña o casilla (toque suave), al abrir y cerrar ventanas, al copiar, al entrar un participante o un voto, al cambiar de pantalla y en el cronómetro de cada momento (aviso a 1 minuto del final y campanita al terminar). Todo respeta el botón de silencio de la barra superior. Los celulares no suenan para no hacer ruido en el salón.

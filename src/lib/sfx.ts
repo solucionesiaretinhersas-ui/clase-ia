@@ -113,6 +113,19 @@ export const sfx = {
     tone(1175, 0, 0.35, 'triangle', 0.16);
     tone(1568, 0.09, 0.5, 'triangle', 0.12);
   },
+  /** Toque suave de interfaz: lo oyen todos los botones del tablero */
+  tap() {
+    tone(920, 0, 0.045, 'triangle', 0.07, 640);
+  },
+  /** Se abre un panel o ventana */
+  open() {
+    tone(420, 0, 0.1, 'sine', 0.1, 760);
+    tone(760, 0.07, 0.12, 'sine', 0.07);
+  },
+  /** Se cierra un panel o ventana */
+  close() {
+    tone(640, 0, 0.09, 'sine', 0.08, 360);
+  },
   drop() {
     tone(320, 0, 0.12, 'sine', 0.18, 120);
   },

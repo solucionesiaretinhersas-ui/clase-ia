@@ -1,5 +1,6 @@
 import { joinRoute } from '../data/workshops';
-import type { CSSProperties } from 'react';
+import { useEffect, useRef, type CSSProperties } from 'react';
+import { sfx } from '../lib/sfx';
 import { Eye, EyeOff, Minus, RefreshCw, Smartphone } from 'lucide-react';
 import { ActivityControls, useActivityStatus } from '../components/ActivityShell';
 import { QRCode } from '../components/QRCode';
@@ -35,6 +36,12 @@ export function OpeningVote() {
   });
   const votes = manual.map((n, i) => n + remote[i]);
   const total = votes.reduce((a, b) => a + b, 0);
+  // Suena un toque cada vez que entra un voto nuevo
+  const lastTotal = useRef(total);
+  useEffect(() => {
+    if (total > lastTotal.current) sfx.pop();
+    lastTotal.current = total;
+  }, [total]);
   const open = status === 'open';
   const reveal = showResults || status === 'closed';
   const max = Math.max(1, ...votes);

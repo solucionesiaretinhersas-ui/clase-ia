@@ -164,7 +164,7 @@ export function LoopVideo({ src, sound, fade = 1.8, onBlocked }: Props) {
   const common = { src, playsInline: true, preload: 'auto' as const, 'aria-hidden': true, tabIndex: -1 };
   return (
     <div className={`loopvideo ${shown || reduce ? 'is-shown' : ''}`} style={{ '--fade': `${fade}s` } as React.CSSProperties} aria-hidden="true">
-      <video ref={refs[0]} {...common} className={front === 0 ? 'is-front' : ''} muted />
+      <video ref={refs[0]} {...common} className={front === 0 ? 'is-front' : ''} muted onLoadedData={() => setShown(true)} onCanPlay={() => setShown(true)} />
       <video ref={refs[1]} {...common} className={front === 1 ? 'is-front' : ''} muted />
     </div>
   );
