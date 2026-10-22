@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
 import {
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
   Expand,
   House,
   LayoutGrid,
@@ -55,6 +57,7 @@ export function Presenter({ screenId }: { screenId: string }) {
   const [wheelOpen, setWheelOpen] = useState(false);
   const [teamsOpen, setTeamsOpen] = useState(false);
   const [dockOpen, setDockOpen] = useState(false);
+  const [barHidden, setBarHidden] = usePersistentState('ui:bar-hidden', false);
   const [isFull, setIsFull] = useState(() => Boolean(document.fullscreenElement));
   const { timers, toggle, running } = useTimers();
   useTicker(running !== null);
@@ -155,6 +158,8 @@ export function Presenter({ screenId }: { screenId: string }) {
         setTeamsOpen(true);
       } else if (k === 'm' || k === 'M') {
         setDockOpen(true);
+      } else if (k === 'b' || k === 'B') {
+        setBarHidden((v) => !v);
       } else if (k === 'Escape') {
         setNotesOpen(false);
         setBoardOpen(false);
@@ -164,7 +169,7 @@ export function Presenter({ screenId }: { screenId: string }) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [next, prev, goTo, toggleFull, toggle, moment, ws]);
+  }, [next, prev, goTo, toggleFull, toggle, moment, ws, setBarHidden]);
 
   const api = useMemo(
     () => ({ goTo, next, prev, current: screen.id, openJoin: () => setJoinOpen(true), openWheel: () => setWheelOpen(true) }),
@@ -177,7 +182,7 @@ export function Presenter({ screenId }: { screenId: string }) {
   return (
     <PresenterCtx.Provider value={api}>
       <AnnounceCtx.Provider value={announceApi}>
-      <div className={`stage ${isCover ? 'stage--cover' : ''}`} style={{ '--accent': accent } as CSSProperties}>
+      <div className={`stage ${isCover ? 'stage--cover' : ''} ${barHidden ? 'stage--nobar' : ''}`} style={{ '--accent': accent } as CSSProperties}>
         <header className="topbar">
           <button type="button" className="brand" onClick={() => goTo(ws.introCover)} aria-label="Ir al inicio">
             <span className="brand__mark" aria-hidden="true">
@@ -231,7 +236,7 @@ export function Presenter({ screenId }: { screenId: string }) {
           <ScreenGuard resetKey={screen.id}>{Screen ? <Screen /> : <p>Pantalla no encontrada.</p>}</ScreenGuard>
         </main>
 
-        <footer className="navbar">
+        <footer className="navbar" hidden={barHidden}>
           <div className="navbar__group">
             <button type="button" className="btn btn--primary btn--icon" onClick={() => setDockOpen(true)} title="Centro de mando (M)" aria-label="Centro de mando">
               <LayoutDashboard />
@@ -304,6 +309,9 @@ export function Presenter({ screenId }: { screenId: string }) {
           </nav>
 
           <div className="navbar__group">
+            <button type="button" className="btn btn--ghost btn--icon" onClick={() => setBarHidden(true)} title="Ocultar la barra (B)" aria-label="Ocultar la barra inferior">
+              <ChevronDown />
+            </button>
             <span className="navbar__count" aria-label={`Pantalla ${idx + 1} de ${SCREENS.length}`}>
               {String(idx + 1).padStart(2, '0')}
               <i>/{SCREENS.length}</i>
@@ -316,6 +324,21 @@ export function Presenter({ screenId }: { screenId: string }) {
             </button>
           </div>
         </footer>
+
+        {barHidden && (
+          <div className="minibar" role="toolbar" aria-label="Controles rápidos">
+            <button type="button" className="btn btn--icon" onClick={prev} disabled={idx === 0} aria-label="Anterior">
+              <ChevronLeft />
+            </button>
+            <span className="minibar__count">{idx + 1}/{SCREENS.length}</span>
+            <button type="button" className="btn btn--icon btn--primary" onClick={next} disabled={idx === SCREENS.length - 1} aria-label="Siguiente">
+              <ChevronRight />
+            </button>
+            <button type="button" className="btn btn--icon" onClick={() => setBarHidden(false)} title="Mostrar la barra (B)" aria-label="Mostrar la barra inferior">
+              <ChevronUp />
+            </button>
+          </div>
+        )}
 
         <Whiteboard screenId={screen.id} open={boardOpen} onClose={() => setBoardOpen(false)} />
         {joinOpen && <JoinModal onClose={() => setJoinOpen(false)} />}
@@ -334,6 +357,7 @@ export function Presenter({ screenId }: { screenId: string }) {
               board: () => setBoardOpen(true),
               full: toggleFull,
               timer: () => moment && toggle(moment.id),
+              bar: () => setBarHidden((v) => !v),
             }}
           />
         )}

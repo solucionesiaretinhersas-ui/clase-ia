@@ -237,10 +237,10 @@ export const SCREENS: ScreenMeta[] = [
     kind: 'content',
     notes: {
       minutes: 4,
-      participant: 'ROCAS: Rol, Objetivo, Contexto, Acción y Solución. Cinco piedras para un prompt fuerte como las rocas.',
+      participant: 'ROCAS: Rol, Objetivo, Contexto, Acción y Salida. Cinco piedras para un prompt fuerte como las rocas.',
       objective: 'Presentar ROCAS como método para escribir prompts fuertes que sostienen la petición a la IA.',
       explanation:
-        'R de Rol (quién es la IA), O de Objetivo (qué quieres lograr), C de Contexto (para quién y cómo es tu aula), A de Acción (qué debe hacer, paso a paso) y S de Solución (qué entrega esperas).',
+        'R de Rol (quién es la IA), O de Objetivo (qué quieres lograr), C de Contexto (para quién y cómo es tu aula), A de Acción (qué debe hacer, paso a paso) y S de Salida (qué debe entregar la IA, en qué formato y cómo lo compruebas).',
       steps: [
         'Toca cada piedra y lee su pregunta y su ejemplo en voz alta.',
         'Subraya que el Contexto es la parte humana: la IA no conoce a tus estudiantes.',
@@ -294,7 +294,7 @@ export const SCREENS: ScreenMeta[] = [
     kind: 'tool',
     notes: {
       minutes: 7,
-      participant: 'Completa tu Rol, Objetivo, Contexto, Acción y Solución, copia el mensaje y pégalo en ChatGPT. Él te dará el prompt para AI Studio.',
+      participant: 'Completa tu Rol, Objetivo, Contexto, Acción y Salida, copia el mensaje y pégalo en ChatGPT. Él te dará el prompt para AI Studio.',
       objective: 'Que cada docente arme con ROCAS un único mensaje para ChatGPT, que le pida el prompt para crear su aula en Google AI Studio.',
       explanation:
         'El constructor solo ordena el texto: no usa ningún modelo. ChatGPT responde con el prompt listo; ese prompt se lleva a Build de Google AI Studio. La parte humana está en el Contexto.',

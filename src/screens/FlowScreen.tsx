@@ -20,7 +20,7 @@ const WHO: Record<Who, { label: string; color: string }> = {
 
 const NODES: Node[] = [
   { icon: UserRound, title: 'Piensas tu clase', text: 'Qué tema, para qué grado y qué quieres que tus estudiantes logren.', who: 'tu' },
-  { icon: ClipboardList, title: 'Armas tu mensaje con ROCAS', text: 'Rol, objetivo, contexto, acción y solución, con lo que solo tú sabes de tu grupo.', who: 'tu' },
+  { icon: ClipboardList, title: 'Armas tu mensaje con ROCAS', text: 'Rol, objetivo, contexto, acción y salida, con lo que solo tú sabes de tu grupo.', who: 'tu' },
   { icon: MessageSquare, title: 'ChatGPT te devuelve el prompt', text: 'Le pides que diseñe tu aula y te entregue el prompt listo para Google AI Studio.', who: 'chatgpt' },
   { icon: Bot, title: 'AI Studio construye tu aula', text: 'Pegas el prompt en Build y Gemini genera tu aula interactiva, con todos los momentos de la clase.', who: 'studio' },
   { icon: Play, title: 'La recorres como estudiante', text: 'Contestas, te equivocas a propósito y revisas con la lupa pedagógica si enseña lo que quieres.', who: 'tu' },

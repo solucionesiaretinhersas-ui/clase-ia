@@ -172,9 +172,9 @@ export function PromptLab({ compact = false }: { compact?: boolean }) {
 
           <fieldset className="stone" style={{ '--c': ROCAS[4].color } as CSSProperties}>
             <legend>
-              <b>S</b> Solución <small>¿Qué resultado esperas y cómo lo compruebas?</small>
+              <b>S</b> Salida <small>¿Qué resultado esperas y cómo lo compruebas?</small>
             </legend>
-            <textarea className="input" rows={2} value={fields.solucion} onChange={(e) => set('solucion', e.target.value)} placeholder="Describe el resultado final, su formato y cómo verificarás que funciona" aria-label="Solución esperada" />
+            <textarea className="input" rows={2} value={fields.solucion} onChange={(e) => set('solucion', e.target.value)} placeholder="Describe el resultado final, su formato y cómo verificarás que funciona" aria-label="Salida esperada" />
             <div className="lab__checks">
               {SOLUCIONES.map((s, i) => (
                 <button key={s} type="button" className={`lab__check ${fields.solucion === s ? 'is-on' : ''}`} onClick={() => set('solucion', s)}>

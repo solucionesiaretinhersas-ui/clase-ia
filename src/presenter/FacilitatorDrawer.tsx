@@ -18,6 +18,7 @@ const SHORTCUTS: [string, string][] = [
   ['R', 'Ruleta'],
   ['E', 'Equipos y marcador'],
   ['M', 'Centro de mando'],
+  ['B', 'Mostrar u ocultar la barra inferior'],
 ];
 
 export function FacilitatorDrawer({ screen, onClose }: { screen: ScreenMeta; onClose: () => void }) {

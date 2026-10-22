@@ -1,6 +1,7 @@
 import { useRef, useState, type ReactNode } from 'react';
 import {
   Bot,
+  PanelBottom,
   Dices,
   Expand,
   ExternalLink,
@@ -36,6 +37,7 @@ export interface DockActions {
   board: () => void;
   full: () => void;
   timer: () => void;
+  bar: () => void;
 }
 
 function Tile({ icon, label, hint, onClick, href, tone }: { icon: ReactNode; label: string; hint?: string; onClick?: () => void; href?: string; tone?: string }) {
@@ -118,6 +120,7 @@ export function CommandDock({ onClose, a }: { onClose: () => void; a: DockAction
           <Tile icon={<NotebookPen />} label="Notas del facilitador" hint="Tecla N" onClick={run(a.notes)} />
           <Tile icon={<LayoutGrid />} label="Vista general" hint="Tecla G" onClick={run(a.overview)} />
           <Tile icon={<Timer />} label="Cronómetro de la etapa" hint="Tecla T" onClick={() => a.timer()} />
+          <Tile icon={<PanelBottom />} label="Mostrar u ocultar la barra" hint="Tecla B" onClick={run(a.bar)} />
           <Tile icon={<Expand />} label="Pantalla completa" hint="Tecla F" onClick={run(a.full)} />
           <Tile icon={muted ? <VolumeX /> : <Volume2 />} label={muted ? 'Activar sonido' : 'Silenciar'} onClick={() => { toggleMute(); if (muted) window.setTimeout(() => sfx.pop(), 30); }} />
           <Tile icon={theme === 'dark' ? <Sun /> : <Moon />} label={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'} onClick={toggleTheme} />

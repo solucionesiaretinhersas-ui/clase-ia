@@ -114,7 +114,7 @@ export function buildChatGptPrompt(f: PromptFields): string {
     `C — CONTEXTO: ${p.contexto}.\n\n` +
     `A — ACCIÓN: Diseña la clase completa y conviértela en un prompt para Google AI Studio. El aula debe incluir: ${p.acciones}. ` +
     `Organiza todo en momentos (inicio, exploración, práctica, evaluación y cierre) para que todo lo de la clase quede en un solo lugar.\n\n` +
-    `S — SOLUCIÓN: Entrégame únicamente el prompt listo para copiar y pegar en Google AI Studio, que construya ${p.solucion}.`
+    `S — SALIDA: Entrégame únicamente el prompt listo para copiar y pegar en Google AI Studio, que construya ${p.solucion}.`
   );
 }
 export function missingFields(f: PromptFields): (keyof PromptFields)[] {

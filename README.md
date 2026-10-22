@@ -56,7 +56,7 @@ Tecla **R** (o el botón de dados): la ruleta se arma con los docentes que se re
 - **Estética de pizarra interactiva:** cuadrícula de puntos, subrayados dibujados a mano, piedras 3D animadas, entradas con movimiento y modo claro/oscuro.
 - **Sonido** sintetizado en el navegador (sin archivos): aciertos, errores, tic de la ruleta, fanfarria y confeti. El botón del altavoz (barra superior, también en el celular) lo silencia; el navegador exige un primer toque para activarlo.
 - **Equipos (tecla E):** divide a los docentes registrados en dos equipos al azar, edita sus nombres y lleva el marcador con turnos. Los juegos suman puntos al equipo en turno.
-- **Juego “Arma el prompt”:** en la pizarra táctil, cada equipo arrastra frases a su letra de ROCAS (Rol, Objetivo, Contexto, Acción, Solución). Acierto: +10 y turno al otro equipo; error: la piedra vuelve y también pasa el turno.
+- **Juego “Arma el prompt”:** en la pizarra táctil, cada equipo arrastra frases a su letra de ROCAS (Rol, Objetivo, Contexto, Acción, Salida). Cada equipo juega por turnos con el tiempo máximo que tú definas en la pantalla y toca ¡Terminamos! al acabar; si empatan en puntos, gana quien terminó más rápido.
 - **Google AI Studio:** Google no permite mostrar AI Studio ni su inicio de sesión dentro de otra página, así que se abre en su propia ventana desde los botones de acceso. Si el navegador bloquea las ventanas emergentes, permítelas para este sitio.
 ## Dos talleres en la misma aplicación
 

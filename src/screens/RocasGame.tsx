@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as RPointerEvent } from 'react';
-import { ArrowRight, CircleCheck, Flag, Hand, Play, RotateCcw, Trophy } from 'lucide-react';
+import { ArrowRight, CircleCheck, Flag, Hand, Minus, Play, Plus, RotateCcw, Timer, Trophy } from 'lucide-react';
 import { Scoreboard } from '../components/Scoreboard';
 import { useTicker } from '../components/ui';
 import { CHALLENGES, ROCAS, type Challenge, type Fragment, type Letter } from '../data/rocas';
@@ -10,7 +10,10 @@ import { shuffle, useTeams, type TeamId } from '../lib/teams';
 import { useAnnounce } from '../presenter/announce';
 import { usePresenter } from '../presenter/context';
 
-const DURATION = 90; // segundos por turno
+const DEFAULT_DURATION = 90; // segundos por turno, ajustable en pantalla
+const MIN_DURATION = 15;
+const MAX_DURATION = 600;
+const PRESETS = [30, 45, 60, 90, 120, 180];
 const HIT = 10;
 const COMPLETE_BONUS = 20;
 
@@ -23,6 +26,8 @@ interface Turn {
   ok: number;
   errors: number;
   left: number;
+  /** Tiempo máximo que tenía el turno */
+  max?: number;
   complete: boolean;
 }
 
@@ -59,6 +64,8 @@ export function RocasGame() {
   const { teams, update, addPoints, resetScores } = useTeams();
   const { next } = usePresenter();
   const [g, setG] = usePersistentState<GameState>('rg:state', INITIAL);
+  const [durRaw, setDur] = usePersistentState<number>('rg:dur', DEFAULT_DURATION);
+  const DURATION = Math.min(MAX_DURATION, Math.max(MIN_DURATION, Number(durRaw) || DEFAULT_DURATION));
   const [drag, setDrag] = useState<Drag | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [wrong, setWrong] = useState<string[]>([]);
@@ -138,7 +145,7 @@ export function RocasGame() {
         confetti({ count: 180 });
       } else if (manual) sfx.ding();
       else sfx.bad();
-      const turn: Turn = { round: s.round, team: t, pts: turnPts, ok: locked.length, errors, left: remaining, complete };
+      const turn: Turn = { round: s.round, team: t, pts: turnPts, ok: locked.length, errors, left: remaining, max: DURATION, complete };
       setG({ ...s, placed, locked, errors, turnPts, phase: 'review', endsAt: null, turns: [...s.turns, turn] });
     } else {
       setG({ ...s, placed, locked, errors, turnPts });
@@ -169,7 +176,7 @@ export function RocasGame() {
   const reviewTurn = [...g.turns].reverse().find((t) => t.round === g.round);
   const roundTurns = g.turns.filter((t) => t.round === g.round);
   const roundPts = (t: TeamId) => roundTurns.filter((x) => x.team === t).reduce((a, x) => a + x.pts, 0);
-  const used = (x: Turn) => DURATION - x.left;
+  const used = (x: Turn) => (x.max ?? DEFAULT_DURATION) - x.left;
   const roundTime = (t: TeamId) => roundTurns.filter((x) => x.team === t).reduce((a, x) => a + used(x), 0);
   const totalTime = (t: TeamId) => g.turns.filter((x) => x.team === t).reduce((a, x) => a + used(x), 0);
 
@@ -299,6 +306,7 @@ export function RocasGame() {
                 <div className="slot__head" data-slot={r.k}>
                   <b>{r.k}</b>
                   <span>{r.name}</span>
+                  <small>{r.short}</small>
                 </div>
                 <div className="slot__body" data-slot={r.k}>
                   {got.map((f) => chip(f, 'slot'))}
@@ -315,16 +323,58 @@ export function RocasGame() {
           <h3>
             Turno de <span style={{ color: team === 'a' ? 'var(--violet)' : 'var(--cyan)' }}>{teamName}</span>
           </h3>
+
+          <div className="game__setup">
+            <div className="setup__row" role="group" aria-label="Tiempo máximo por turno">
+              <span className="setup__label">
+                <Timer /> Tiempo máximo por turno
+              </span>
+              <div className="setup__time">
+                <button type="button" className="btn btn--icon" onClick={() => setDur(Math.max(MIN_DURATION, DURATION - 15))} aria-label="Menos tiempo">
+                  <Minus />
+                </button>
+                <b>
+                  {Math.floor(DURATION / 60)}:{String(DURATION % 60).padStart(2, '0')}
+                </b>
+                <button type="button" className="btn btn--icon" onClick={() => setDur(Math.min(MAX_DURATION, DURATION + 15))} aria-label="Más tiempo">
+                  <Plus />
+                </button>
+              </div>
+              <div className="setup__chips">
+                {PRESETS.map((s) => (
+                  <button key={s} type="button" className={`chipbtn ${DURATION === s ? 'is-on' : ''}`} onClick={() => { setDur(s); sfx.pop(); }}>
+                    {s < 60 ? `${s} s` : `${s / 60} min`}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {g.step === 0 && (
+              <div className="setup__row" role="group" aria-label="Elegir el reto">
+                <span className="setup__label">
+                  <Flag /> Reto
+                </span>
+                <div className="setup__chips">
+                  {CHALLENGES.map((c, i) => (
+                    <button key={c.id} type="button" className={`chipbtn ${g.round === i ? 'is-on' : ''}`} onClick={() => { setG((s) => ({ ...s, round: i })); sfx.pop(); }} title={c.title}>
+                      {i + 1}. {c.title.split(' en ')[0]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           <p>
-            Tienen {DURATION} segundos para colocar los 10 fragmentos en su letra de ROCAS. Arrastren, o toquen un fragmento y luego su letra. Pulsen <b>Comprobar</b> para fijar los aciertos y
-            corregir los errores. +{HIT} por acierto y +{COMPLETE_BONUS} por completar la estructura, más un bonus por tiempo.
+            Tienen <b>{DURATION} segundos</b> para colocar los 10 fragmentos en su letra de ROCAS. Cada fragmento empieza con una pista: <i>“Actúa como…”</i> es Rol, <i>“Mi meta…”</i> es Objetivo, <i>“Mi grupo…”</i> es Contexto,{' '}
+            <i>“Haz / Incluye…”</i> es Acción y <i>“Entrégamelo / Debe…”</i> es Salida. Arrastren, o toquen un fragmento y luego su letra, y pulsen <b>Comprobar</b>. Al acabar toquen <b>¡Terminamos!</b> para registrar su tiempo.
+            +{HIT} por acierto y +{COMPLETE_BONUS} por completar la estructura, más un bonus por tiempo.
           </p>
           <button type="button" className="btn btn--primary btn--xl" onClick={startTurn}>
             <Play /> ¡Empezar!
           </button>
         </div>
       )}
-
       {playing && (
         <>
           <div className="game__pool" data-slot="pool" aria-label="Fragmentos por colocar">

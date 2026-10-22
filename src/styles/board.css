@@ -469,3 +469,16 @@ kbd { display: inline-block; padding: 0.05em 0.5em; border-radius: 0.4em; border
 .btn--done { background: linear-gradient(135deg, var(--mint), color-mix(in srgb, var(--mint) 60%, var(--cyan))) !important; color: #04221a !important; border-color: transparent !important; box-shadow: 0 14px 30px -12px var(--mint); } .btn--done svg { color: inherit; }
 .igturn { display: inline-flex; align-items: baseline; gap: 0.5rem; padding: 0.5rem 1.2rem; border-radius: 999px; background: var(--surface-2); font-size: 1.15rem; } .igturn b { font-family: var(--font-display); font-size: 1.4rem; } .igturn--a b { color: var(--violet); } .igturn--b b { color: var(--cyan); } .igturn em { font-style: normal; color: var(--mint); font-weight: 700; }
 .game__time { color: var(--text-2); } .game__time b { color: var(--text); }
+
+/* ───── Barra inferior ocultable ───── */
+.navbar[hidden] { display: none; } .stage--nobar { grid-template-rows: auto 1fr; }
+.minibar { position: fixed; right: clamp(0.8rem, 2vw, 1.6rem); bottom: clamp(0.8rem, 2vw, 1.6rem); z-index: 40; display: flex; align-items: center; gap: 0.35rem; padding: 0.4rem; border-radius: 999px; background: rgb(var(--panel-rgb) / 0.82); border: 1px solid var(--line-strong); backdrop-filter: blur(14px); box-shadow: 0 16px 40px -16px rgb(0 0 0 / 0.7); opacity: 0.55; transition: opacity 0.25s; } .minibar:hover, .minibar:focus-within { opacity: 1; }
+.minibar .btn--icon { width: 2.8rem; min-width: 2.8rem; min-height: 2.8rem; } .minibar__count { min-width: 3.4rem; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; font-size: 0.9rem; color: var(--text-2); }
+
+/* ───── Juego ROCAS: ajustes y nombres editables ───── */
+.game__setup { display: grid; gap: 0.9rem; margin: 0.4rem 0 0.8rem; padding: 0.9rem 1rem; border-radius: var(--r-md); background: var(--surface-2); text-align: left; }
+.setup__row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1rem; } .setup__label { display: inline-flex; align-items: center; gap: 0.4rem; min-width: 12rem; font-weight: 700; } .setup__label svg { color: var(--cyan); width: 1.1em; }
+.setup__time { display: inline-flex; align-items: center; gap: 0.5rem; } .setup__time b { min-width: 4.6rem; text-align: center; font-family: var(--font-display); font-size: 1.8rem; font-variant-numeric: tabular-nums; }
+.setup__chips { display: flex; flex-wrap: wrap; gap: 0.4rem; } .chipbtn { min-height: 2.6rem; padding: 0 1rem; border-radius: 999px; border: 1.5px solid var(--line-strong); background: var(--surface); color: var(--text-2); font-weight: 600; } .chipbtn:hover { border-color: var(--btn-primary); } .chipbtn.is-on { background: var(--btn-primary); border-color: var(--btn-primary); color: #fff; }
+.slot__head small { margin-left: auto; font-size: 0.72em; font-weight: 500; color: var(--text-3); text-align: right; }
+.score__name { cursor: text; } .score__edit { width: 9rem; min-height: 2.2rem; padding: 0 0.6rem; border-radius: 0.6rem; border: 2px solid var(--btn-primary); background: var(--surface); color: var(--text); font: inherit; font-weight: 700; }
