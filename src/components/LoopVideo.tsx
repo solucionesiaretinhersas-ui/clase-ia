@@ -18,7 +18,7 @@ export function LoopVideo({ src, sound, fade = 1.8, onBlocked }: Props) {
   const refs = [useRef<HTMLVideoElement>(null), useRef<HTMLVideoElement>(null)];
   const [front, setFront] = useState<0 | 1>(0);
   const [shown, setShown] = useState(false);
-  const live = useRef({ front: 0 as 0 | 1, fading: false, sound, blocked: false });
+  const live = useRef({ front: 0 as 0 | 1, fading: false, sound, blocked: false, alive: false });
   live.current.sound = sound;
   const reduce = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
@@ -40,6 +40,7 @@ export function LoopVideo({ src, sound, fade = 1.8, onBlocked }: Props) {
     const [a, b] = vids();
     if (!a || !b || reduce) return;
     const state = live.current;
+    state.alive = true;
     let cancelled = false;
     a.muted = !state.sound;
     b.muted = !state.sound;
@@ -119,8 +120,28 @@ export function LoopVideo({ src, sound, fade = 1.8, onBlocked }: Props) {
       window.removeEventListener('pointerdown', unlock);
       window.removeEventListener('keydown', unlock);
       document.removeEventListener('visibilitychange', onVis);
-      a.pause();
-      b.pause();
+      // Al salir de la portada el sonido baja en un instante y el video se detiene del todo
+      state.alive = false;
+      const t0 = performance.now();
+      const from = [a.volume, b.volume];
+      const fadeOut = (now: number) => {
+        if (state.alive) return; // volvió a montarse (modo desarrollo): no se toca
+        const k = Math.min(1, (now - t0) / 350);
+        a.volume = from[0] * (1 - k);
+        b.volume = from[1] * (1 - k);
+        if (k < 1) requestAnimationFrame(fadeOut);
+      };
+      requestAnimationFrame(fadeOut);
+      window.setTimeout(() => {
+        if (state.alive) return;
+        a.pause();
+        b.pause();
+        a.muted = true;
+        b.muted = true;
+      }, 400);
+      // Nada se reproduce durante el fundido de salida
+      a.loop = false;
+      b.loop = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

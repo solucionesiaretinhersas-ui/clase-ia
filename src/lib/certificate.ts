@@ -330,9 +330,18 @@ export async function renderCertificate(d: CertificateData, width = TPL.w): Prom
   // Texto central (se rehace con la fecha y la duración reales)
   const date = (d.date ?? new Date()).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
   ctx.fillStyle = '#1f2a44';
-  ctx.font = `400 29px ${SERIF}`;
-  const lines = wrap(ctx, `${d.text}, realizado el ${date}, con una intensidad de ${d.minutes} minutos, en el marco de la Semana de la IA.`, 900);
-  lines.slice(0, 3).forEach((l, i) => ctx.fillText(l, TPL.w / 2 - 2, 578 + i * 39));
+  // El párrafo siempre se muestra completo: si no cabe en tres renglones, se reduce la letra hasta que quepa.
+  const body = `${d.text}, realizado el ${date}, con una intensidad de ${d.minutes} minutos, en el marco de la Semana de la IA.`;
+  let size = 29;
+  let lines: string[] = [];
+  for (; size >= 18; size -= 1) {
+    ctx.font = `400 ${size}px ${SERIF}`;
+    lines = wrap(ctx, body, 900);
+    if (lines.length <= 3) break;
+  }
+  const lh = Math.round(size * 1.34);
+  const y0 = 578 + (29 - size) * 0.5;
+  lines.forEach((l, i) => ctx.fillText(l, TPL.w / 2 - 2, y0 + i * lh));
 
   // Nombre (recuadro superior)
   const name = d.name.trim();
