@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import { GraduationCap, Sparkles } from 'lucide-react';
+import { Clock, GraduationCap, HeartHandshake, Lightbulb, MessageCircleQuestion, Sparkles, type LucideIcon } from 'lucide-react';
 import { sfx } from '../lib/sfx';
 
 /* ═════════ La IA llegó a la educación ═════════ */
@@ -28,15 +28,56 @@ function pt(i: number, v: number): [number, number] {
 }
 const poly = (vals: number[]) => vals.map((v, i) => pt(i, v).join(',')).join(' ');
 
+const ASKS = [
+  '¿Cuántas horas de tu semana se van en preparar, copiar, calificar y registrar?',
+  '¿Qué clase has soñado diseñar y nunca tuviste el tiempo para hacerla?',
+  '¿Y si cada estudiante pudiera tener una versión de la clase a su medida?',
+  '¿Qué harías con cinco horas más cada semana?',
+];
+
+interface Slice {
+  label: string;
+  solo: number;
+  con: number;
+  color: string;
+}
+
+const DAY: Slice[] = [
+  { label: 'Preparar materiales', solo: 38, con: 18, color: 'var(--amber)' },
+  { label: 'Calificar y registrar', solo: 27, con: 15, color: 'var(--rose)' },
+  { label: 'Estar con tus estudiantes', solo: 25, con: 40, color: 'var(--mint)' },
+  { label: 'Diseñar e innovar', solo: 10, con: 27, color: 'var(--violet)' },
+];
+
+interface Myth {
+  icon: LucideIcon;
+  myth: string;
+  truth: string;
+  color: string;
+}
+
+const MYTHS: Myth[] = [
+  { icon: GraduationCap, myth: '“La IA me va a reemplazar.”', truth: 'No conoce a tus estudiantes, su historia ni tu comunidad. Tú pones el sentido, el vínculo y el criterio.', color: 'var(--blue)' },
+  { icon: Lightbulb, myth: '“Usarla es hacer trampa.”', truth: 'Es un asistente de borradores. Tú decides qué se queda, qué se corrige y qué se descarta.', color: 'var(--amber)' },
+  { icon: Sparkles, myth: '“Es muy difícil de usar.”', truth: 'Se le habla en español, como a un colega. Hoy lo vas a comprobar con tu propia clase.', color: 'var(--violet)' },
+  { icon: HeartHandshake, myth: '“Los estudiantes aprenderán menos.”', truth: 'Depende del diseño. Una buena aula interactiva da práctica, pistas y retroalimentación inmediata.', color: 'var(--rose)' },
+];
+
 export function Potencia() {
   const [ia, setIa] = useState(false);
   const [sel, setSel] = useState<number | null>(null);
+  const [ask, setAsk] = useState(0);
+  const [flip, setFlip] = useState<number[]>([]);
   const a = sel !== null ? AXES[sel] : null;
 
   const pick = (i: number) => {
     setSel(i === sel ? null : i);
     if (!ia) setIa(true);
     sfx.pop();
+  };
+  const toggleIa = (v: boolean) => {
+    setIa(v);
+    v ? sfx.whoosh() : sfx.pop();
   };
 
   return (
@@ -48,38 +89,70 @@ export function Potencia() {
           <br />
           Viene a <span className="grad-text">ampliar lo que puedes diseñar</span>.
         </h2>
-        <p className="pot__ask">¿Y si lo que te falta no son ideas… sino tiempo para convertirlas en clases?</p>
       </header>
 
-      <div className="pot__body">
-        <div className="pot__orbit" aria-hidden="true">
-          <i className="pot__ring pot__ring--1" />
-          <i className="pot__ring pot__ring--2" />
-          <i className="pot__ring pot__ring--3" />
-          <span className="pot__core">
-            <GraduationCap />
-            <b>Docente</b>
-          </span>
-          {['Diseñar', 'Personalizar', 'Crear', 'Evaluar', 'Comunicar'].map((t, i) => (
-            <span key={t} className="pot__sat" style={{ '--a': `${i * 72}deg` } as CSSProperties}>
-              <em>{t}</em>
-            </span>
+      <div className="pot__asks" role="group" aria-label="Preguntas para pensar">
+        <span className="pot__asks-ico">
+          <MessageCircleQuestion />
+        </span>
+        <div className="pot__asks-main">
+          <span className="kicker">Antes de seguir, pregúntate…</span>
+          <p key={ask} className="pot__asks-q">
+            {ASKS[ask]}
+          </p>
+        </div>
+        <div className="pot__asks-dots">
+          {ASKS.map((q, i) => (
+            <button key={q} type="button" className={i === ask ? 'is-on' : ''} onClick={() => { setAsk(i); sfx.pop(); }} aria-label={`Pregunta ${i + 1}`}>
+              {i + 1}
+            </button>
           ))}
-          <span className="pot__ai">
-            <Sparkles /> IA
-          </span>
+        </div>
+      </div>
+
+      <div className="pot__switch">
+        <div className="seg" role="group" aria-label="Comparar al docente solo y con IA">
+          <button type="button" className={`seg__btn ${!ia ? 'is-on' : ''}`} onClick={() => toggleIa(false)} aria-pressed={!ia}>
+            <GraduationCap /> Docente
+          </button>
+          <button type="button" className={`seg__btn ${ia ? 'is-on' : ''}`} onClick={() => toggleIa(true)} aria-pressed={ia}>
+            <Sparkles /> Docente + IA
+          </button>
+        </div>
+        <span className="pot__switch-hint">Cambia entre los dos y mira qué se mueve.</span>
+      </div>
+
+      <div className="pot__body">
+        <div className="pot__time glass">
+          <h3>
+            <Clock /> ¿En qué se va tu tiempo?
+          </h3>
+          <ul>
+            {DAY.map((s) => {
+              const v = ia ? s.con : s.solo;
+              return (
+                <li key={s.label} style={{ '--c': s.color } as CSSProperties}>
+                  <span>
+                    {s.label} <b>{v}%</b>
+                  </span>
+                  <i>
+                    <u style={{ width: `${v}%` }} />
+                  </i>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="pot__time-note" aria-live="polite">
+            {ia ? 'Menos tiempo en lo repetitivo, más en estar con tus estudiantes y en diseñar. Ese tiempo es tuyo.' : 'Hoy, buena parte de tu semana se va en tareas que se repiten.'}
+          </p>
+          <small>Ilustración para pensar, no un dato medido.</small>
         </div>
 
         <div className="pot__chart glass">
-          <div className="seg seg--small" role="group" aria-label="Comparar capacidades">
-            <button type="button" className={`seg__btn ${!ia ? 'is-on' : ''}`} onClick={() => { setIa(false); sfx.pop(); }} aria-pressed={!ia}>
-              Docente
-            </button>
-            <button type="button" className={`seg__btn ${ia ? 'is-on' : ''}`} onClick={() => { setIa(true); sfx.whoosh(); }} aria-pressed={ia}>
-              <Sparkles /> Docente + IA
-            </button>
-          </div>
-          <svg viewBox="0 0 320 300" role="img" aria-label="Gráfica ilustrativa de capacidades de diseño del docente, solo y con IA">
+          <h3>
+            <Sparkles /> ¿Qué puedes diseñar?
+          </h3>
+          <svg viewBox="-50 0 420 300" role="img" aria-label="Gráfica ilustrativa de capacidades de diseño del docente, solo y con IA">
             {[0.33, 0.66, 1].map((g) => (
               <polygon key={g} points={poly(AXES.map(() => g))} className="radar__grid" />
             ))}
@@ -115,11 +188,30 @@ export function Potencia() {
                 <em>{a.human}</em>
               </>
             ) : (
-              <span className="pot__hint">Toca un eje de la gráfica para ver qué cambia y qué sigue siendo humano.</span>
+              <span className="pot__hint">Toca un eje para ver qué cambia y qué sigue siendo humano.</span>
             )}
           </div>
-          <small>Ilustración conceptual para ayudar a pensar; no son datos científicos.</small>
+          <small>Ilustración conceptual; no son datos científicos.</small>
         </div>
+      </div>
+
+      <div className="pot__myths">
+        <h3>Lo que muchos docentes piensan… y lo que vas a comprobar hoy</h3>
+        <ul>
+          {MYTHS.map((m, i) => {
+            const Icon = m.icon;
+            const open = flip.includes(i);
+            return (
+              <li key={m.myth} style={{ '--c': m.color } as CSSProperties}>
+                <button type="button" className={`myth ${open ? 'is-open' : ''}`} onClick={() => { setFlip((f) => (f.includes(i) ? f.filter((x) => x !== i) : [...f, i])); sfx.pop(); }} aria-expanded={open}>
+                  <Icon />
+                  <strong>{m.myth}</strong>
+                  <p>{open ? m.truth : 'Toca para ver otra mirada'}</p>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       </div>
 
       <p className="pot__line">

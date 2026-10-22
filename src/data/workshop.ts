@@ -107,11 +107,12 @@ export const SCREENS: ScreenMeta[] = [
       explanation:
         'La IA no llegó para reemplazar al docente. Llegó para ayudarle a potenciar sus capacidades, ampliar sus posibilidades de diseño pedagógico y dedicar más tiempo a lo verdaderamente importante: el aprendizaje de sus estudiantes.',
       steps: [
-        'Lee la pregunta provocadora y deja diez segundos de silencio.',
-        'Toca Docente + IA y luego cada eje de la gráfica: explica qué cambia y qué sigue siendo humano. Es una ilustración, no una medición.',
-        'Cierra con la idea: la IA acelera el borrador, tú diriges el diseño. Pasa a la actividad siguiente.',
+        'Empieza por las preguntas de arriba: léelas una a una y deja diez segundos de silencio. Pide que alguien responda en voz alta la de las horas.',
+        'Cambia entre Docente y Docente + IA en “¿En qué se va tu tiempo?” y pregunta: ¿qué harían con ese tiempo?',
+        'Toca cada eje de la gráfica: explica qué cambia y qué sigue siendo humano. Es una ilustración, no una medición.',
+        'Toca las cuatro creencias comunes y pregunta cuál han pensado ellos. Cierra con: la IA acelera el borrador, tú diriges el diseño.',
       ],
-      activity: 'Gráfica interactiva que se explica al tocar sus ejes.',
+      activity: 'Preguntas para pensar, comparación de tiempo, gráfica interactiva y creencias que se voltean al tocar.',
     },
   },
   {
