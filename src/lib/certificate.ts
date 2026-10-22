@@ -256,6 +256,22 @@ function loadTemplate(): Promise<HTMLImageElement> {
   return templatePromise;
 }
 
+/** Firmas (PNG con fondo transparente) del facilitador y del director. Si faltan, el certificado se emite sin ellas. */
+const sigCache = new Map<string, Promise<HTMLImageElement | null>>();
+function loadSignature(file: string): Promise<HTMLImageElement | null> {
+  let p = sigCache.get(file);
+  if (!p) {
+    p = new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = `brand/${file}`;
+    });
+    sigCache.set(file, p);
+  }
+  return p;
+}
+
 /** Borra un texto de la plantilla repintando el fondo con un degradado muestreado de los bordes. */
 function patch(ctx: CanvasRenderingContext2D, src: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number) {
   const left = src.getImageData(x0 - 3, y0, 1, y1 - y0).data;
@@ -291,6 +307,7 @@ export async function renderCertificate(d: CertificateData, width = TPL.w): Prom
   } catch {
     return renderVectorCertificate(d, Math.max(width, 1600));
   }
+  const [sigFacilitator, sigDirector] = await Promise.all([loadSignature('firma-facilitador.png'), loadSignature('firma-director.png')]);
   const W = Math.min(width, img.naturalWidth);
   const k = W / TPL.w;
   const canvas = document.createElement('canvas');
@@ -349,8 +366,18 @@ export async function renderCertificate(d: CertificateData, width = TPL.w): Prom
     ctx.fillText(d.facilitator.trim(), 500, 889);
   }
 
+  // Firmas sobre las líneas: facilitador (izquierda) y director (derecha)
+  const drawSig = (s: HTMLImageElement | null, cx: number, bottom: number, h: number) => {
+    if (!s) return;
+    const w = (s.naturalWidth / s.naturalHeight) * h;
+    ctx.drawImage(s, cx - w / 2, bottom - h, w, h);
+  };
+  drawSig(sigFacilitator, 495, 864, 84);
+  drawSig(sigDirector, 1005, 862, 74);
+
   return canvas;
 }
+
 export function canvasBlob(canvas: HTMLCanvasElement, type: 'image/png' | 'image/jpeg', quality = 0.92): Promise<Blob> {
   return new Promise((resolve, reject) => canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('blob'))), type, quality));
 }
