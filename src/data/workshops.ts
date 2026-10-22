@@ -24,12 +24,12 @@ export interface WorkshopDef {
 }
 
 const D_OUTCOMES = [
-  'La IA como copiloto, no reemplazo',
-  'Llegar a la sección Build',
-  'La estructura de tu clase con ChatGPT',
-  'Tu recurso interactivo funcionando',
-  'Uno o dos recursos en el tablero',
-  'Ética y docencia humanizada',
+  'tu idea: qué quieres que la IA haga por ti',
+  'tu tipo de experiencia y acceso a Build',
+  'la estructura de tu clase con ChatGPT',
+  'tu recurso interactivo, probado con la lupa',
+  'retroalimentación de tus colegas',
+  'tu plan para aplicarlo y tu certificado',
 ];
 
 function build(def: Omit<WorkshopDef, 'total'>): WorkshopDef {

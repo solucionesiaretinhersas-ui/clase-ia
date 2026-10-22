@@ -19,12 +19,12 @@ npm run preview    # sirve dist/ localmente
 
 | # | Momento | Min | Qué ocurre |
 |---|---|---|---|
-| 1 | Apertura: la IA como copiloto | 12 | Votación, charla sobre docencia aumentada (la IA ayuda, no reemplaza; la parte humana no se delega) y actividad “¿la IA ayuda o solo tú?” |
-| 2 | Conociendo Google AI Studio | 10 | Qué es Build, guía de acceso y QR del taller |
-| 3 | Diseña tu clase con ChatGPT | 18 | Tema difícil, “interactivo vs. tradicional” y **Prompt 1**: ChatGPT devuelve la estructura de la clase |
-| 4 | Construye y perfecciona en AI Studio | 35 | Demo, **Prompt 2** con la estructura (siempre simuladores y actividades para el tablero), humanizar con contexto propio y perfeccionar |
-| 5 | Socialización | 7 | Uno o dos docentes presentan su recurso |
-| 6 | Cierre ético y humano | 8 | Ética, docencia humanizada, inteligencia aumentada y evaluación distinta; compromiso final |
+| 1 | Mirar distinto: la IA como copiloto | 12 | Votación, docencia aumentada (la IA ayuda, no reemplaza), lluvia de ideas en vivo y “¿la IA ayuda o solo tú?”. **Te llevas:** tu idea de qué quieres que la IA haga por ti |
+| 2 | Explorar lo posible | 10 | **Galería de experiencias** (quiz, simulador, juego, historia, tutor, laboratorio) con vista previa, prompt de ejemplo y votación desde el celular; luego **“Llega a Build”** con avance en vivo (listo / en proceso / necesito ayuda). **Te llevas:** tu tipo de experiencia y el acceso a Build |
+| 3 | Diseñar la experiencia | 18 | Tema difícil, “interactivo vs. tradicional”, construcción del prompt por piezas y **Prompt 1**: ChatGPT devuelve la estructura de la clase. **Te llevas:** la estructura de tu clase |
+| 4 | Construir y probar | 35 | Demo, **Prompt 2** con la estructura (siempre simuladores y actividades para el tablero), avance en vivo por fases, **lupa pedagógica** (7 criterios con su prompt de arreglo) y perfeccionamiento. **Te llevas:** tu recurso interactivo probado |
+| 5 | Compartir y mejorar | 7 | Uno o dos docentes presentan (ruleta) y diálogo en vivo. **Te llevas:** retroalimentación de tus colegas |
+| 6 | Llevarlo al aula | 8 | Ética y docencia humanizada, regla ética de cada docente, compromiso de aplicación, asistencia y certificado. **Te llevas:** tu plan para aplicarlo |
 
 ## Modo claro y oscuro · estilo Apple
 

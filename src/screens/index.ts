@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import { AIStudioIntro } from './AIStudioIntro';
+import { ExperienceGallery } from './ExperienceGallery';
 import { Closing } from './Closing';
 import { Copilot } from './Copilot';
 import { DemoScreen } from './DemoScreen';
@@ -31,7 +31,7 @@ export const SCREEN_COMPONENTS: Record<string, ComponentType> = {
   dialogo: WallDialogo,
   reflexion: WallReflexion,
   'humano-ia': HumanVsAI,
-  'ai-studio': AIStudioIntro,
+  'ai-studio': ExperienceGallery,
   estacion: StudioStation,
   reto: PedagogicalChallenge,
   tradicional: TraditionalVsInteractive,

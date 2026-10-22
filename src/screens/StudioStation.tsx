@@ -6,6 +6,9 @@ import { usePersistentState } from '../lib/storage';
 import { AI_STUDIO_URL } from '../lib/urls';
 import { usePresenter } from '../presenter/context';
 import { useWorkshop } from '../data/workshops';
+import { CheckinBars } from '../components/CheckinBars';
+import { useAnnounce } from '../presenter/announce';
+import { LIVE_SYNC_AVAILABLE, useLiveResponses, useParticipants, useSessionCode } from '../lib/sync';
 
 export function StudioStation() {
   const [step, setStep] = usePersistentState('station:step', 0);
@@ -13,6 +16,13 @@ export function StudioStation() {
   const { goTo } = usePresenter();
   const ws = useWorkshop();
   const s = STUDIO_STEPS[step];
+  // Registro de avance: cada docente marca desde su celular en qué paso va.
+  const { code } = useSessionCode();
+  const people = useParticipants(LIVE_SYNC_AVAILABLE ? code : '', ws.audience);
+  const live = useLiveResponses(LIVE_SYNC_AVAILABLE ? code : '', `estacion-${step}`);
+  const CHECK = ['¡Listo, ya lo hice!', 'Voy en ello', 'Necesito ayuda'];
+  const counts = CHECK.map((_, i) => live.responses.filter((r) => r.value === String(i)).length);
+  useAnnounce('estacion', { key: `estacion-${step}`, kind: 'choice', prompt: `Paso ${step + 1}: ${s.title}`, options: CHECK, open: true });
   const isDone = done.includes(step);
 
   const toggleDone = () => setDone((d) => (d.includes(step) ? d.filter((x) => x !== step) : [...d, step]));
@@ -92,6 +102,7 @@ export function StudioStation() {
         </article>
       </div>
 
+      {LIVE_SYNC_AVAILABLE && <CheckinBars title={`Paso ${step + 1} · ${s.title}`} labels={CHECK} counts={counts} total={people.length} />}
       <div className="station__meter" aria-label={`${done.length} de ${STUDIO_STEPS.length} pasos completados`}>
         <span style={{ width: `${(done.length / STUDIO_STEPS.length) * 100}%` }} />
       </div>

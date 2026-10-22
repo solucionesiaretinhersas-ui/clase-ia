@@ -11,12 +11,12 @@ export interface Moment {
 }
 
 export const MOMENTS: Moment[] = [
-  { id: 'm1', index: 1, title: 'Apertura: la IA como copiloto', short: 'Abrir', minutes: 12, accent: 'var(--violet)' },
-  { id: 'm2', index: 2, title: 'Conociendo Google AI Studio', short: 'Conocer', minutes: 10, accent: 'var(--blue)' },
-  { id: 'm3', index: 3, title: 'Diseña tu clase con ChatGPT', short: 'Planear', minutes: 18, accent: 'var(--cyan)' },
-  { id: 'm4', index: 4, title: 'Construye y perfecciona en AI Studio', short: 'Crear', minutes: 35, accent: 'var(--mint)' },
-  { id: 'm5', index: 5, title: 'Socialización de recursos', short: 'Compartir', minutes: 7, accent: 'var(--amber)' },
-  { id: 'm6', index: 6, title: 'Cierre ético y humano', short: 'Cerrar', minutes: 8, accent: 'var(--rose)' },
+  { id: 'm1', index: 1, title: 'Mirar distinto: la IA como copiloto', short: 'Mirar', minutes: 12, accent: 'var(--violet)' },
+  { id: 'm2', index: 2, title: 'Explorar lo posible', short: 'Explorar', minutes: 10, accent: 'var(--blue)' },
+  { id: 'm3', index: 3, title: 'Diseñar la experiencia', short: 'Diseñar', minutes: 18, accent: 'var(--cyan)' },
+  { id: 'm4', index: 4, title: 'Construir y probar', short: 'Construir', minutes: 35, accent: 'var(--mint)' },
+  { id: 'm5', index: 5, title: 'Compartir y mejorar', short: 'Compartir', minutes: 7, accent: 'var(--amber)' },
+  { id: 'm6', index: 6, title: 'Llevarlo al aula', short: 'Aplicar', minutes: 8, accent: 'var(--rose)' },
 ];
 
 export const TOTAL_MINUTES = MOMENTS.reduce((s, m) => s + m.minutes, 0);
@@ -156,38 +156,39 @@ export const SCREENS: ScreenMeta[] = [
   {
     id: 'ai-studio',
     moment: 'm2',
-    title: 'Google AI Studio',
+    title: 'Galería de experiencias',
     kind: 'content',
     notes: {
       minutes: 3,
-      participant: 'Conoce Google AI Studio y su sección Build: describes una aplicación y la IA la construye.',
-      objective: 'Presentar Google AI Studio y su modo Build como un taller para construir aplicaciones con lenguaje natural.',
+      participant: 'Elige desde tu celular qué tipo de experiencia te gustaría crear: quiz, simulador, juego, historia, tutor o laboratorio.',
+      objective: 'Descubrir qué se puede crear con Google AI Studio (Build) y elegir el tipo de experiencia que cada docente construirá.',
       explanation:
-        'En Build se describe la aplicación con palabras; Gemini genera el código, lo muestra funcionando y permite pedir cambios conversando.',
+        'No explicamos la herramienta: la usamos. En Build se describe el recurso con palabras y Gemini lo construye; cada tipo de experiencia se pide con una frase distinta.',
       steps: [
-        'Explica el ciclo: describir → generar → probar → mejorar.',
-        'Aclara que se usa con una cuenta de Google y que el docente siempre revisa el contenido.',
-        'Si hay conexión, abre AI Studio en otra pestaña y muestra la sección Build.',
+        'Abre la votación y toca cada tarjeta para mostrar su vista previa y el prompt de ejemplo.',
+        'Pide a 2 o 3 docentes que cuenten para qué tema usarían el tipo que más les gustó.',
+        'Cierra con el ciclo describir, generar, probar y mejorar, y pasa a entrar a Build.',
       ],
+      activity: 'Votación en vivo del tipo de experiencia y prompts de ejemplo copiables.',
     },
   },
   {
     id: 'estacion',
     moment: 'm2',
-    title: 'Estación AI Studio',
+    title: 'Llega a Build',
     kind: 'tool',
     notes: {
       minutes: 7,
-      participant: 'Sigue los pasos de la guía hasta llegar a Build. Marca cada paso cuando lo completes.',
+      participant: 'Sigue los pasos hasta llegar a Build y marca desde tu celular cómo vas: listo, en proceso o necesito ayuda.',
       objective: 'Guiar paso a paso el acceso a Google AI Studio y a la sección Build.',
       explanation:
         'Cada docente debe llegar a la pantalla de Build antes de terminar este momento. La interfaz de Google puede cambiar: guíate por los nombres de las secciones.',
       steps: [
         'Pide que abran Google AI Studio desde el enlace que ya aparece en su celular.',
-        'Avanza paso a paso y pide una mano arriba cuando cada docente complete el paso.',
-        'Ayuda primero a quienes tengan problemas para iniciar sesión.',
+        'Avanza paso a paso: el tablero muestra cuántos docentes ya están listos y cuántos necesitan ayuda.',
+        'Atiende primero a quienes marcaron "Necesito ayuda" (suele ser el inicio de sesión).',
       ],
-      activity: 'Checklist grupal: los docentes marcan cada paso completado.',
+      activity: 'Registro de avance en vivo desde los celulares.',
     },
   },
   {
@@ -289,18 +290,19 @@ export const SCREENS: ScreenMeta[] = [
   {
     id: 'taller',
     moment: 'm4',
-    title: 'Taller práctico',
+    title: 'Construye y prueba tu recurso',
     kind: 'tool',
     notes: {
       minutes: 30,
-      participant: 'Pega el Prompt 2 con tu estructura en AI Studio (Build), prueba el resultado y perfecciónalo con tus mejoras.',
+      participant: 'Pega el Prompt 2 en Build, pruébalo con la lupa pedagógica, perfecciónalo y marca cómo vas en cada fase.',
       objective: 'Cada docente genera su recurso en AI Studio, lo humaniza con su contexto y lo perfecciona.',
       explanation:
         'Cuatro fases: estructura (ya con ChatGPT), generar en Build, humanizar con contexto propio y perfeccionar probando como estudiante.',
       steps: [
         'Inicia el temporizador de 35 minutos del Momento 4.',
         'Pide que incluyan siempre interactividad: simuladores y actividades para que un estudiante pase al tablero proyectado.',
-        'Recorre las mesas. Avanza las fases en pantalla para marcar el ritmo del grupo.',
+        'Avanza las fases en pantalla: el tablero muestra en vivo cuántos van listos para ajustar el ritmo.',
+        'En la fase 3 abre la lupa pedagógica: cada criterio que falla trae su prompt de arreglo.',
         'Recuerda en voz alta la parte humana: contexto, ejemplos de su comunidad, criterio para revisar.',
         'A los 30 minutos, pide que guarden o preparen su recurso para presentarlo.',
       ],

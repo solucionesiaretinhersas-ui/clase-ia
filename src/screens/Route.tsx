@@ -42,7 +42,7 @@ export function Route() {
                 </span>
                 <span className="route__num">0{m.index}</span>
                 <strong>{m.title}</strong>
-                <span className="route__out">{OUTCOMES[i]}</span>
+                <span className="route__out">{ws.audience === 'docente' && <i>Te llevas: </i>}{OUTCOMES[i]}</span>
               </button>
             </li>
           );
