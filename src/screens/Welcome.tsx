@@ -1,4 +1,8 @@
-import { ArrowRight, GraduationCap, Lightbulb, School, Sparkles, WandSparkles } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, GraduationCap, Lightbulb, School, Sparkles, Volume2, VolumeX, WandSparkles } from 'lucide-react';
+import { LoopVideo } from '../components/LoopVideo';
+import { useMuted } from '../lib/sfx';
+import { usePersistentState } from '../lib/storage';
 import { usePresenter } from '../presenter/context';
 import { resetWorkshop } from '../lib/storage';
 import { navigate } from '../lib/router';
@@ -8,6 +12,9 @@ import { WORKSHOPS, setWorkshopId, useWorkshop, type WorkshopId } from '../data/
 export function Welcome() {
   const { goTo } = usePresenter();
   const ws = useWorkshop();
+  const [appMuted] = useMuted();
+  const [soundOn, setSoundOn] = usePersistentState('welcome:video-sound', true);
+  const [blocked, setBlocked] = useState(false);
 
   function pick(id: WorkshopId) {
     if (id === ws.id) return;
@@ -16,7 +23,9 @@ export function Welcome() {
   }
 
   return (
-    <section className="welcome">
+    <section className="welcome welcome--video">
+      <LoopVideo src="/brand/inicio.mp4" sound={soundOn && !appMuted} onBlocked={setBlocked} />
+      <div className="welcome__scrim" aria-hidden="true" />
       <div className="welcome__copy enter">
         <span className="welcome__inst">Institución Educativa Santa Rosa de Lima</span>
         <h1 className="welcome__title">
@@ -45,6 +54,10 @@ export function Welcome() {
             Taller para {ws.audience === 'docente' ? 'docentes' : 'estudiantes'} · {ws.total} minutos
           </span>
           <BrandLogo label="con Google AI Studio" />
+          <button type="button" className="welcome__sound" onClick={() => setSoundOn((v) => !v)} aria-pressed={soundOn && !appMuted}>
+            {soundOn && !appMuted ? <Volume2 /> : <VolumeX />}
+            {appMuted ? 'Sonido apagado en la barra' : soundOn ? (blocked ? 'Toca la pantalla para oír el video' : 'Sonido del video activado') : 'Sonido del video apagado'}
+          </button>
           <button
             type="button"
             className="btn btn--ghost welcome__reset"
@@ -57,7 +70,7 @@ export function Welcome() {
         </div>
       </div>
 
-      <div className="orbit" aria-hidden="true">
+      <div className="orbit welcome__orbit" aria-hidden="true">
         <div className="orbit__ring orbit__ring--1" />
         <div className="orbit__ring orbit__ring--2" />
         <div className="orbit__ring orbit__ring--3" />

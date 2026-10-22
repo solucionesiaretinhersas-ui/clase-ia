@@ -201,3 +201,7 @@ Arquitectura recomendada para sincronizar en vivo:
 ## Google AI Studio
 
 La app solo abre `https://aistudio.google.com/` en una pestaña nueva. No simula el inicio de sesión ni afirma que un recurso se haya guardado o publicado. La interfaz de Google cambia: la guía describe las secciones por nombre (Build), no por posición.
+
+## Video de la portada
+
+La pantalla de inicio reproduce `public/brand/inicio.mp4` como fondo, en bucle sin cortes: dos copias del video se alternan con un fundido de imagen y de volumen justo antes del final. El navegador puede exigir un toque antes de permitir el sonido: se inicia mudo y se activa solo al primer toque. Hay un botón para apagar el sonido del video y respeta el silencio general de la barra. Para cambiar el video, reemplaza ese archivo (mejor MP4 H.264, 1280x720).

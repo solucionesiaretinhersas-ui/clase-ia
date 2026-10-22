@@ -548,3 +548,14 @@ kbd { display: inline-block; padding: 0.05em 0.5em; border-radius: 0.4em; border
 .slab .lab__hero { align-items: center; }
 .kid__predict .btn { justify-self: start; } .kid__uses ul { grid-template-columns: repeat(auto-fit, minmax(9.2rem, 1fr)); } .kid__flow li.is-past button { background: color-mix(in srgb, var(--mint) 8%, var(--surface)); }
 .robi__tray { min-height: 11.5rem; align-content: flex-start; } .fab__tray { min-height: 8.5rem; align-content: flex-start; }
+
+/* ───── Portada con video de fondo ───── */
+.loopvideo { position: fixed; inset: 0; z-index: -1; overflow: hidden; background: #040818; opacity: 0; transition: opacity 1.6s ease; } .loopvideo.is-shown { opacity: 1; }
+.loopvideo video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity var(--fade, 1.8s) linear; } .loopvideo video.is-front { opacity: 1; }
+.welcome--video { --text: #f4f7ff; --text-2: #cfd8f3; --text-3: #a7b6df; --surface: rgb(10 16 42 / 0.55); --surface-2: rgb(255 255 255 / 0.12); --line: rgb(255 255 255 / 0.18); --line-strong: rgb(255 255 255 / 0.3); color: var(--text); }
+.welcome__scrim { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(90deg, rgb(3 7 22 / 0.86) 0%, rgb(3 7 22 / 0.6) 42%, rgb(3 7 22 / 0.12) 78%, rgb(3 7 22 / 0) 100%), linear-gradient(0deg, rgb(3 7 22 / 0.55), transparent 28%); }
+.welcome--video { grid-template-columns: minmax(0, 1.1fr) 0.9fr; } .welcome--video .welcome__orbit { display: none; } .welcome--video .welcome__title { text-shadow: 0 6px 40px rgb(0 0 0 / 0.55); }
+.welcome--video .welcome__inst, .welcome--video .seg { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.welcome__sound { display: inline-flex; align-items: center; gap: 0.5em; min-height: 2.6rem; padding: 0 1rem; border-radius: 999px; border: 1px solid var(--line-strong); background: rgb(255 255 255 / 0.1); backdrop-filter: blur(10px); color: var(--text-2); font-size: 0.9rem; font-weight: 600; } .welcome__sound:hover { background: rgb(255 255 255 / 0.2); color: var(--text); } .welcome__sound svg { width: 1.1em; }
+@media (prefers-reduced-motion: reduce) { .loopvideo, .loopvideo video { transition: none; } }
+.welcome--video .grad-text { background-image: linear-gradient(90deg, #d4b8ff, #86d8ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; } .welcome--video .doodle { color: #cfd8f3; } .welcome--video .welcome__reset { color: #a7b6df; }
