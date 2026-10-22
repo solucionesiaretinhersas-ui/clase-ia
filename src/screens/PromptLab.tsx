@@ -1,5 +1,6 @@
 import { useState, type CSSProperties } from 'react';
 import { Check, ExternalLink, Pencil, RotateCcw, Wand2 } from 'lucide-react';
+import { Art } from '../components/MuralArt';
 import { CopyButton } from '../components/ui';
 import { ACCIONES, AREAS, EMPTY_FIELDS, EXAMPLES, GRADOS, ROLES, SOLUCIONES, buildChatGptPrompt, normalizeFields, type PromptFields } from '../data/prompts';
 import { ROCAS, type Letter } from '../data/rocas';
@@ -54,9 +55,30 @@ export function PromptLab({ compact = false }: { compact?: boolean }) {
   return (
     <section className={`lab ${compact ? 'lab--compact' : 'enter'}`}>
       {!compact && (
-        <header className="screen-head">
-          <span className="kicker">Pídele a ChatGPT tu aula</span>
-          <h2 className="h-lg">Completa las cinco piedras</h2>
+        <header className="screen-head lab__hero">
+          <div>
+            <span className="kicker">Pídele a ChatGPT tu aula</span>
+            <h2 className="h-lg">
+              Cinco piedras y <span className="grad-text">ChatGPT te escribe el prompt</span>
+            </h2>
+          </div>
+          <ol className="journey" aria-label="El camino de tu mensaje">
+            <li>
+              <Art name="bulb" />
+              <b>Tu idea</b>
+              <small>ROCAS</small>
+            </li>
+            <li>
+              <Art name="robot" />
+              <b>ChatGPT</b>
+              <small>te da el prompt</small>
+            </li>
+            <li>
+              <Art name="rocket" />
+              <b>AI Studio</b>
+              <small>construye tu aula</small>
+            </li>
+          </ol>
         </header>
       )}
 
@@ -164,16 +186,9 @@ export function PromptLab({ compact = false }: { compact?: boolean }) {
         </form>
 
         <div className="lab__out glass">
-          <div className="lab__send">
-            <span className="lab__send-step">
-              <b>1</b> Copia este mensaje
-            </span>
-            <span className="lab__send-step">
-              <b>2</b> Pégalo en ChatGPT
-            </span>
-            <span className="lab__send-step">
-              <b>3</b> Lleva su respuesta a AI Studio
-            </span>
+          <div className="lab__chat-bar">
+            <i /> <i /> <i />
+            <span>Mensaje para ChatGPT</span>
           </div>
 
           <ol className="assembly" aria-label="Cómo se ensambla tu mensaje">
