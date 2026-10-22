@@ -20,7 +20,7 @@ npm run preview    # sirve dist/ localmente
 | # | Momento | Min | Qué ocurre |
 |---|---|---|---|
 | 1 | La IA llegó a la educación | 12 | Votación, **charla “no viene a reemplazarte, viene a ampliar tu diseño”** con gráfica interactiva (Docente vs. Docente + IA), “¿la IA ayuda o solo tú?” y lluvia de ideas en vivo |
-| 2 | Google AI Studio | 14 | **Qué es y cómo funciona** (ilustración con puntos para tocar), **aula interactiva completa** simulada que se construye por momentos y se mejora con una frase, la baraja de ideas (dinámica en equipos) y “Llega a Build” |
+| 2 | Google AI Studio | 14 | **Qué es y cómo funciona** (ilustración con puntos para tocar), **aula interactiva completa** simulada que se construye por momentos y se mejora con una frase, “Llega a Build” |
 | 3 | Tu prompt con ROCAS | 20 | **Metodología ROCAS** (piedras, comparador y juego por equipos) y un **único mensaje para ChatGPT** que le pide el prompt para crear el aula en AI Studio |
 | 4 | Crea tu aula | 30 | Recorrido ChatGPT → AI Studio, creación guiada con avance en vivo y **lupa pedagógica** |
 | 5 | Compartir y mejorar | 6 | Uno o dos docentes presentan (ruleta con pregunta) y diálogo en un mural ilustrado |
@@ -58,6 +58,7 @@ Tecla **R** (o el botón de dados): la ruleta se arma con los docentes que se re
 - **Equipos (tecla E):** divide a los docentes registrados en dos equipos al azar, edita sus nombres y lleva el marcador con turnos. Los juegos suman puntos al equipo en turno.
 - **Juego “Arma el prompt”:** en la pizarra táctil, cada equipo arrastra frases a su letra de ROCAS (Rol, Objetivo, Contexto, Acción, Salida). Cada equipo juega por turnos con el tiempo máximo que tú definas en la pantalla y toca ¡Terminamos! al acabar; si empatan en puntos, gana quien terminó más rápido.
 - **Google AI Studio:** Google no permite mostrar AI Studio ni su inicio de sesión dentro de otra página, así que se abre en su propia ventana desde los botones de acceso. Si el navegador bloquea las ventanas emergentes, permítelas para este sitio.
+
 ## Dos talleres en la misma aplicación
 
 En la portada hay un selector: **Taller para docentes** (90 min, 6 momentos) y **Taller para estudiantes** (90 min, 5 momentos). Cambia el guion, las actividades, los textos del celular y el certificado; el diseño y las herramientas (pizarra, ruleta, QR, tema claro/oscuro) son los mismos. El QR de ingreso lleva el taller en el enlace (`&w=d` o `&w=e`), así que el celular sabe cuál es sin configurar nada.
@@ -66,10 +67,10 @@ En la portada hay un selector: **Taller para docentes** (90 min, 6 momentos) y *
 
 | # | Momento | Min | Qué ocurre |
 |---|---|---|---|
-| 1 | Despierta tu curiosidad | 12 | Votación, qué es la IA, nube “¿dónde ves IA?” y “¿es IA o no?” |
-| 2 | ¿Cómo funciona la IA? | 14 | Datos → modelo → predicción, juego de adivinar la palabra (nube de palabras) y “¿confío o verifico?” |
-| 3 | Crear con Google AI Studio | 14 | Qué es AI Studio (nivel gratuito con límites, apps web vs. Android), programar escribiendo (*vibe coding*), ejemplo y acceso a Build |
-| 4 | Manos a la obra: tu aplicación | 40 | Idea, constructor de prompt, taller con prompts de mejora (incluye agregar IA con Gemini dentro de la app) y muestra con ruleta |
+| 1 | Despierta tu curiosidad | 12 | Votación, **tarjetas que se voltean** (qué es la IA y dónde la usas), nube “¿dónde ves IA?” y “¿es IA o no?” |
+| 2 | ¿Cómo funciona la IA? | 14 | Datos → modelo → predicción animada, **juego “Entrena a Robi”** (arrastrar animales a su casa y ver cómo aprende y se equivoca), adivinar la palabra y “¿confío o verifico?” |
+| 3 | Crear con Google AI Studio | 16 | **Qué es AI Studio** (ilustración con puntos para tocar), **“Tú escribes, la IA programa”** (un juego tocable creado por la IA que se mejora pidiendo cambios), **“La fábrica de apps”** (arrastrar piezas con misiones y estrellas; la maqueta cambia y sale el prompt) y acceso a Build |
+| 4 | Manos a la obra: tu aplicación | 38 | Muro de ideas, constructor de prompt, **taller con misiones, puntos y niveles** (Aprendiz → Maestro de apps), cofre de poderes con prompts de mejora (incluye IA con Gemini) y muestra con ruleta |
 | 5 | Cierre y reconocimiento | 10 | Uso responsable, “lo que me llevo” y certificados |
 
 > **Antes de usarlo con estudiantes:** verifica las condiciones de uso de Google AI Studio (edad mínima y tipo de cuenta) y las políticas de la institución. Si los estudiantes no pueden tener cuenta propia, usen la del docente en parejas o en pantalla compartida. El uso gratuito de los modelos tiene límites y puede cambiar.

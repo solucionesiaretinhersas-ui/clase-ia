@@ -3,15 +3,15 @@ import type { Moment, ScreenMeta } from './workshop';
 export const E_MOMENTS: Moment[] = [
   { id: 'e1', index: 1, title: 'Despierta tu curiosidad', short: 'Curiosidad', minutes: 12, accent: 'var(--violet)' },
   { id: 'e2', index: 2, title: '¿Cómo funciona la IA?', short: 'Cómo funciona', minutes: 14, accent: 'var(--blue)' },
-  { id: 'e3', index: 3, title: 'Crear con Google AI Studio', short: 'Crear', minutes: 14, accent: 'var(--cyan)' },
-  { id: 'e4', index: 4, title: 'Manos a la obra: tu aplicación', short: 'Tu app', minutes: 40, accent: 'var(--mint)' },
+  { id: 'e3', index: 3, title: 'Crear con Google AI Studio', short: 'Crear', minutes: 16, accent: 'var(--cyan)' },
+  { id: 'e4', index: 4, title: 'Manos a la obra: tu aplicación', short: 'Tu app', minutes: 38, accent: 'var(--mint)' },
   { id: 'e5', index: 5, title: 'Cierre y reconocimiento', short: 'Cierre', minutes: 10, accent: 'var(--amber)' },
 ];
 
 export const E_OUTCOMES = [
   'Qué es la inteligencia artificial',
   'Cómo aprende y cómo se equivoca',
-  'Qué es Google AI Studio y programar escribiendo',
+  'Qué es Google AI Studio y cómo pedirle una app',
   'Tu propia aplicación o juego funcionando',
   'Uso responsable y tu certificado',
 ];
@@ -72,15 +72,16 @@ export const E_SCREENS: ScreenMeta[] = [
     kind: 'content',
     notes: {
       minutes: 4,
-      participant: 'Escucha: la IA aprende de muchos ejemplos y encuentra patrones para ayudarte a hacer cosas.',
+      participant: 'Toca las tarjetas y descubre qué es la IA y dónde la usas sin darte cuenta.',
       objective: 'Entender con ejemplos cotidianos qué es la IA.',
       explanation:
         'La IA es un programa que aprende de muchísimos ejemplos para reconocer patrones y generar respuestas. No “piensa” como una persona: calcula lo más probable.',
       steps: [
-        'Usa los ejemplos: recomendaciones de videos, filtros de cámara, asistentes de voz, traductores.',
-        'Aclara las tres ideas: aprende de ejemplos, reconoce patrones, genera respuestas.',
-        'Pregunta: ¿dónde la usan ustedes sin darse cuenta?',
+        'Pide a un estudiante que pase al tablero y toque cada tarjeta: aprende de ejemplos, encuentra patrones y genera respuestas.',
+        'Toca los seis ejemplos de la vida diaria y pregunta cuáles usan ellos. El contador sube con cada uno.',
+        'Cierra con la pregunta: ¿dónde la usan sin darse cuenta?',
       ],
+      activity: 'Tarjetas que se voltean y ejemplos que se tocan en la pizarra.',
     },
   },
   {
@@ -117,12 +118,37 @@ export const E_SCREENS: ScreenMeta[] = [
     title: 'Así aprende una IA',
     kind: 'content',
     notes: {
-      minutes: 5,
+      minutes: 3,
       participant: 'Mira el recorrido: datos → modelo → respuesta. La IA predice lo más probable.',
       objective: 'Entender de forma sencilla cómo funciona un modelo de IA.',
       explanation:
         'Se le muestran millones de ejemplos (datos), el modelo ajusta lo que aprendió, y cuando le preguntas calcula la respuesta más probable. Por eso puede equivocarse.',
-      steps: ['Recorre los tres pasos tocando cada uno.', 'Usa la analogía del autocompletar del celular.', 'Conecta con el siguiente juego.'],
+      steps: [
+        'Toca los tres pasos: datos, modelo y predicción.',
+        'En el paso 3 pulsa “Ver cómo piensa” y explica los porcentajes con la analogía del autocompletar del celular.',
+        'Conecta con el juego siguiente: ahora ellos van a entrenar a una IA.',
+      ],
+      activity: 'Recorrido de tres pasos y una predicción animada.',
+    },
+  },
+  {
+    id: 'e-robi',
+    moment: 'e2',
+    title: 'Entrena a Robi',
+    kind: 'activity',
+    notes: {
+      minutes: 5,
+      participant: 'Dale ejemplos a Robi, el robot, y mira qué tan bien aprende. ¿Se equivocará?',
+      objective: 'Experimentar que una IA mejora con más ejemplos y que se equivoca con lo que nunca vio.',
+      explanation:
+        'Robi es un robot de juguete que aprende a distinguir perros de gatos. Con pocos ejemplos se confunde; con más ejemplos acierta, pero con un lobo o un tigre, que nunca vio, se equivoca con seguridad.',
+      steps: [
+        'Pasa estudiantes al tablero de a uno: cada uno arrastra un animal a su casa (o lo toca y toca la casa).',
+        'Cuando Robi tenga 3 o más ejemplos puedes pulsar “¡Probar a Robi!”. Para mostrar el contraste, prueba una vez con pocos ejemplos y otra con todos.',
+        'Revela cada prueba. Pregunta por qué se equivocó con el lobo y el tigre.',
+        'Cierra con las tres ideas: más ejemplos, más aprendizaje; con lo nuevo se equivoca; por eso verificamos.',
+      ],
+      activity: 'Juego de arrastrar y soltar en la pizarra con prueba final.',
     },
   },
   {
@@ -131,7 +157,7 @@ export const E_SCREENS: ScreenMeta[] = [
     title: 'Adivina la palabra',
     kind: 'activity',
     notes: {
-      minutes: 4,
+      minutes: 3,
       participant: 'Completa la frase con UNA palabra desde tu celular. Veremos cuál es la más repetida.',
       objective: 'Experimentar cómo una IA predice la siguiente palabra.',
       explanation: 'Entre todos, la palabra más repetida es “la más probable”: así elige la IA su respuesta.',
@@ -145,7 +171,7 @@ export const E_SCREENS: ScreenMeta[] = [
     title: '¿Confío o verifico?',
     kind: 'activity',
     notes: {
-      minutes: 5,
+      minutes: 3,
       participant: 'Para cada caso, toca en tu celular: ¿puedo confiar o debo verificar?',
       objective: 'Desarrollar el hábito de verificar lo que dice una IA.',
       explanation: 'La IA puede inventar datos con total seguridad. Verificar en fuentes confiables es parte de usarla bien.',
@@ -160,43 +186,56 @@ export const E_SCREENS: ScreenMeta[] = [
     kind: 'content',
     notes: {
       minutes: 3,
-      participant: 'Con Google AI Studio puedes crear aplicaciones web describiendo tu idea. Aquí verás los enlaces.',
-      objective: 'Presentar AI Studio como un espacio para crear cualquier aplicación con ayuda de la IA.',
+      participant: 'Con Google AI Studio creas aplicaciones escribiendo tu idea. Toca los números para ver cómo se usa.',
+      objective: 'Presentar AI Studio como un lugar para crear cualquier aplicación con ayuda de la IA.',
       explanation:
         'En AI Studio (sección Build) describes tu idea con palabras y se genera una aplicación web. Ofrece acceso gratuito a modelos de Google con límites de uso; las condiciones pueden cambiar, así que se revisan en el sitio.',
       steps: [
-        'Muestra los tipos de aplicación posibles: juegos, quizzes, simuladores, historias, herramientas.',
-        'Aclara: aquí se crean aplicaciones web; las de Android son posibles pero más complejas.',
-        'Aclara que el uso gratuito tiene límites y condiciones vigentes.',
+        'Pide a un estudiante que toque los cuatro números de la ilustración: Build, tu idea, tu app funcionando y pedir cambios.',
+        'Recorre las cuatro fases: escribes, la IA programa, tú pruebas y mejoras.',
+        'Aclara: aquí se crean aplicaciones web; las de Android son posibles pero más complejas. El uso gratuito tiene límites y condiciones vigentes.',
       ],
+      activity: 'Ilustración de la pantalla con puntos para tocar.',
     },
   },
   {
     id: 'e-vibe',
     moment: 'e3',
-    title: 'Programar escribiendo',
-    kind: 'content',
+    title: 'Tú escribes, la IA programa',
+    kind: 'activity',
     notes: {
-      minutes: 3,
-      participant: 'Programar con IA es describir lo que quieres, probarlo y mejorarlo, una y otra vez.',
-      objective: 'Entender el “vibe coding”: crear software conversando con la IA.',
+      minutes: 4,
+      participant: 'Mira cómo una frase se convierte en un juego, y juégalo. Después pídele mejoras.',
+      objective: 'Entender el vibe coding: crear software conversando con la IA, y ver que se mejora pidiendo cambios.',
       explanation:
-        'Programar es dar instrucciones a un computador. Ahora puedes escribirlas en lenguaje natural y la IA genera el código; tú diriges, pruebas y corriges.',
-      steps: ['Explica el ciclo: describir → generar → probar → mejorar.', 'Aclara: no hace falta saber programar para empezar, pero sí pensar claro.', 'Recuerda que tú eres quien decide.'],
+        'Programar es dar instrucciones a un computador. Ahora puedes escribirlas en lenguaje natural y la IA genera el código; tú diriges, pruebas y corriges. Esta demo es una ilustración: cada app real se crea en AI Studio.',
+      steps: [
+        'Pulsa “Pídele el juego a la IA” y narra cómo se escribe la frase y cómo aparece el código.',
+        'Pasa estudiantes al tablero a jugar: tocan estrellas y esquivan meteoritos.',
+        'Activa las mejoras (más rápido, tema océano, joya de bonus) y juega otra vez: así se mejora una app pidiendo cambios.',
+        'Aclara que no hace falta saber programar para empezar, pero sí pensar claro lo que quieres.',
+      ],
+      activity: 'Juego tocable creado “por la IA” y mejoras que se piden con botones.',
     },
   },
   {
-    id: 'e-demo',
+    id: 'e-fabrica',
     moment: 'e3',
-    title: 'Un ejemplo hecho con IA',
-    kind: 'content',
+    title: 'La fábrica de apps',
+    kind: 'activity',
     notes: {
-      minutes: 3,
-      participant: 'Mira una aplicación hecha con IA: introducción, retos, puntos y resultados.',
-      objective: 'Ver un ejemplo concreto de lo que se puede crear.',
-      explanation: 'Esta misión tiene todo lo que piden en el prompt: pantallas, retos, puntos y retroalimentación.',
-      steps: ['Juega el primer reto con el grupo.', 'Pide a un estudiante pasar al tablero.', 'Pregunta: ¿qué le pedirían ustedes a la IA?'],
-      activity: 'Un estudiante juega frente al grupo.',
+      minutes: 5,
+      participant: 'Arma la idea de una app pieza por pieza y mira cómo cambia. ¡Cumple misiones y gana estrellas!',
+      objective: 'Practicar cómo se describe una app: qué es, de qué trata, cómo se ve y qué trae.',
+      explanation:
+        'Un buen prompt tiene partes claras. Cada pieza es una parte de la idea: el tipo de app, el tema, el estilo visual y los extras. La maqueta cambia a medida que las colocan y al final aparece el prompt para AI Studio.',
+      steps: [
+        'Elige una misión (o modo libre) y pasa estudiantes al tablero a arrastrar las piezas a su casilla.',
+        'Si se equivocan de casilla, la pieza vuelve y pueden intentarlo de nuevo: pregunta por qué creen que va en otra.',
+        'Pulsa “Comprobar misión” para ganar la estrella. Cuando termine, copia el prompt y muestra que es lo que se pega en AI Studio.',
+        'Conecta con lo siguiente: ahora van a hacerlo con su propia idea.',
+      ],
+      activity: 'Juego de arrastrar piezas con misiones, estrellas y maqueta en vivo.',
     },
   },
   {
@@ -205,7 +244,7 @@ export const E_SCREENS: ScreenMeta[] = [
     title: 'Entra a AI Studio',
     kind: 'tool',
     notes: {
-      minutes: 5,
+      minutes: 4,
       participant: 'Sigue los pasos hasta llegar a Build. Usa la cuenta que tu docente indique y nunca compartas tus datos.',
       objective: 'Llegar a la sección Build de Google AI Studio.',
       explanation: 'Cada estudiante (o pareja) debe llegar a Build antes de que termine este momento.',
@@ -223,7 +262,7 @@ export const E_SCREENS: ScreenMeta[] = [
     title: '¿Qué crearías?',
     kind: 'activity',
     notes: {
-      minutes: 5,
+      minutes: 4,
       participant: 'Escribe la idea de una aplicación o juego que te gustaría crear y envíala.',
       objective: 'Elegir una idea propia para construir.',
       explanation: 'Las mejores aplicaciones nacen de ideas que a ti te importan: un juego, una herramienta para tus tareas, una historia.',
@@ -237,7 +276,7 @@ export const E_SCREENS: ScreenMeta[] = [
     title: 'Escribe tu prompt',
     kind: 'tool',
     notes: {
-      minutes: 7,
+      minutes: 6,
       participant: 'Completa los datos de tu idea, copia el prompt y pégalo en AI Studio (Build).',
       objective: 'Convertir una idea en un prompt claro para AI Studio.',
       explanation: 'Un buen prompt dice qué es, para quién, cómo funciona y cómo se ve. Cuanto más claro, mejor la primera versión.',
@@ -251,17 +290,17 @@ export const E_SCREENS: ScreenMeta[] = [
     title: 'Taller: crea tu aplicación',
     kind: 'tool',
     notes: {
-      minutes: 23,
-      participant: 'Genera tu app, pruébala y mejórala con los prompts de la pantalla. Un cambio a la vez.',
+      minutes: 24,
+      participant: 'Completa tus misiones: cada tarea suma puntos y te sube de nivel. Pide un cambio a la vez.',
       objective: 'Cada estudiante o pareja genera, prueba y mejora su aplicación.',
-      explanation: 'Cuatro fases: generar, probar, mejorar y potenciar con IA dentro de la app.',
+      explanation: 'Cuatro misiones: idea y prompt, genera tu app, prueba y mejora, y potencia con IA. Cada tarea marcada suma 10 puntos y sube de nivel: Aprendiz, Creador, Inventor y Maestro de apps.',
       steps: [
-        'Inicia el temporizador de 40 minutos del Momento 4.',
-        'Recorre los grupos; pide que prueben su app como si fueran otro usuario.',
-        'Recuerda: la IA ayuda, pero las ideas, los cambios y las decisiones son suyas.',
-        'Reserva los últimos minutos para elegir quién presenta.',
+        'Inicia el temporizador del momento (tecla T).',
+        'Recorre los grupos: pide que prueben su app como si fueran otra persona y que marquen cada tarea al cumplirla.',
+        'Abre el cofre de poderes para copiar los prompts de mejora. Un cambio a la vez.',
+        'Celebra los cambios de nivel. Reserva los últimos minutos para elegir quién presenta.',
       ],
-      activity: 'Creación guiada con prompts de mejora.',
+      activity: 'Misiones con puntos, niveles y avance en vivo.',
     },
   },
   {
@@ -270,7 +309,7 @@ export const E_SCREENS: ScreenMeta[] = [
     title: 'Muestra tu app',
     kind: 'activity',
     notes: {
-      minutes: 5,
+      minutes: 4,
       participant: 'Uno o dos grupos pasan al tablero a mostrar su app. ¡Prepárate para preguntar!',
       objective: 'Presentar aplicaciones creadas y conversar sobre el proceso.',
       explanation: 'Mostrar lo creado da sentido al trabajo. Usa la ruleta para elegir quién pasa y qué pregunta responde.',

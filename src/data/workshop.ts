@@ -193,25 +193,6 @@ export const SCREENS: ScreenMeta[] = [
     },
   },
   {
-    id: 'reto-ideas',
-    moment: 'm2',
-    title: 'La baraja de ideas',
-    kind: 'activity',
-    notes: {
-      minutes: 4,
-      participant: 'Jueguen en equipos: una carta, un minuto para pensar y luego cada equipo comparte su idea.',
-      objective: 'Que los docentes se cuestionen y generen ideas de aula antes de crearlas: qué clase soñada, qué tarea liberar, qué estudiante atender.',
-      explanation: 'Cada carta plantea una pregunta provocadora. No hay respuestas correctas: se premia la idea más original o la más útil para su contexto. Las ideas alimentan el prompt que armarán después.',
-      steps: [
-        'Pulsa E para armar dos equipos si aún no lo has hecho.',
-        'Saca una carta, léela en voz alta y deja correr el minuto de pensar en equipo.',
-        'Cada equipo comparte su idea y el grupo decide a quién dar los 10 puntos.',
-        'Repite con dos o tres cartas y pide que anoten la idea que más les gustó: será el tema de su aula.',
-      ],
-      activity: 'Juego de cartas por equipos con cronómetro y marcador.',
-    },
-  },
-  {
     id: 'estacion',
     moment: 'm2',
     title: 'Llega a Build',

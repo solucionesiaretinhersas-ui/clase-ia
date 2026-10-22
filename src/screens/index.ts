@@ -1,7 +1,5 @@
 import type { ComponentType } from 'react';
 import { Closing } from './Closing';
-import { DemoScreen } from './DemoScreen';
-import { IdeasGame } from './IdeasGame';
 import { Ethics } from './Ethics';
 import { Gallery } from './Gallery';
 import { HumanVsAI } from './HumanVsAI';
@@ -11,7 +9,7 @@ import { PromptLab } from './PromptLab';
 import { Route } from './Route';
 import { StudioStation } from './StudioStation';
 import { Potencia } from './IntroScreens';
-import { AulaDemo, StudioIntro } from './StudioScreens';
+import { AulaDemo, StudioIntro, StudioIntroKids } from './StudioScreens';
 import { Usos } from './Usos';
 import { RocasCompare, RocasIntro } from './RocasScreens';
 import { RocasGame } from './RocasGame';
@@ -20,7 +18,9 @@ import { Welcome } from './Welcome';
 import { Certificates } from './Certificates';
 import { StudentLab } from './StudentLab';
 import { StudentWorkshop } from './StudentWorkshop';
-import { HowAI, StudioForStudents, VibeCoding, WhatIsAI } from './StudentScreens';
+import { HowAI, WhatIsAI } from './StudentScreens';
+import { AppFactory, RobiGame } from './StudentGames';
+import { VibeKids } from './StudentVibe';
 import { EConfiar, EIaONo } from './StudentClassify';
 import { WallDialogo, WallDonde, WallEReflexion, WallIdea, WallLluvia, WallPrediccion, WallReflexion } from './Walls';
 
@@ -57,10 +57,10 @@ export const SCREEN_COMPONENTS: Record<string, ComponentType> = {
   'e-como': HowAI,
   'e-prediccion': WallPrediccion,
   'e-confiar': EConfiar,
-  'e-studio': StudioForStudents,
-  'e-vibe': VibeCoding,
-  'e-demo': DemoScreen,
-  'reto-ideas': IdeasGame,
+  'e-robi': RobiGame,
+  'e-studio': StudioIntroKids,
+  'e-vibe': VibeKids,
+  'e-fabrica': AppFactory,
   'e-estacion': StudioStation,
   'e-idea': WallIdea,
   'e-lab': StudentLab,

@@ -65,4 +65,6 @@ export function confetti({ x = 0.5, y = 0.35, count = 140 }: { x?: number; y?: n
     else canvas.remove();
   };
   requestAnimationFrame(step);
+  // Por si el navegador pausa la animación (pestaña oculta): nunca deja el lienzo pegado
+  window.setTimeout(() => canvas.remove(), 6000);
 }

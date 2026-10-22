@@ -37,22 +37,51 @@ const HOW = [
   { icon: PencilRuler, t: 'Mejoras', d: 'Pides cambios hasta que sea tu aula.' },
 ];
 
+const HOTSPOTS_KIDS = [
+  { n: 1, t: 'Build', d: 'Aquí se construyen las aplicaciones. ¡Es tu taller de inventos!' },
+  { n: 2, t: 'Tu idea', d: 'Escribes qué quieres crear, con tus palabras. No necesitas saber programar.' },
+  { n: 3, t: 'Tu app funcionando', d: 'Aparece al instante y puedes probarla como si fuera un videojuego.' },
+  { n: 4, t: 'Pide cambios', d: 'Si algo no te gusta, escribes “hazlo más rápido” y la IA lo cambia.' },
+];
+
+const HOW_KIDS = [
+  { icon: MessageSquareText, t: 'Escribes tu idea', d: 'Cuentas qué quieres crear: un juego, un quiz, una historia…' },
+  { icon: Wand2, t: 'La IA programa', d: 'Escribe el código de tu aplicación en un momento.' },
+  { icon: MonitorPlay, t: 'Tú la pruebas', d: 'La juegas y miras si hace lo que querías.' },
+  { icon: PencilRuler, t: 'Pides mejoras', d: 'Cambias colores, niveles, puntos… ¡hasta que sea tuya!' },
+];
+
 /** Qué es Google AI Studio, cómo funciona y dónde está cada cosa en su pantalla (ilustración). */
-export function StudioIntro() {
+export function StudioIntro({ kids = false }: { kids?: boolean }) {
   const [hot, setHot] = useState(1);
-  const cur = HOTSPOTS.find((h) => h.n === hot) ?? HOTSPOTS[0];
+  const spots = kids ? HOTSPOTS_KIDS : HOTSPOTS;
+  const how = kids ? HOW_KIDS : HOW;
+  const cur = spots.find((h) => h.n === hot) ?? spots[0];
 
   return (
     <section className="stu enter">
       <header className="screen-head">
-        <span className="kicker">Etapa 2 · Google AI Studio</span>
-        <h2 className="h-xl">
-          Describes tu clase y la IA <span className="grad-text">construye tu aula</span>
-        </h2>
-        <p className="lead">
-          Google AI Studio es una herramienta de Google donde se crean aplicaciones hablando con Gemini. Para un docente significa algo muy concreto:
-          una <b>aula interactiva completa</b>, con todo lo de tu clase en un solo lugar, sin escribir código.
-        </p>
+        <span className="kicker">{kids ? 'Momento 3 · Google AI Studio' : 'Etapa 2 · Google AI Studio'}</span>
+        {kids ? (
+          <>
+            <h2 className="h-xl">
+              Escribes una idea y la IA <span className="grad-text">crea tu app</span>
+            </h2>
+            <p className="lead">
+              Google AI Studio es un lugar de Google donde se crean aplicaciones <b>escribiendo con tus palabras</b>. Hoy vas a inventar tu propio juego o tu propia herramienta.
+            </p>
+          </>
+        ) : (
+          <>
+            <h2 className="h-xl">
+              Describes tu clase y la IA <span className="grad-text">construye tu aula</span>
+            </h2>
+            <p className="lead">
+              Google AI Studio es una herramienta de Google donde se crean aplicaciones hablando con Gemini. Para un docente significa algo muy concreto: una <b>aula interactiva completa</b>, con todo lo de tu clase en un solo lugar, sin
+              escribir código.
+            </p>
+          </>
+        )}
       </header>
 
       <div className="stu__body">
@@ -73,19 +102,19 @@ export function StudioIntro() {
             <div className="stu__main">
               <button type="button" className={`stu__prompt stu__hot ${hot === 2 ? 'is-on' : ''}`} onClick={() => { setHot(2); sfx.pop(); }} aria-label="Ver: tu instrucción">
                 <b>2</b>
-                <span>Crea un aula interactiva sobre el ciclo del agua para grado sexto…</span>
+                <span>{kids ? 'Crea un juego donde atrapo estrellas y esquivo meteoritos…' : 'Crea un aula interactiva sobre el ciclo del agua para grado sexto…'}</span>
               </button>
               <div className="stu__split">
                 <button type="button" className={`stu__preview stu__hot ${hot === 3 ? 'is-on' : ''}`} onClick={() => { setHot(3); sfx.pop(); }} aria-label="Ver: vista previa">
                   <b>3</b>
                   <div className="stu__aula">
-                    <em>El ciclo del agua</em>
+                    <em>{kids ? 'Atrapa estrellas ⭐' : 'El ciclo del agua'}</em>
                     <i /> <i /> <i />
                   </div>
                 </button>
                 <button type="button" className={`stu__chat stu__hot ${hot === 4 ? 'is-on' : ''}`} onClick={() => { setHot(4); sfx.pop(); }} aria-label="Ver: mejorar conversando">
                   <b>4</b>
-                  <span>Hazlo más grande para el tablero</span>
+                  <span>{kids ? 'Hazlo más rápido' : 'Hazlo más grande para el tablero'}</span>
                 </button>
               </div>
             </div>
@@ -101,7 +130,7 @@ export function StudioIntro() {
       </div>
 
       <ol className="stu__how">
-        {HOW.map(({ icon: Icon, t, d }, i) => (
+        {how.map(({ icon: Icon, t, d }, i) => (
           <li key={t} style={{ '--i': i } as CSSProperties}>
             <span>
               <Icon />
@@ -455,3 +484,6 @@ export function AulaDemo() {
     </section>
   );
 }
+
+/** Versión para estudiantes. */
+export const StudioIntroKids = () => <StudioIntro kids />;

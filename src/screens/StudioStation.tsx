@@ -1,7 +1,7 @@
 import { Check, ShieldCheck, ChevronLeft, ChevronRight, ExternalLink, Lightbulb, WandSparkles } from 'lucide-react';
 import { QRCode } from '../components/QRCode';
 import { BrandLogo } from '../components/BrandLogo';
-import { STUDIO_STEPS } from '../data/studioSteps';
+import { studioStepsFor } from '../data/studioSteps';
 import { usePersistentState } from '../lib/storage';
 import { AI_STUDIO_URL } from '../lib/urls';
 import { usePresenter } from '../presenter/context';
@@ -15,7 +15,8 @@ export function StudioStation() {
   const [done, setDone] = usePersistentState<number[]>('station:done', []);
   const { goTo } = usePresenter();
   const ws = useWorkshop();
-  const s = STUDIO_STEPS[step];
+  const STUDIO_STEPS = studioStepsFor(ws.audience);
+  const s = STUDIO_STEPS[Math.min(step, STUDIO_STEPS.length - 1)];
   // Registro de avance: cada docente marca desde su celular en qué paso va.
   const { code } = useSessionCode();
   const people = useParticipants(LIVE_SYNC_AVAILABLE ? code : '', ws.audience);
@@ -33,7 +34,7 @@ export function StudioStation() {
         <div>
           <BrandLogo size="2.2em" />
           <span className="kicker">Estación Google AI Studio</span>
-          <h2 className="h-lg">Seis pasos para crear tu primera aplicación</h2>
+          <h2 className="h-lg">{ws.audience === 'estudiante' ? 'Seis pasos para crear tu primera app' : 'Seis pasos para crear tu primera aula'}</h2>
         </div>
         <a className="btn btn--primary btn--lg" href={AI_STUDIO_URL} target="_blank" rel="noopener noreferrer">
           Abrir Google AI Studio <ExternalLink />

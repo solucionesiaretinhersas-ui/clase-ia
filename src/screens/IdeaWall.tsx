@@ -1,4 +1,4 @@
-import { joinRoute } from '../data/workshops';
+import { joinRoute, useWorkshop } from '../data/workshops';
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { EyeOff, Plus, Smartphone, Star } from 'lucide-react';
 import { ActivityControls, useActivityStatus } from '../components/ActivityShell';
@@ -40,6 +40,7 @@ const REACTIONS = ['👏', '💡', '❤️'];
 /** Muro de ideas: los docentes envían desde el celular y las ideas aparecen en el tablero al instante. */
 export function IdeaWall({ cfg }: { cfg: WallConfig }) {
   const [status] = useActivityStatus(cfg.id);
+  const who = useWorkshop().audience === 'estudiante' ? 'estudiantes' : 'docentes';
   const { code } = useSessionCode();
   const { base } = usePublicBase();
   const live = useLiveResponses(LIVE_SYNC_AVAILABLE ? code : '', cfg.id);
@@ -123,8 +124,8 @@ export function IdeaWall({ cfg }: { cfg: WallConfig }) {
               <p>{status === 'open' ? 'Esperando ideas…' : 'El muro está esperando.'}</p>
               <span>
                 {status === 'open'
-                  ? 'Los docentes escriben desde su celular y aparecerán aquí al instante.'
-                  : 'Pulsa “Abrir muro” para que los docentes puedan enviar sus ideas.'}
+                  ? `Los ${who} escriben desde su celular y aparecerán aquí al instante.`
+                  : `Pulsa “Abrir muro” para que los ${who} puedan enviar sus ideas.`}
               </span>
             </div>
           ) : cfg.cloud ? (
@@ -182,7 +183,7 @@ export function IdeaWall({ cfg }: { cfg: WallConfig }) {
               </span>
             </>
           ) : (
-            <p className="note-muted">Sincronización no configurada: escribe aquí las ideas que dicen los docentes.</p>
+            <p className="note-muted">Sincronización no configurada: escribe aquí las ideas que dicen los {who}.</p>
           )}
           <form className="wall-screen__add" onSubmit={add}>
             <input className="input" value={text} onChange={(e) => setText(e.target.value)} placeholder="Escribir una idea en el tablero" maxLength={200} aria-label="Escribir una idea en el tablero" />

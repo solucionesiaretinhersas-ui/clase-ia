@@ -10,7 +10,7 @@ import { SoundToggle } from '../components/SoundToggle';
 import { sfx } from '../lib/sfx';
 import { ANSWER_KEYS } from '../data/answers';
 import { STUDENT_REFINEMENTS } from '../data/prompts';
-import { STUDIO_STEPS } from '../data/studioSteps';
+import { studioStepsFor } from '../data/studioSteps';
 import { navigate, queryParam, segments } from '../lib/router';
 import { LIVE_SYNC_AVAILABLE, lookupCertificate, registerParticipant, sendIdea, sendResponse, useLiveState, type IssuedCertificate, type LiveAct } from '../lib/sync';
 import { clearStored, usePersistentState } from '../lib/storage';
@@ -564,6 +564,7 @@ function PromptPage() {
 
 function Guide() {
   const ws = useWorkshop();
+  const STUDIO_STEPS = studioStepsFor(ws.audience);
   const [done, setDone] = usePersistentState<number[]>('mobile:guide', []);
   return (
     <Shell title="Guía de creación">
