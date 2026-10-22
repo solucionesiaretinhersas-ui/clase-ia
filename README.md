@@ -209,3 +209,7 @@ La pantalla de inicio reproduce `public/brand/inicio.mp4` como fondo, en bucle s
 ## Sonidos de la interfaz
 
 En los dos talleres, el tablero suena al tocar cualquier botón, enlace, pestaña o casilla (toque suave), al abrir y cerrar ventanas, al copiar, al entrar un participante o un voto, al cambiar de pantalla y en el cronómetro de cada momento (aviso a 1 minuto del final y campanita al terminar). Todo respeta el botón de silencio de la barra superior. Los celulares no suenan para no hacer ruido en el salón.
+
+## Transiciones entre diapositivas
+
+Al cambiar de pantalla el tablero usa la API View Transitions (Chrome, Edge y Safari reciente) con 8 efectos: zoom cinematográfico, deslizar en 3D, iris, cubo, subir, cortina diagonal, volteo y glitch neón. Cada pantalla usa uno distinto y al retroceder se invierten. Al entrar a un momento nuevo se muestra además una tarjeta de capítulo con el número y el nombre del momento. Las barras superior e inferior no se mueven. Si el equipo pide reducir el movimiento o el navegador no lo soporta, el cambio es simple. Los estilos están en `src/styles/transitions.css`.

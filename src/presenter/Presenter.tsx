@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import {
   ChevronDown,
   ChevronLeft,
@@ -45,6 +45,19 @@ function isTyping(el: EventTarget | null) {
   if (!(el instanceof HTMLElement)) return false;
   return el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName);
 }
+
+/** Efectos de cambio de diapositiva: cada pantalla usa uno distinto; al cambiar de momento se usa el iris. */
+const EFFECTS = ['slide', 'zoom', 'rise', 'cube', 'wipe', 'flip', 'glitch'];
+
+interface Chapter {
+  key: number;
+  index: number;
+  title: string;
+  minutes: number;
+  accent: string;
+}
+
+type VTDoc = Document & { startViewTransition?: (cb: () => Promise<void>) => { finished: Promise<unknown> } };
 
 export function Presenter({ screenId }: { screenId: string }) {
   const ws = useWorkshop();
@@ -123,10 +136,66 @@ export function Presenter({ screenId }: { screenId: string }) {
 
   const [boardOpen, setBoardOpen] = useState(false);
 
-  const goTo = useCallback((id: string) => {
-    sfx.whoosh();
-    navigate(`/s/${id}`);
-  }, []);
+  const idxRef = useRef(idx);
+  idxRef.current = idx;
+  const vtDone = useRef<(() => void) | null>(null);
+  // Cuando la diapositiva nueva ya está en pantalla, se cierra la espera de la transición
+  useLayoutEffect(() => {
+    vtDone.current?.();
+    vtDone.current = null;
+  }, [screenId]);
+
+  const goTo = useCallback(
+    (id: string) => {
+      sfx.whoosh();
+      const go = () => navigate(`/s/${id}`);
+      const doc = document as VTDoc;
+      const to = ws.screenIndex(id);
+      const from = idxRef.current;
+      const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      if (!doc.startViewTransition || reduce || document.hidden || to === from) return go();
+      const root = document.documentElement;
+      const sameMoment = ws.screens[to]?.moment === ws.screens[from]?.moment;
+      root.dataset.vt = sameMoment ? EFFECTS[to % EFFECTS.length] : 'iris';
+      root.dataset.vtDir = to > from ? 'fwd' : 'back';
+      const t = doc.startViewTransition(
+        () =>
+          new Promise<void>((resolve) => {
+            vtDone.current = resolve;
+            go();
+            window.setTimeout(resolve, 800);
+          }),
+      );
+      const clean = () => {
+        delete root.dataset.vt;
+        delete root.dataset.vtDir;
+      };
+      void t.finished.finally(clean);
+      window.setTimeout(clean, 2600);
+    },
+    [ws],
+  );
+
+  // Tarjeta de capítulo al entrar a un momento nuevo
+  const [chapter, setChapter] = useState<Chapter | null>(null);
+  const lastMoment = useRef(moment?.id);
+  useEffect(() => {
+    if (!moment || moment.id === lastMoment.current) {
+      lastMoment.current = moment?.id;
+      return;
+    }
+    lastMoment.current = moment.id;
+    if (screen.kind === 'cover' || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const show = window.setTimeout(() => {
+      setChapter({ key: Date.now(), index: moment.index, title: moment.title, minutes: moment.minutes, accent: moment.accent });
+      sfx.open();
+    }, 260);
+    const hide = window.setTimeout(() => setChapter(null), 2300);
+    return () => {
+      window.clearTimeout(show);
+      window.clearTimeout(hide);
+    };
+  }, [moment, screen.kind]);
   const next = useCallback(() => {
     if (idx < SCREENS.length - 1) goTo(SCREENS[idx + 1].id);
   }, [idx, goTo]);
@@ -343,6 +412,20 @@ export function Presenter({ screenId }: { screenId: string }) {
             </button>
           </div>
         </footer>
+
+        {chapter && (
+          <div key={chapter.key} className="chapter" style={{ '--cp': chapter.accent } as CSSProperties} aria-hidden="true">
+            <div className="chapter__bars">
+              <i /> <i /> <i /> <i />
+            </div>
+            <div className="chapter__box">
+              <span className="chapter__kicker">Momento</span>
+              <span className="chapter__num">{chapter.index}</span>
+              <h2 className="chapter__title">{chapter.title}</h2>
+              <span className="chapter__min">{chapter.minutes} minutos</span>
+            </div>
+          </div>
+        )}
 
         {barHidden && (
           <div className="minibar" role="toolbar" aria-label="Controles rápidos">
