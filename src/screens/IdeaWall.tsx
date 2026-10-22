@@ -1,10 +1,11 @@
 import { joinRoute } from '../data/workshops';
-import { useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { EyeOff, Plus, Smartphone, Star } from 'lucide-react';
 import { ActivityControls, useActivityStatus } from '../components/ActivityShell';
 import { QRCode } from '../components/QRCode';
 import { useAnnounce } from '../presenter/announce';
 import { usePersistentState } from '../lib/storage';
+import { sfx } from '../lib/sfx';
 import { LIVE_SYNC_AVAILABLE, useLiveResponses, useSessionCode } from '../lib/sync';
 import { internalUrl } from '../lib/urls';
 import { usePublicBase } from '../lib/usePublicBase';
@@ -47,6 +48,13 @@ export function IdeaWall({ cfg }: { cfg: WallConfig }) {
     const remote = live.responses.map((r) => ({ id: r.id, text: r.value, at: r.at, local: false }));
     return [...manual, ...remote].filter((i) => !hidden.includes(i.id)).sort((a, b) => b.at - a.at);
   }, [live.responses, manual, hidden]);
+
+  // Suena un pop cada vez que llega una idea nueva.
+  const seen = useRef(ideas.length);
+  useEffect(() => {
+    if (ideas.length > seen.current) sfx.pop();
+    seen.current = ideas.length;
+  }, [ideas.length]);
 
   // Nube de palabras: agrupa respuestas iguales.
   const words = useMemo(() => {

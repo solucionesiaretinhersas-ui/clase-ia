@@ -32,7 +32,7 @@ export function Route() {
           const Icon = ICONS[i];
           const first = SCREENS.find((s) => s.moment === m.id);
           return (
-            <li key={m.id} className="route__step" style={{ '--accent': m.accent } as CSSProperties}>
+            <li key={m.id} className="route__step" style={{ '--accent': m.accent, '--i': i } as CSSProperties}>
               <button type="button" onClick={() => first && goTo(first.id)}>
                 <span className="route__bar">
                   <span className="route__min">{m.minutes}′</span>

@@ -1,30 +1,38 @@
-import { useState } from 'react';
-import { ExternalLink, Pencil, RotateCcw, Wand2 } from 'lucide-react';
+import { useState, type CSSProperties } from 'react';
+import { Check, ExternalLink, Pencil, RotateCcw, Wand2 } from 'lucide-react';
 import { CopyButton } from '../components/ui';
 import {
+  ACCIONES,
   AREAS,
   EMPTY_FIELDS,
   EXAMPLES,
   GRADOS,
+  ROLES,
+  SOLUCIONES,
   buildChatGptPrompt,
   buildStudioPrompt,
-  missingFields,
   normalizeFields,
   type PromptFields,
 } from '../data/prompts';
+import { ROCAS, type Letter } from '../data/rocas';
+import { sfx } from '../lib/sfx';
 import { usePersistentState } from '../lib/storage';
 import { AI_STUDIO_URL, CHATGPT_URL } from '../lib/urls';
 
-const LABELS: Record<keyof PromptFields, string> = {
-  tema: 'Tema',
-  grado: 'Grado',
-  area: 'Área',
-  objetivo: 'Objetivo de aprendizaje',
-  contexto: 'Contexto de tu aula y estudiantes',
-};
-
 type Tab = 'chatgpt' | 'studio';
+const SHORT_SOL = ['Estructura en tabla + lista de verificación', 'Guía lista para usar + rúbrica', 'Secuencia de actividades numeradas'];
 
+function ready(f: PromptFields): Record<Letter, boolean> {
+  return {
+    R: Boolean(f.rol.trim()),
+    O: Boolean(f.tema.trim() && f.grado.trim() && f.objetivo.trim()),
+    C: f.contexto.trim().length > 12,
+    A: f.acciones.length >= 3,
+    S: Boolean(f.solucion.trim()),
+  };
+}
+
+/** Constructor de prompts con la metodología ROCAS: cinco piedras que se van completando. */
 export function PromptLab({ compact = false }: { compact?: boolean }) {
   const [stored, setFields] = usePersistentState<PromptFields>('lab:fields', EMPTY_FIELDS);
   const fields = normalizeFields(stored);
@@ -35,77 +43,127 @@ export function PromptLab({ compact = false }: { compact?: boolean }) {
   const generated = tab === 'chatgpt' ? buildChatGptPrompt(fields) : buildStudioPrompt(fields);
   const edited = manual[tab] ?? null;
   const text = edited ?? generated;
-  const missing = missingFields(fields);
+  const ok = ready(fields);
+  const done = ROCAS.filter((r) => ok[r.k]).length;
 
-  const set = (k: keyof PromptFields, v: string) => {
+  const set = <K extends keyof PromptFields>(k: K, v: PromptFields[K]) => {
     setManual({ chatgpt: null, studio: null });
     setFields((f) => ({ ...normalizeFields(f), [k]: v }));
+  };
+  const toggleAction = (a: string) => {
+    sfx.pop();
+    set('acciones', fields.acciones.includes(a) ? fields.acciones.filter((x) => x !== a) : [...fields.acciones, a]);
   };
 
   return (
     <section className={`lab ${compact ? 'lab--compact' : 'enter'}`}>
       {!compact && (
         <header className="screen-head">
-          <span className="kicker">Momento 3 · Laboratorio de prompts</span>
-          <h2 className="h-lg">Dos prompts: planear y construir</h2>
+          <span className="kicker">Tu prompt con ROCAS</span>
+          <h2 className="h-lg">Completa las cinco piedras</h2>
         </header>
       )}
 
-      <div className="lab__examples" role="group" aria-label="Ejemplos listos">
-        <span>Ejemplos:</span>
-        {EXAMPLES.map((ex) => (
-          <button
-            key={ex.id}
-            type="button"
-            className={`btn ${active === ex.id ? 'btn--primary' : ''}`}
-            onClick={() => {
-              setActive(ex.id);
-              setManual({ chatgpt: null, studio: null });
-              setFields(ex.fields);
-            }}
-          >
-            <Wand2 /> {ex.kind} · {ex.label}
-          </button>
-        ))}
+      <div className="lab__top">
+        <div className="lab__stones" role="img" aria-label={`${done} de 5 piedras completas`}>
+          {ROCAS.map((r) => (
+            <i key={r.k} className={ok[r.k] ? 'is-on' : ''} style={{ '--c': r.color } as CSSProperties}>
+              {r.k}
+            </i>
+          ))}
+        </div>
+        <div className="lab__examples" role="group" aria-label="Ejemplos listos">
+          <span>Ejemplos:</span>
+          {EXAMPLES.map((ex) => (
+            <button
+              key={ex.id}
+              type="button"
+              className={`btn ${active === ex.id ? 'btn--primary' : ''}`}
+              onClick={() => {
+                setActive(ex.id);
+                setManual({ chatgpt: null, studio: null });
+                setFields((f) => ({ ...normalizeFields(f), ...ex.fields }));
+                sfx.ok();
+              }}
+            >
+              <Wand2 /> {ex.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="lab__grid">
-        <form className="lab__form glass" onSubmit={(e) => e.preventDefault()}>
-          <label className="field">
-            <span>{LABELS.tema}</span>
-            <input className="input" value={fields.tema} onChange={(e) => set('tema', e.target.value)} placeholder="Ej.: las fracciones equivalentes" />
-          </label>
-          <div className="lab__row">
-            <label className="field">
-              <span>{LABELS.grado}</span>
-              <input className="input" list="grados" value={fields.grado} onChange={(e) => set('grado', e.target.value)} placeholder="Ej.: grado sexto" />
+        <form className="lab__form" onSubmit={(e) => e.preventDefault()}>
+          <fieldset className="stone" style={{ '--c': ROCAS[0].color } as CSSProperties}>
+            <legend>
+              <b>R</b> Rol <small>¿Quién es la IA?</small>
+            </legend>
+            <select className="input" value={fields.rol} onChange={(e) => set('rol', e.target.value)} aria-label="Rol de la IA">
+              {ROLES.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          </fieldset>
+
+          <fieldset className="stone" style={{ '--c': ROCAS[1].color } as CSSProperties}>
+            <legend>
+              <b>O</b> Objetivo <small>¿Qué quieres lograr?</small>
+            </legend>
+            <input className="input" value={fields.tema} onChange={(e) => set('tema', e.target.value)} placeholder="Tema. Ej.: las fracciones equivalentes" aria-label="Tema" />
+            <div className="lab__row">
+              <input className="input" list="grados" value={fields.grado} onChange={(e) => set('grado', e.target.value)} placeholder="Grado" aria-label="Grado" />
+              <input className="input" list="areas" value={fields.area} onChange={(e) => set('area', e.target.value)} placeholder="Área" aria-label="Área" />
               <datalist id="grados">
                 {GRADOS.map((g) => (
                   <option key={g} value={g} />
                 ))}
               </datalist>
-            </label>
-            <label className="field">
-              <span>{LABELS.area}</span>
-              <input className="input" list="areas" value={fields.area} onChange={(e) => set('area', e.target.value)} placeholder="Ej.: Matemáticas" />
               <datalist id="areas">
                 {AREAS.map((a) => (
                   <option key={a} value={a} />
                 ))}
               </datalist>
-            </label>
-          </div>
-          <label className="field">
-            <span>{LABELS.objetivo}</span>
-            <textarea className="input" rows={2} value={fields.objetivo} onChange={(e) => set('objetivo', e.target.value)} placeholder="Ej.: que los estudiantes comparen fracciones y justifiquen su respuesta" />
-          </label>
-          <label className="field">
-            <span>{LABELS.contexto}</span>
-            <textarea className="input" rows={3} value={fields.contexto} onChange={(e) => set('contexto', e.target.value)} placeholder="Ej.: 30 estudiantes, video beam, poca conectividad, les gustan los retos en equipo" />
-          </label>
-          <p className="note-muted lab__human">Esta es tu parte humana: cuanto más puntual tu contexto, mejor resultado.</p>
+            </div>
+            <textarea className="input" rows={2} value={fields.objetivo} onChange={(e) => set('objetivo', e.target.value)} placeholder="Qué debe lograr el estudiante" aria-label="Objetivo de aprendizaje" />
+          </fieldset>
+
+          <fieldset className="stone" style={{ '--c': ROCAS[2].color } as CSSProperties}>
+            <legend>
+              <b>C</b> Contexto <small>Tu parte humana</small>
+            </legend>
+            <textarea className="input" rows={3} value={fields.contexto} onChange={(e) => set('contexto', e.target.value)} placeholder="Tu grupo, tu aula, tu comunidad: cuántos son, qué recursos tienen, qué les motiva" aria-label="Contexto" />
+          </fieldset>
+
+          <fieldset className="stone" style={{ '--c': ROCAS[3].color } as CSSProperties}>
+            <legend>
+              <b>A</b> Acción <small>¿Qué debe incluir?</small>
+            </legend>
+            <div className="lab__checks">
+              {ACCIONES.map((a) => (
+                <button key={a} type="button" className={`lab__check ${fields.acciones.includes(a) ? 'is-on' : ''}`} onClick={() => toggleAction(a)} aria-pressed={fields.acciones.includes(a)}>
+                  {fields.acciones.includes(a) && <Check />} {a}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset className="stone" style={{ '--c': ROCAS[4].color } as CSSProperties}>
+            <legend>
+              <b>S</b> Solución <small>¿Qué entrega esperas?</small>
+            </legend>
+            <select className="input" value={fields.solucion} onChange={(e) => set('solucion', e.target.value)} aria-label="Formato de la solución">
+              {SOLUCIONES.map((s, i) => (
+                <option key={s} value={s}>
+                  {SHORT_SOL[i]}
+                </option>
+              ))}
+            </select>
+          </fieldset>
+
           <button type="button" className="btn btn--ghost" onClick={() => { setFields(EMPTY_FIELDS); setManual({ chatgpt: null, studio: null }); setActive(null); }}>
-            <RotateCcw /> Limpiar campos
+            <RotateCcw /> Limpiar
           </button>
         </form>
 
@@ -121,20 +179,16 @@ export function PromptLab({ compact = false }: { compact?: boolean }) {
           <div className="lab__out-head">
             <span className="kicker">{tab === 'chatgpt' ? 'Pégalo en ChatGPT' : 'Pégalo en Build'}</span>
             {edited !== null ? (
-              <span className="chip chip--warn"><Pencil /> Editado a mano</span>
-            ) : missing.length > 0 ? (
-              <span className="chip chip--warn">Faltan: {missing.map((m) => LABELS[m].split(' ')[0].toLowerCase()).join(', ')}</span>
+              <span className="chip chip--warn">
+                <Pencil /> Editado a mano
+              </span>
+            ) : done === 5 ? (
+              <span className="chip chip--live">5 de 5 piedras</span>
             ) : (
-              <span className="chip chip--live">Completo</span>
+              <span className="chip chip--warn">{done} de 5 piedras</span>
             )}
           </div>
-          <textarea
-            className="input lab__textarea"
-            value={text}
-            onChange={(e) => setManual({ ...manual, [tab]: e.target.value })}
-            rows={compact ? 9 : 10}
-            aria-label="Prompt editable"
-          />
+          <textarea className="input lab__textarea" value={text} onChange={(e) => setManual({ ...manual, [tab]: e.target.value })} rows={compact ? 11 : 14} aria-label="Prompt editable" />
           <div className="lab__actions">
             <CopyButton text={text} label={`Copiar prompt ${tab === 'chatgpt' ? '1' : '2'}`} className="btn--primary btn--lg" />
             <a className="btn btn--lg" href={tab === 'chatgpt' ? CHATGPT_URL : AI_STUDIO_URL} target="_blank" rel="noopener noreferrer">
@@ -142,7 +196,7 @@ export function PromptLab({ compact = false }: { compact?: boolean }) {
             </a>
           </div>
           {tab === 'studio' && <p className="note-muted">Antes de enviarlo, reemplaza [PEGA AQUÍ LA ESTRUCTURA…] por la respuesta de ChatGPT.</p>}
-          {tab === 'chatgpt' && missing.length > 0 && edited === null && <p className="note-muted">Los campos vacíos quedan entre [CORCHETES] para completarlos después.</p>}
+          {tab === 'chatgpt' && done < 5 && edited === null && <p className="note-muted">Lo que falte quedará entre [CORCHETES] para completarlo después.</p>}
         </div>
       </div>
     </section>

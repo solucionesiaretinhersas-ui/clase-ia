@@ -10,6 +10,7 @@ import './styles/whiteboard.css';
 import './styles/join.css';
 import './styles/student.css';
 import './styles/experience.css';
+import './styles/board.css';
 import App from './App';
 
 createRoot(document.getElementById('root')!).render(

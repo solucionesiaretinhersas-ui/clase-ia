@@ -11,6 +11,7 @@ import {
   Play,
   QrCode,
   Dices,
+  Users,
   Shrink,
   Smartphone,
 } from 'lucide-react';
@@ -25,6 +26,9 @@ import { Whiteboard } from './Whiteboard';
 import { JoinModal } from './JoinModal';
 import { Wheel } from './Wheel';
 import { ThemeToggle } from '../components/ThemeToggle';
+import { SoundToggle } from '../components/SoundToggle';
+import { TeamsModal } from './TeamsModal';
+import { sfx } from '../lib/sfx';
 import { elapsedOf, useTimers } from './timers';
 import { FacilitatorDrawer } from './FacilitatorDrawer';
 import { Overview } from './Overview';
@@ -45,6 +49,7 @@ export function Presenter({ screenId }: { screenId: string }) {
   const [overview, setOverview] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
   const [wheelOpen, setWheelOpen] = useState(false);
+  const [teamsOpen, setTeamsOpen] = useState(false);
   const [isFull, setIsFull] = useState(() => Boolean(document.fullscreenElement));
   const { timers, toggle, running } = useTimers();
   useTicker(running !== null);
@@ -91,7 +96,10 @@ export function Presenter({ screenId }: { screenId: string }) {
 
   const [boardOpen, setBoardOpen] = useState(false);
 
-  const goTo = useCallback((id: string) => navigate(`/s/${id}`), []);
+  const goTo = useCallback((id: string) => {
+    sfx.whoosh();
+    navigate(`/s/${id}`);
+  }, []);
   const next = useCallback(() => {
     if (idx < SCREENS.length - 1) goTo(SCREENS[idx + 1].id);
   }, [idx, goTo]);
@@ -138,6 +146,8 @@ export function Presenter({ screenId }: { screenId: string }) {
         setJoinOpen(true);
       } else if (k === 'r' || k === 'R') {
         setWheelOpen(true);
+      } else if (k === 'e' || k === 'E') {
+        setTeamsOpen(true);
       } else if (k === 'Escape') {
         setNotesOpen(false);
         setBoardOpen(false);
@@ -196,6 +206,7 @@ export function Presenter({ screenId }: { screenId: string }) {
               </button>
             )}
             <TimerPill momentId={moment?.id} timers={timers} onToggle={toggle} />
+            <SoundToggle />
             <ThemeToggle />
             <button
               type="button"
@@ -236,6 +247,9 @@ export function Presenter({ screenId }: { screenId: string }) {
             </button>
             <button type="button" className="btn btn--ghost btn--icon" onClick={() => setWheelOpen(true)} title="Ruleta de docentes (R)" aria-label="Ruleta de docentes">
               <Dices />
+            </button>
+            <button type="button" className="btn btn--ghost btn--icon" onClick={() => setTeamsOpen(true)} title="Dividir en equipos y marcador (E)" aria-label="Equipos y marcador">
+              <Users />
             </button>
             <button
               type="button"
@@ -296,6 +310,7 @@ export function Presenter({ screenId }: { screenId: string }) {
         <Whiteboard screenId={screen.id} open={boardOpen} onClose={() => setBoardOpen(false)} />
         {joinOpen && <JoinModal onClose={() => setJoinOpen(false)} />}
         {wheelOpen && <Wheel onClose={() => setWheelOpen(false)} />}
+        {teamsOpen && <TeamsModal onClose={() => setTeamsOpen(false)} />}
         {notesOpen && <FacilitatorDrawer screen={screen} onClose={() => setNotesOpen(false)} />}
         {overview && <Overview currentId={screen.id} onPick={(id) => { goTo(id); setOverview(false); }} onClose={() => setOverview(false)} />}
       </div>

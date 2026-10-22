@@ -5,6 +5,8 @@ import { usePersistentState } from '../lib/storage';
 import { LIVE_SYNC_AVAILABLE, useParticipants, useSessionCode } from '../lib/sync';
 import { useTheme } from '../lib/theme';
 import { useWorkshop } from '../data/workshops';
+import { sfx } from '../lib/sfx';
+import { confetti } from '../lib/confetti';
 
 const COLORS = ['#8b5cf6', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#f43f5e', '#a855f7', '#0ea5e9'];
 const SIZE = 560;
@@ -42,6 +44,7 @@ export function Wheel({ onClose }: { onClose: () => void }) {
   const rot = useRef(0);
   const raf = useRef(0);
   const lastQ = useRef(-1);
+  const lastTick = useRef(-1);
 
   const everyone = useMemo(() => {
     const seen = new Set<string>();
@@ -137,8 +140,16 @@ export function Wheel({ onClose }: { onClose: () => void }) {
       const p = Math.min(1, (now - t0) / dur);
       rot.current = from + (to - from) * easeOut(p);
       draw(rot.current, spinList);
+      // tic cada vez que un nombre pasa por el puntero
+      const under = Math.floor(((((-Math.PI / 2 - rot.current) % TAU) + TAU) % TAU) / a);
+      if (under !== lastTick.current) {
+        lastTick.current = under;
+        sfx.tick();
+      }
       if (p < 1) raf.current = requestAnimationFrame(step);
       else {
+        sfx.win();
+        confetti({ y: 0.4, count: 120 });
         rot.current = to % TAU;
         const picked = spinList[i];
         setWinner(picked);

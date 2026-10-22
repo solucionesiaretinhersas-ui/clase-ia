@@ -3,6 +3,8 @@ import { ArrowRight, Check, RotateCcw, Smartphone, X } from 'lucide-react';
 import { ActivityControls, ActivityGate, useActivityStatus } from '../components/ActivityShell';
 import { useAnnounce } from '../presenter/announce';
 import { usePersistentState } from '../lib/storage';
+import { sfx } from '../lib/sfx';
+import { confetti } from '../lib/confetti';
 import { LIVE_SYNC_AVAILABLE, useLiveResponses, useSessionCode } from '../lib/sync';
 
 type Side = 'A' | 'B';
@@ -59,6 +61,10 @@ export function ClassifyActivity({ cfg }: { cfg: ClassifyConfig }) {
 
   const choose = (k: Side) => {
     if (pick) return;
+    if (k === item.answer) {
+      sfx.ok();
+      confetti({ y: 0.55, count: 40 });
+    } else sfx.bad();
     setSt((s) => ({ ...s, picks: s.picks.map((p, i) => (i === s.index ? k : p)) }));
   };
 

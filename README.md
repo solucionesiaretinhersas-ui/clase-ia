@@ -19,12 +19,12 @@ npm run preview    # sirve dist/ localmente
 
 | # | Momento | Min | Qué ocurre |
 |---|---|---|---|
-| 1 | Mirar distinto: la IA como copiloto | 12 | Votación, docencia aumentada (la IA ayuda, no reemplaza), lluvia de ideas en vivo y “¿la IA ayuda o solo tú?”. **Te llevas:** tu idea de qué quieres que la IA haga por ti |
-| 2 | Explorar lo posible | 10 | **Galería de experiencias** (quiz, simulador, juego, historia, tutor, laboratorio) con vista previa, prompt de ejemplo y votación desde el celular; luego **“Llega a Build”** con avance en vivo (listo / en proceso / necesito ayuda). **Te llevas:** tu tipo de experiencia y el acceso a Build |
-| 3 | Diseñar la experiencia | 18 | Tema difícil, “interactivo vs. tradicional”, construcción del prompt por piezas y **Prompt 1**: ChatGPT devuelve la estructura de la clase. **Te llevas:** la estructura de tu clase |
-| 4 | Construir y probar | 35 | Demo, **Prompt 2** con la estructura (siempre simuladores y actividades para el tablero), avance en vivo por fases, **lupa pedagógica** (7 criterios con su prompt de arreglo) y perfeccionamiento. **Te llevas:** tu recurso interactivo probado |
-| 5 | Compartir y mejorar | 7 | Uno o dos docentes presentan (ruleta) y diálogo en vivo. **Te llevas:** retroalimentación de tus colegas |
-| 6 | Llevarlo al aula | 8 | Ética y docencia humanizada, regla ética de cada docente, compromiso de aplicación, asistencia y certificado. **Te llevas:** tu plan para aplicarlo |
+| 1 | La IA llegó a la educación | 12 | Votación, **charla “no viene a reemplazarte, viene a ampliar tu diseño”** con gráfica interactiva (Docente vs. Docente + IA), “¿la IA ayuda o solo tú?” y lluvia de ideas en vivo |
+| 2 | Google AI Studio y el vibe coding | 14 | **Vibe coding animado** (describes, la IA programa, pruebas, mejoras), galería de experiencias con votación, **demostración en vivo** (AI Studio en ventana lateral + panel del guion) y “Llega a Build” con avance en vivo |
+| 3 | Tu prompt con ROCAS | 20 | **Metodología ROCAS** (Rol, Objetivo, Contexto, Acción, Solución) con piedras animadas, comparador “prompt frágil vs. fuerte”, **juego por equipos en la pizarra táctil** y constructor de prompts ROCAS para ChatGPT |
+| 4 | Construir y probar | 30 | Demo, **Prompt 2** (también ROCAS) para AI Studio, avance en vivo por fases y **lupa pedagógica** (7 criterios con su prompt de arreglo) |
+| 5 | Compartir y mejorar | 6 | Uno o dos docentes presentan (ruleta con pregunta) y diálogo en vivo |
+| 6 | Llevarlo al aula | 8 | Ética y docencia humanizada, regla ética, compromiso de aplicación, asistencia y certificado |
 
 ## Modo claro y oscuro · estilo Apple
 
@@ -49,6 +49,13 @@ Tecla **R** (o el botón de dados): la ruleta se arma con los docentes que se re
 - Los celulares que entran con el código nuevo borran automáticamente lo guardado del taller anterior y vuelven a pedir el nombre.
 - Si la sesión guardada tiene más de 12 horas, se reinicia sola al abrir la app.
 - Los datos antiguos en Firebase quedan bajo el código anterior, sin ningún enlace que los muestre. Para borrarlos de la nube, elimina la colección `sessions` desde la consola de Firebase.
+## Diseño de pizarra, sonido y juegos en equipo
+
+- **Estética de pizarra interactiva:** cuadrícula de puntos, subrayados dibujados a mano, piedras 3D animadas, entradas con movimiento y modo claro/oscuro.
+- **Sonido** sintetizado en el navegador (sin archivos): aciertos, errores, tic de la ruleta, fanfarria y confeti. El botón del altavoz (barra superior, también en el celular) lo silencia; el navegador exige un primer toque para activarlo.
+- **Equipos (tecla E):** divide a los docentes registrados en dos equipos al azar, edita sus nombres y lleva el marcador con turnos. Los juegos suman puntos al equipo en turno.
+- **Juego “Arma el prompt”:** en la pizarra táctil, cada equipo arrastra frases a su letra de ROCAS (Rol, Objetivo, Contexto, Acción, Solución). Acierto: +10 y turno al otro equipo; error: la piedra vuelve y también pasa el turno.
+- **Demostración en vivo de Google AI Studio:** Google no permite mostrar AI Studio ni su inicio de sesión dentro de otra página, así que se abre en una ventana propia a la derecha (con el botón de la pantalla “Demostración en vivo”), junto a un **panel flotante con el guion** (`#/panel`) y los prompts para copiar. Si el navegador bloquea las ventanas emergentes, permítelas para este sitio.
 ## Dos talleres en la misma aplicación
 
 En la portada hay un selector: **Taller para docentes** (90 min, 6 momentos) y **Taller para estudiantes** (90 min, 5 momentos). Cambia el guion, las actividades, los textos del celular y el certificado; el diseño y las herramientas (pizarra, ruleta, QR, tema claro/oscuro) son los mismos. El QR de ingreso lleva el taller en el enlace (`&w=d` o `&w=e`), así que el celular sabe cuál es sin configurar nada.

@@ -25,8 +25,8 @@ export interface WorkshopDef {
 
 const D_OUTCOMES = [
   'tu idea: qué quieres que la IA haga por ti',
-  'tu tipo de experiencia y acceso a Build',
-  'la estructura de tu clase con ChatGPT',
+  'una app creada en vivo y tu acceso a Build',
+  'tu prompt ROCAS listo para ChatGPT',
   'tu recurso interactivo, probado con la lupa',
   'retroalimentación de tus colegas',
   'tu plan para aplicarlo y tu certificado',

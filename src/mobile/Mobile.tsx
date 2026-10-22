@@ -6,6 +6,8 @@ import { CertificateCard } from '../components/CertificateCard';
 import { StudentLab } from '../screens/StudentLab';
 import { CopyButton } from '../components/ui';
 import { ThemeToggle } from '../components/ThemeToggle';
+import { SoundToggle } from '../components/SoundToggle';
+import { sfx } from '../lib/sfx';
 import { ANSWER_KEYS } from '../data/answers';
 import { REFINEMENTS, STUDENT_REFINEMENTS } from '../data/prompts';
 import { STUDIO_STEPS } from '../data/studioSteps';
@@ -29,6 +31,7 @@ function Shell({ title, children, back = true, wide = false }: { title: string; 
             <span className="brand__mark" aria-hidden="true">A</span>
           )}
           <span className="mob__bar-title">Aula IA · Santa Rosa de Lima</span>
+          <SoundToggle />
           <ThemeToggle />
         </div>
       </header>
@@ -78,6 +81,8 @@ function Participate({ session, act }: { session: string; act: LiveAct }) {
   const [wait, setWait] = useState(false);
 
   async function choose(i: number) {
+    sfx.ok();
+    navigator.vibrate?.(30);
     setState('sending');
     setPicks((p) => ({ ...p, [act.key]: i }));
     try {
@@ -92,6 +97,8 @@ function Participate({ session, act }: { session: string; act: LiveAct }) {
     e.preventDefault();
     const t = text.trim();
     if (!t || wait) return;
+    sfx.ok();
+    navigator.vibrate?.(30);
     setState('sending');
     setWait(true);
     window.setTimeout(() => setWait(false), 1200);

@@ -37,6 +37,10 @@ export function Welcome() {
           <button type="button" className="btn btn--primary btn--xl" onClick={() => goTo(ws.screens[1].id)}>
             Comenzar el taller <ArrowRight />
           </button>
+          <span className="doodle" aria-hidden="true">
+            <svg viewBox="0 0 90 50"><path d="M4 40 C 20 8, 50 6, 82 24" /><path d="M70 12 L84 25 L66 32" /></svg>
+            ¡Empecemos!
+          </span>
           <span className="welcome__meta">
             Taller para {ws.audience === 'docente' ? 'docentes' : 'estudiantes'} · {ws.total} minutos
           </span>

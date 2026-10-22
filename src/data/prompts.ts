@@ -4,13 +4,51 @@ export interface PromptFields {
   area: string;
   objetivo: string;
   contexto: string;
+  /** R · quién debe ser la IA */
+  rol: string;
+  /** A · partes que debe incluir (marcadas) */
+  acciones: string[];
+  /** S · formato del resultado esperado */
+  solucion: string;
 }
 
-export const EMPTY_FIELDS: PromptFields = { tema: '', grado: '', area: '', objetivo: '', contexto: '' };
+export const ROLES = [
+  'diseñador de experiencias educativas interactivas',
+  'diseñador instruccional experto en metodologías activas',
+  'tutor experto en didáctica de la materia',
+  'coach pedagógico que acompaña a docentes',
+];
+
+export const ACCIONES = [
+  'una explicación breve',
+  'ejemplos cercanos a mi contexto',
+  'actividades interactivas',
+  'un simulador que se pueda proyectar en el tablero',
+  'preguntas con retroalimentación inmediata',
+  'una evaluación final',
+];
+
+export const SOLUCIONES = [
+  'la estructura de la clase en una tabla con el propósito, la duración y lo que hace el estudiante en cada parte, y una lista de verificación para revisarla',
+  'una guía de aprendizaje lista para usar, con títulos claros y una rúbrica de 3 niveles',
+  'una secuencia de actividades numeradas con instrucciones para el docente y para el estudiante',
+];
+
+export const EMPTY_FIELDS: PromptFields = {
+  tema: '',
+  grado: '',
+  area: '',
+  objetivo: '',
+  contexto: '',
+  rol: ROLES[0],
+  acciones: ACCIONES.slice(0, 5),
+  solucion: SOLUCIONES[0],
+};
 
 /** Mezcla datos guardados con la forma actual (por si vienen de una versión anterior). */
 export function normalizeFields(f: Partial<PromptFields> | null | undefined): PromptFields {
-  return { ...EMPTY_FIELDS, ...(f ?? {}) };
+  const m = { ...EMPTY_FIELDS, ...(f ?? {}) };
+  return { ...m, acciones: Array.isArray(m.acciones) ? m.acciones : EMPTY_FIELDS.acciones };
 }
 
 export const GRADOS = [
@@ -47,45 +85,42 @@ export const AREAS = [
 function parts(raw: PromptFields) {
   const f = normalizeFields(raw);
   const area = f.area.trim();
+  const list = f.acciones.length ? f.acciones : ACCIONES.slice(0, 3);
   return {
+    rol: f.rol.trim() || ROLES[0],
     tema: f.tema.trim() || '[TEMA]',
     grado: f.grado.trim() || '[GRADO]',
     areaTxt: area ? ` del área de ${area}` : '',
     objetivo: f.objetivo.trim().replace(/\.$/, '') || '[OBJETIVO DE APRENDIZAJE]',
     contexto: f.contexto.trim().replace(/\.$/, '') || '[CONTEXTO DE TU AULA Y TUS ESTUDIANTES]',
+    acciones: list.length > 1 ? `${list.slice(0, -1).join(', ')} y ${list[list.length - 1]}` : list[0],
+    solucion: f.solucion.trim() || SOLUCIONES[0],
   };
 }
 
-/** Prompt 1 · ChatGPT: estructura de la clase, qué debe tener cada parte. */
+/** Prompt 1 · ChatGPT, con la metodología ROCAS: la estructura de la clase. */
 export function buildChatGptPrompt(f: PromptFields): string {
   const p = parts(f);
   return (
-    `Actúa como un diseñador instruccional y pedagogo experto en experiencias de aprendizaje interactivas. ` +
-    `Voy a crear una clase sobre ${p.tema}${p.areaTxt} para estudiantes de ${p.grado}. ` +
-    `El objetivo de aprendizaje es ${p.objetivo}. ` +
-    `Contexto de mi aula: ${p.contexto}. ` +
-    `Entrégame la estructura de la clase indicando qué debe tener cada parte: 1) inicio o motivación, 2) explicación breve, ` +
-    `3) ejemplos cercanos a mi contexto, 4) actividades interactivas y simuladores que se puedan proyectar en el tablero ` +
-    `para que los estudiantes pasen a usarlos, 5) preguntas con retroalimentación inmediata y 6) evaluación final. ` +
-    `Para cada parte indica su propósito, una duración sugerida y qué hace el estudiante. ` +
-    `Prioriza recursos interactivos y no solo texto. Al final, dame una lista breve para revisar la clase antes de usarla.`
+    `R — ROL: Actúa como ${p.rol}.\n\n` +
+    `O — OBJETIVO: Quiero crear una clase sobre ${p.tema}${p.areaTxt} para estudiantes de ${p.grado}. El objetivo de aprendizaje es ${p.objetivo}.\n\n` +
+    `C — CONTEXTO: ${p.contexto}.\n\n` +
+    `A — ACCIÓN: Diseña la clase indicando qué debe tener cada parte: ${p.acciones}. Prioriza experiencias interactivas y no solo texto; ` +
+    `para cada parte indica su propósito, una duración sugerida y qué hace el estudiante.\n\n` +
+    `S — SOLUCIÓN: Entrégame ${p.solucion}.`
   );
 }
 
-/** Prompt 2 · Google AI Studio (Build): construir el recurso a partir de la estructura. */
+/** Prompt 2 · Google AI Studio (Build), también con ROCAS: construir el recurso. */
 export function buildStudioPrompt(f: PromptFields): string {
   const p = parts(f);
   return (
-    `Actúa como diseñador de experiencias educativas interactivas. ` +
-    `Crea un recurso para enseñar ${p.tema}${p.areaTxt} a estudiantes de ${p.grado}. ` +
-    `El objetivo de aprendizaje es ${p.objetivo}. ` +
-    `Contexto de mis estudiantes y mi aula: ${p.contexto}. ` +
-    `Sigue esta estructura de clase: [PEGA AQUÍ LA ESTRUCTURA QUE TE DIO CHATGPT]. ` +
-    `Diseña una experiencia visual moderna con una explicación breve, ejemplos, actividades interactivas y al menos un simulador, ` +
-    `preguntas con retroalimentación inmediata y una actividad final de evaluación. ` +
-    `Debe poder proyectarse en el tablero: textos grandes, botones grandes y un estudiante que pase a manejarlo frente al grupo. ` +
-    `Utiliza instrucciones claras, navegación intuitiva y una interfaz adaptable a computadores, tabletas y celulares. ` +
-    `El recurso debe ser funcional y no limitarse a una presentación estática.`
+    `R — ROL: Actúa como desarrollador de experiencias educativas interactivas, experto en diseño pedagógico.\n\n` +
+    `O — OBJETIVO: Crea una aplicación web para enseñar ${p.tema}${p.areaTxt} a estudiantes de ${p.grado}. El objetivo de aprendizaje es ${p.objetivo}.\n\n` +
+    `C — CONTEXTO: ${p.contexto}.\n\n` +
+    `A — ACCIÓN: Sigue esta estructura de clase: [PEGA AQUÍ LA ESTRUCTURA QUE TE DIO CHATGPT]. Incluye ${p.acciones}, ` +
+    `y al menos una actividad en la que un estudiante pase al tablero a manejarla frente al grupo.\n\n` +
+    `S — SOLUCIÓN: Una aplicación web funcional (no una presentación estática), con textos y botones grandes para proyectar, navegación intuitiva y adaptable a computador, tableta y celular.`
   );
 }
 
@@ -94,14 +129,14 @@ export const buildPrompt = buildStudioPrompt;
 
 export function missingFields(f: PromptFields): (keyof PromptFields)[] {
   const n = normalizeFields(f);
-  return (Object.keys(n) as (keyof PromptFields)[]).filter((k) => !n[k].trim());
+  return (['tema', 'grado', 'objetivo', 'contexto'] as const).filter((k) => !n[k].trim());
 }
 
 export interface PromptExample {
   id: string;
   label: string;
   kind: string;
-  fields: PromptFields;
+  fields: Partial<PromptFields>;
 }
 
 export const EXAMPLES: PromptExample[] = [
@@ -142,7 +177,6 @@ export const EXAMPLES: PromptExample[] = [
     },
   },
 ];
-
 /** Prompts de iteración para pedir mejoras en Build */
 export const REFINEMENTS: { title: string; prompt: string }[] = [
   {

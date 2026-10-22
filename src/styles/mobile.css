@@ -9,7 +9,6 @@
 .mob__back { display: inline-flex; align-items: center; min-width: 4.5rem; padding: 0.4rem 0.4rem 0.4rem 0; border: 0; background: none; color: var(--blue); font-size: 1.05rem; }
 .mob__back svg { width: 1.5rem; height: 1.5rem; margin-left: -0.3rem; }
 .mob__bar-spacer { min-width: 4.5rem; display: flex; }
-.mob__bar .btn--icon { margin-left: auto; }
 
 /* Contenido: columna en celular, hasta dos columnas en computador */
 .mob__main { display: grid; gap: 1rem; align-content: start; width: min(100%, 44rem); margin: 0 auto; padding: 0.4rem 1rem max(2.5rem, env(safe-area-inset-bottom)); }
