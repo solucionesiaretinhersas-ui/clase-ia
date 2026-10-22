@@ -12,6 +12,7 @@ import {
   QrCode,
   Dices,
   Users,
+  LayoutDashboard,
   Shrink,
   Smartphone,
 } from 'lucide-react';
@@ -28,7 +29,9 @@ import { Wheel } from './Wheel';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { SoundToggle } from '../components/SoundToggle';
 import { TeamsModal } from './TeamsModal';
+import { CommandDock } from './CommandDock';
 import { sfx } from '../lib/sfx';
+import { CountUp } from '../components/CountUp';
 import { elapsedOf, useTimers } from './timers';
 import { FacilitatorDrawer } from './FacilitatorDrawer';
 import { Overview } from './Overview';
@@ -50,6 +53,7 @@ export function Presenter({ screenId }: { screenId: string }) {
   const [joinOpen, setJoinOpen] = useState(false);
   const [wheelOpen, setWheelOpen] = useState(false);
   const [teamsOpen, setTeamsOpen] = useState(false);
+  const [dockOpen, setDockOpen] = useState(false);
   const [isFull, setIsFull] = useState(() => Boolean(document.fullscreenElement));
   const { timers, toggle, running } = useTimers();
   useTicker(running !== null);
@@ -148,6 +152,8 @@ export function Presenter({ screenId }: { screenId: string }) {
         setWheelOpen(true);
       } else if (k === 'e' || k === 'E') {
         setTeamsOpen(true);
+      } else if (k === 'm' || k === 'M') {
+        setDockOpen(true);
       } else if (k === 'Escape') {
         setNotesOpen(false);
         setBoardOpen(false);
@@ -202,7 +208,7 @@ export function Presenter({ screenId }: { screenId: string }) {
                 title={liveState === 'error' ? 'No se pudo conectar con Firebase: revisa que Firestore esté activo y las reglas publicadas' : 'Sesión en vivo: muestra el QR de ingreso (J)'}
               >
                 {liveState === 'ok' && <span className="dot dot--pulse" />}
-                {liveState === 'ok' ? 'En vivo' : liveState === 'error' ? 'Sin conexión' : 'Conectando'} · {code} · {people.length} {ws.audience === 'docente' ? 'docentes' : 'estudiantes'}
+                {liveState === 'ok' ? 'En vivo' : liveState === 'error' ? 'Sin conexión' : 'Conectando'} · {code} · <CountUp value={people.length} /> {ws.audience === 'docente' ? 'docentes' : 'estudiantes'}
               </button>
             )}
             <TimerPill momentId={moment?.id} timers={timers} onToggle={toggle} />
@@ -226,6 +232,9 @@ export function Presenter({ screenId }: { screenId: string }) {
 
         <footer className="navbar">
           <div className="navbar__group">
+            <button type="button" className="btn btn--primary btn--icon" onClick={() => setDockOpen(true)} title="Centro de mando (M)" aria-label="Centro de mando">
+              <LayoutDashboard />
+            </button>
             <button type="button" className="btn btn--ghost btn--icon" onClick={() => goTo(ws.introCover)} title="Inicio (Inicio)" aria-label="Inicio">
               <House />
             </button>
@@ -311,6 +320,22 @@ export function Presenter({ screenId }: { screenId: string }) {
         {joinOpen && <JoinModal onClose={() => setJoinOpen(false)} />}
         {wheelOpen && <Wheel onClose={() => setWheelOpen(false)} />}
         {teamsOpen && <TeamsModal onClose={() => setTeamsOpen(false)} />}
+        {dockOpen && (
+          <CommandDock
+            onClose={() => setDockOpen(false)}
+            a={{
+              goTo,
+              notes: () => setNotesOpen(true),
+              overview: () => setOverview(true),
+              join: () => setJoinOpen(true),
+              wheel: () => setWheelOpen(true),
+              teams: () => setTeamsOpen(true),
+              board: () => setBoardOpen(true),
+              full: toggleFull,
+              timer: () => moment && toggle(moment.id),
+            }}
+          />
+        )}
         {notesOpen && <FacilitatorDrawer screen={screen} onClose={() => setNotesOpen(false)} />}
         {overview && <Overview currentId={screen.id} onPick={(id) => { goTo(id); setOverview(false); }} onClose={() => setOverview(false)} />}
       </div>

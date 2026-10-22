@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Check, ExternalLink, HeartHandshake, ScanSearch, Sparkles } from 'lucide-react';
 import { CheckinBars } from '../components/CheckinBars';
+import { Lupa } from '../components/Lupa';
 import { CopyButton } from '../components/ui';
 import { REFINEMENTS } from '../data/prompts';
 import { useWorkshop } from '../data/workshops';
@@ -11,30 +12,19 @@ import { useAnnounce } from '../presenter/announce';
 import { usePresenter } from '../presenter/context';
 
 const PHASES = [
-  { title: 'Estructura', min: 5, text: 'Ten lista la estructura de tu clase que te dio ChatGPT (Prompt 1).' },
-  { title: 'Genera', min: 8, text: 'En Build, pega el Prompt 2 con tu estructura. Pide siempre simuladores y actividades para el tablero.' },
-  { title: 'Prueba con la lupa', min: 7, text: 'Úsalo como estudiante y revísalo con la lupa pedagógica: ¿enseña lo que quieres, como lo quieres?' },
-  { title: 'Perfecciona', min: 10, text: 'Pide cambios, uno a la vez, con los prompts de abajo, y vuelve a probar.' },
+  { title: 'Prompt listo', min: 4, text: 'Ten tu prompt ROCAS revisado en ChatGPT (Prompt 1) y la estructura de tu clase.' },
+  { title: 'Primera versión', min: 6, text: 'En Build, pega el Prompt 2 con tu estructura. Pide siempre simuladores y actividades para el tablero.' },
+  { title: 'Prueba con la lupa', min: 6, text: 'Úsalo como estudiante y revísalo con la lupa pedagógica: ¿enseña lo que quieres, como lo quieres?' },
+  { title: 'Mejora y vuelve a probar', min: 6, text: 'Pide cambios, uno a la vez, con los prompts de abajo, y vuelve a probar.' },
 ];
 
 const CHECK = ['¡Listo!', 'Voy en proceso', 'Necesito ayuda'];
-
-/** Criterios para revisar lo que generó la IA, con el prompt que lo corrige si falla. */
-const LUPA = [
-  { q: '¿El contenido es correcto y está bien explicado?', fix: 'Revisa la exactitud del contenido sobre [TEMA]. Señala y corrige cualquier error o afirmación dudosa, y explícame qué cambiaste.' },
-  { q: '¿El nivel y el lenguaje corresponden al grado?', fix: 'Ajusta el vocabulario y la dificultad para estudiantes de [GRADO]. Usa frases cortas y ejemplos cercanos.' },
-  { q: '¿Hay interacción real (decidir, probar, equivocarse)?', fix: 'Agrega interacción real: que el estudiante pueda decidir, probar y repetir, y no solo leer o presionar “siguiente”.' },
-  { q: '¿La retroalimentación explica el porqué?', fix: 'Cuando el estudiante responda mal, explica por qué, da una pista y permite intentarlo de nuevo.' },
-  { q: '¿Se ve y se maneja bien proyectado en el tablero?', fix: 'Haz que todo se vea bien proyectado: textos grandes, buen contraste y botones grandes para que un estudiante pase a manejarlo.' },
-  { q: '¿Usa ejemplos y situaciones de mi contexto?', fix: 'Cambia los ejemplos por situaciones de mi contexto: [DESCRIBE TU MUNICIPIO, COLEGIO O REGIÓN].' },
-  { q: '¿Evita pedir datos personales de los estudiantes?', fix: 'Quita cualquier campo que pida datos personales de los estudiantes; usa solo apodos o nombres ficticios.' },
-];
 
 export function PracticalWorkshop() {
   const ws = useWorkshop();
   const [phase, setPhase] = usePersistentState('taller:phase', 0);
   const [tab, setTab] = useState<'mejora' | 'lupa'>('mejora');
-  const [ticks, setTicks] = usePersistentState<number[]>('taller:lupa', []);
+  const [ticks] = usePersistentState<number[]>('taller:lupa', []);
   const { goTo } = usePresenter();
 
   // Avance en vivo: cada docente marca desde su celular cómo va en la fase actual.
@@ -44,13 +34,11 @@ export function PracticalWorkshop() {
   const counts = CHECK.map((_, i) => live.responses.filter((r) => r.value === String(i)).length);
   useAnnounce('taller', { key: `taller-${phase}`, kind: 'choice', prompt: `Fase ${phase + 1}: ${PHASES[phase].title}. ¿Cómo vas?`, options: CHECK, open: true });
 
-  const toggle = (i: number) => setTicks((t) => (t.includes(i) ? t.filter((x) => x !== i) : [...t, i]));
-
   return (
     <section className="practice enter">
       <header className="screen-head screen-head--row">
         <div>
-          <span className="kicker">Construir y probar</span>
+          <span className="kicker">Etapa 4 · Construir y probar</span>
           <h2 className="h-xl">Tu turno: crea tu recurso</h2>
         </div>
         <div className="practice__links">
@@ -98,7 +86,7 @@ export function PracticalWorkshop() {
           <Sparkles /> Prompts para perfeccionar
         </button>
         <button type="button" role="tab" aria-selected={tab === 'lupa'} className={`seg__btn ${tab === 'lupa' ? 'is-on' : ''}`} onClick={() => setTab('lupa')}>
-          <ScanSearch /> Lupa pedagógica <b>{ticks.length}/{LUPA.length}</b>
+          <ScanSearch /> Lupa pedagógica <b>{ticks.length}/7</b>
         </button>
       </div>
 
@@ -115,20 +103,7 @@ export function PracticalWorkshop() {
           </div>
         </div>
       ) : (
-        <ul className="lupa">
-          {LUPA.map((c, i) => {
-            const ok = ticks.includes(i);
-            return (
-              <li key={c.q} className={ok ? 'is-ok' : ''}>
-                <button type="button" className="lupa__check" onClick={() => toggle(i)} aria-pressed={ok} aria-label={ok ? 'Cumple' : 'Marcar como cumple'}>
-                  {ok && <Check />}
-                </button>
-                <span>{c.q}</span>
-                {!ok && <CopyButton text={c.fix} label="Si no: copiar arreglo" />}
-              </li>
-            );
-          })}
-        </ul>
+        <Lupa />
       )}
       <p className="note-muted">Reemplaza lo que aparece entre [CORCHETES] antes de enviar. Revisa siempre el contenido generado antes de usarlo con estudiantes.</p>
     </section>

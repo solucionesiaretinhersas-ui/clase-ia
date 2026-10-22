@@ -129,7 +129,8 @@ export type LiveStatus = 'off' | 'connecting' | 'live' | 'error';
 /** Actividad que el celular debe mostrar para que los docentes participen. */
 export interface LiveAct {
   key: string;
-  kind: 'choice' | 'ideas';
+  /** info muestra datos (reto, marcador) sin pedir respuesta. */
+  kind: 'choice' | 'ideas' | 'info';
   prompt: string;
   options?: string[];
   open: boolean;

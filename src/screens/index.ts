@@ -12,7 +12,10 @@ import { Route } from './Route';
 import { StudioStation } from './StudioStation';
 import { DemoLive } from './DemoLive';
 import { Potencia, VibeDemo } from './IntroScreens';
-import { RocasCompare, RocasGame, RocasIntro } from './RocasScreens';
+import { RocasCompare, RocasIntro } from './RocasScreens';
+import { RocasGame } from './RocasGame';
+import { FlowScreen } from './FlowScreen';
+import { ResourceGallery } from './ResourceGallery';
 import { Welcome } from './Welcome';
 import { Certificates } from './Certificates';
 import { StudentLab } from './StudentLab';
@@ -38,7 +41,8 @@ export const SCREEN_COMPONENTS: Record<string, ComponentType> = {
   'ai-studio': ExperienceGallery,
   estacion: StudioStation,
   laboratorio: PromptLab,
-  demo: DemoScreen,
+  flujo: FlowScreen,
+  recursos: ResourceGallery,
   taller: PracticalWorkshop,
   galeria: Gallery,
   etica: Ethics,

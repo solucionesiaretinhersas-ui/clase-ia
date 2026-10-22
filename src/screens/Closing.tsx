@@ -53,7 +53,7 @@ export function Closing() {
         <div>
           <span className="kicker">Cierre y compromiso</span>
           <h2 className="h-lg">
-            Mañana, en tu clase: <span className="grad-text">¿qué vas a crear?</span>
+            ¿Qué recurso vas a <span className="grad-text">crear o mejorar con IA</span> en las próximas semanas?
           </h2>
         </div>
         <ActivityControls id={ID} onReset={() => setItems([])} openLabel="Abrir muro" />
@@ -76,7 +76,7 @@ export function Closing() {
           <ActivityGate id={ID}>
             <form className="closing__form" onSubmit={add}>
               <input className="input" placeholder="Tu nombre" value={f.who} onChange={(e) => setF({ ...f, who: e.target.value })} aria-label="Nombre" />
-              <input className="input" placeholder="Voy a crear… (recurso)" value={f.resource} onChange={(e) => setF({ ...f, resource: e.target.value })} aria-label="Recurso a crear" required />
+              <input className="input" placeholder="Voy a crear o mejorar… (recurso educativo)" value={f.resource} onChange={(e) => setF({ ...f, resource: e.target.value })} aria-label="Recurso a crear" required />
               <input className="input" placeholder="Para resolver… (problema de aprendizaje)" value={f.problem} onChange={(e) => setF({ ...f, problem: e.target.value })} aria-label="Problema de aprendizaje" />
               <input className="input" placeholder="Lo aplicaré… (cómo y cuándo)" value={f.how} onChange={(e) => setF({ ...f, how: e.target.value })} aria-label="Cómo lo aplicaré" />
               <button type="submit" className="btn btn--primary" disabled={!f.resource.trim()}>

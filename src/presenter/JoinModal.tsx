@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { CircleAlert, CircleCheck, Download, Users, Wifi } from 'lucide-react';
 import { CopyButton, Modal } from '../components/ui';
 import { QRCode, downloadQR } from '../components/QRCode';
+import { CountUp } from '../components/CountUp';
 import { useToast } from '../components/Toast';
 import { LIVE_SYNC_AVAILABLE, useParticipants, useSessionCode } from '../lib/sync';
 import { internalUrl, normalizeBase } from '../lib/urls';
@@ -87,7 +88,7 @@ export function JoinModal({ onClose }: { onClose: () => void }) {
 
           <div className="join__people">
             <h3>
-              <Users /> Docentes conectados <b>{people.length}</b>
+              <Users /> Conectados <b><CountUp value={people.length} /></b>
             </h3>
             {!LIVE_SYNC_AVAILABLE ? (
               <p className="note-muted">Sincronización no configurada: los nombres no se registran.</p>

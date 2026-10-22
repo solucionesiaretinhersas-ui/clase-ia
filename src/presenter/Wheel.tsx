@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
-import { MessageCircleQuestion, Plus, RotateCcw, Shuffle, Trash2 } from 'lucide-react';
+import { Hand, MessageCircleQuestion, Plus, RotateCcw, Shuffle, Trash2 } from 'lucide-react';
 import { Modal } from '../components/ui';
 import { usePersistentState } from '../lib/storage';
 import { LIVE_SYNC_AVAILABLE, useParticipants, useSessionCode } from '../lib/sync';
@@ -13,17 +13,14 @@ const SIZE = 560;
 const TAU = Math.PI * 2;
 
 const QUESTIONS = [
-  '¿Qué problema de aprendizaje resuelve tu recurso?',
-  '¿Qué le pediste exactamente a la IA?',
-  '¿Qué aportaste tú que la IA no podía saber?',
-  '¿Qué fue lo más difícil del proceso?',
-  '¿Cómo lo usarías con tus estudiantes?',
-  '¿Qué mejorarías de tu recurso?',
-  '¿Qué cuidado ético tendrías al usarlo en clase?',
+  '¿Qué necesidad educativa resolviste?',
+  '¿Qué parte del prompt fue más importante?',
+  '¿Qué tuviste que corregir?',
+  '¿Qué decisiones siguen siendo responsabilidad del docente?',
+  '¿Cómo adaptarías el recurso a tu grupo?',
+  '¿Qué le pediste exactamente a la IA y qué te devolvió?',
   '¿Qué aprendiste hoy sobre trabajar con la IA?',
-  '¿Qué le recomendarías a un colega que apenas empieza?',
 ];
-
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 4);
 
 /** Ruleta de docentes: se arma con los registrados desde el celular (y nombres añadidos a mano). */
@@ -202,6 +199,12 @@ export function Wheel({ onClose }: { onClose: () => void }) {
             <p className="wheel__question">
               <MessageCircleQuestion /> {question}
             </p>
+          )}
+
+          {winner && !spinning && (
+            <button type="button" className="btn btn--lg wheel__applause" onClick={() => { sfx.win(); confetti({ count: 160, y: 0.5 }); }}>
+              <Hand /> ¡Aplausos para {winner}!
+            </button>
           )}
 
           <div className="wheel__actions">

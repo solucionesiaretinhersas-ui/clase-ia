@@ -5,48 +5,36 @@ import { useWorkshop } from '../data/workshops';
 
 const PILLARS = [
   {
-    icon: ShieldCheck,
-    title: 'Uso ético',
-    lead: 'Transparencia, verificación y cuidado de los datos.',
-    points: [
-      'Revisa siempre lo que la IA genera: puede equivocarse o tener sesgos.',
-      'No ingreses datos personales de estudiantes en herramientas de IA.',
-      'Sé transparente: cuenta cuándo y cómo se usó la IA.',
-      'El docente es el responsable final del recurso.',
-    ],
-  },
-  {
     icon: HeartHandshake,
-    title: 'Docencia humanizada',
-    lead: 'La tecnología libera tiempo para lo que más importa.',
+    title: 'El criterio es tuyo',
+    lead: 'La IA puede ayudar a diseñar, pero el docente mantiene el criterio pedagógico.',
     points: [
-      'Más tiempo para escuchar, acompañar y motivar.',
-      'La sabiduría, la empatía y el ejemplo no se automatizan.',
-      'La IA es copiloto: tú sigues siendo quien orienta el rumbo.',
+      'Tú decides qué enseñar, cómo y por qué.',
+      'La IA propone un borrador; tú lo adaptas a tu grupo y a tu comunidad.',
+      'El vínculo, la empatía y la sabiduría no se delegan.',
     ],
   },
   {
-    icon: Lightbulb,
-    title: 'Inteligencia aumentada',
-    lead: 'Docente + IA amplían lo que cada estudiante puede lograr.',
+    icon: ShieldCheck,
+    title: 'Todo se revisa',
+    lead: 'Todo contenido generado debe revisarse antes de utilizarlo.',
     points: [
-      'Invita a tus estudiantes a crear recursos con IA, con tu guía.',
-      'Que pregunten mejor, prueben, se equivoquen y mejoren.',
-      'Del consumo de información a la creación de conocimiento.',
+      'Comprueba datos, conceptos y fuentes: la IA puede equivocarse con seguridad.',
+      'Prueba el recurso como lo haría un estudiante.',
+      'Sé transparente: cuenta cuándo y cómo usaste IA.',
     ],
   },
   {
     icon: Scale,
-    title: 'Evaluar de otra manera',
-    lead: 'Ya no basta con “investiga y entrega”.',
+    title: 'Protege a tus estudiantes',
+    lead: 'La privacidad y los datos de los estudiantes deben protegerse.',
     points: [
-      'Evalúa el proceso: qué pidió, qué decidió, qué mejoró.',
-      'Pide justificar y explicar con sus propias palabras.',
-      'Diseña retos que amplíen su capacidad, no que la IA resuelva sola.',
+      'No ingreses nombres, fotos ni datos personales de estudiantes en herramientas de IA.',
+      'Usa solo cuentas y servicios autorizados por tu institución.',
+      'Pide permisos cuando el recurso lo requiera.',
     ],
   },
 ];
-
 const PILLARS_E = [
   {
     icon: ShieldCheck,

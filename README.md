@@ -108,7 +108,18 @@ Tecla **D** (o el botón de lápiz de la barra inferior) abre las herramientas s
 | ← | Anterior | | G | Vista general |
 | Inicio | Portada | | T | Iniciar/pausar cronómetro del momento |
 | F | Pantalla completa | | D | Pizarra interactiva |
-| Esc | Cerrar paneles y pizarra | | | |
+| Esc | Cerrar paneles y pizarra | | M | **Centro de mando** |
+| E | Equipos y marcador | | R / J | Ruleta / QR de ingreso |
+
+### Centro de mando (tecla M o botón del extremo izquierdo de la barra)
+Botones grandes y táctiles para equipos, ruleta, QR, pizarra, notas, vista general, cronómetro, pantalla completa, sonido, tema, vista de participación (`#/m`), demostración en vivo, accesos a Google AI Studio y ChatGPT (pestaña nueva), salto a cualquier actividad y, al final, el **reinicio protegido**: hay que mantener presionado ~2 s, así no se activa por accidente.
+
+### Elementos nuevos del rediseño
+- **ROCAS**: piedras, comparador (ejemplo del ciclo del agua), constructor libre de prompts (funciona sin IA) y **juego por equipos** “Construye el prompt más sólido” (arrastrar o tocar, temporizador, puntos, corrección y marcador).
+- **Cabina de demostración** (`demo-vivo`) y panel flotante del guion en `#/panel`. AI Studio no se puede incrustar ni se simula su sesión: se abre en ventana aparte; la app nunca pide ni guarda credenciales.
+- **Flujo ChatGPT → AI Studio**, galería de recursos (demostraciones locales o maquetas rotuladas) y **lupa pedagógica** que sugiere, no certifica.
+- En el celular: barra de avance de la etapa y estado de conexión real (Conectado / Conectando / Sin conexión).
+- El fondo neuronal se pausa en pestañas ocultas y respeta `prefers-reduced-motion`; el sonido tiene botón de silencio.
 
 ## Estructura
 

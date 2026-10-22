@@ -6,16 +6,16 @@
   /* tinta de las superposiciones, sombras, paneles y velo de los modales */
   --fg-rgb: 255 255 255;
   --k-rgb: 0 0 0;
-  --panel-rgb: 28 28 30;
+  --panel-rgb: 13 20 38;
   --scrim-rgb: 0 0 0;
 
-  --bg: #000000;
-  --bg-2: #1c1c1e;
+  --bg: #060a14;
+  --bg-2: #0e1628;
   --surface: rgb(var(--fg-rgb) / 0.07);
   --surface-2: rgb(var(--fg-rgb) / 0.12);
   --surface-strong: rgb(var(--panel-rgb) / 0.88);
-  --surface-pop: #2c2c2e;
-  --field-bg: rgb(118 118 128 / 0.24);
+  --surface-pop: #172240;
+  --field-bg: rgb(130 150 200 / 0.2);
   --line: rgb(var(--fg-rgb) / 0.12);
   --line-strong: rgb(var(--fg-rgb) / 0.22);
 
@@ -23,11 +23,11 @@
   --text-2: #bcbcc4;
   --text-3: #8e8e93;
 
-  --violet: #bf5af2;
-  --violet-deep: #8e3fd0;
-  --blue: #0a84ff;
-  --blue-deep: #0060df;
-  --cyan: #64d2ff;
+  --violet: #a66bff;
+  --violet-deep: #7c3aed;
+  --blue: #3b82ff;
+  --blue-deep: #1d5fe0;
+  --cyan: #22e0ff;
   --mint: #30d158;
   --amber: #ff9f0a;
   --rose: #ff375f;
@@ -39,9 +39,9 @@
   --grad: linear-gradient(115deg, #d38bff 0%, #4da3ff 50%, #64d2ff 100%);
   --grad-soft: linear-gradient(115deg, rgb(191 90 242 / 0.22), rgb(10 132 255 / 0.16), rgb(100 210 255 / 0.18));
 
-  --btn-primary: #0a84ff;
-  --amb-1: rgb(10 132 255 / 0.15);
-  --amb-2: rgb(191 90 242 / 0.17);
+  --btn-primary: #2f7bff;
+  --amb-1: rgb(34 224 255 / 0.13);
+  --amb-2: rgb(124 58 237 / 0.2);
   --orb-o: 0.5;
   --shadow: 0 24px 60px -24px rgb(0 0 0 / 0.7), 0 1px 0 rgb(255 255 255 / 0.05) inset;
 }
@@ -54,7 +54,7 @@
   --panel-rgb: 255 255 255;
   --scrim-rgb: 28 28 36;
 
-  --bg: #f2f2f7;
+  --bg: #f6f8fc;
   --bg-2: #ffffff;
   --surface: rgb(255 255 255 / 0.78);
   --surface-2: rgb(118 118 128 / 0.14);

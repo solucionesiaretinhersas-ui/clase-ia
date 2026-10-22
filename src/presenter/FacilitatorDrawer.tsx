@@ -17,6 +17,7 @@ const SHORTCUTS: [string, string][] = [
   ['J', 'QR de ingreso'],
   ['R', 'Ruleta'],
   ['E', 'Equipos y marcador'],
+  ['M', 'Centro de mando'],
 ];
 
 export function FacilitatorDrawer({ screen, onClose }: { screen: ScreenMeta; onClose: () => void }) {

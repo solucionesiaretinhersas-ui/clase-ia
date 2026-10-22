@@ -115,6 +115,21 @@ function Participate({ session, act }: { session: string; act: LiveAct }) {
   const mine = sent[act.key] ?? [];
   const picked = picks[act.key];
 
+  // Actividad informativa (por ejemplo, el juego por equipos): reto y marcador sin pedir respuesta.
+  if (act.kind === 'info') {
+    return (
+      <section className="part glass" aria-label="En juego">
+        <span className="kicker">En juego ahora</span>
+        <h3>{act.prompt}</h3>
+        <ul className="part__info">
+          {(act.options ?? []).map((o) => (
+            <li key={o}>{o}</li>
+          ))}
+        </ul>
+      </section>
+    );
+  }
+
   return (
     <section className="part glass" aria-label="Participa">
       <span className="kicker">Tu turno</span>
@@ -304,6 +319,22 @@ function Live({ session: fromUrl }: { session: string }) {
         {status === 'live' && <span className="dot dot--pulse" />}
         {status === 'live' ? 'Conectado' : status === 'error' ? 'Sin conexión' : 'Conectando…'} · sesión {session}
       </span>
+
+      {curIdx >= 0 && (
+        <div className="mob__stage" aria-label="Avance del taller">
+          <div className="mob__stage-top">
+            <span>
+              <b>{moment ? `Etapa ${moment.index}` : 'Inicio'}</b> {moment ? `· ${moment.title}` : ''}
+            </span>
+            <span>
+              {curIdx + 1} / {ws.screens.length}
+            </span>
+          </div>
+          <div className="mob__progress" role="progressbar" aria-valuemin={0} aria-valuemax={ws.screens.length} aria-valuenow={curIdx + 1}>
+            <i style={{ width: `${((curIdx + 1) / ws.screens.length) * 100}%` }} />
+          </div>
+        </div>
+      )}
 
       <div className="mob__cols">
         <div className="mob__col">
@@ -597,7 +628,7 @@ function Exit({ session }: { session: string }) {
       ) : (
         <form className="mob__form" onSubmit={submit}>
           <label className="field">
-            <span>¿Qué recurso vas a crear?</span>
+            <span>¿Qué recurso educativo vas a crear o mejorar con IA durante las próximas semanas?</span>
             <input className="input" value={draft.resource} onChange={(e) => setDraft({ ...draft, resource: e.target.value })} required />
           </label>
           <label className="field">

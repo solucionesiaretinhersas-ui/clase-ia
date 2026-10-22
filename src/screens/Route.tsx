@@ -2,6 +2,7 @@ import { joinRoute } from '../data/workshops';
 import type { CSSProperties } from 'react';
 import { ArrowRight, Hammer, HeartHandshake, Layers, MessagesSquare, ShieldCheck, Smartphone, Telescope } from 'lucide-react';
 import { QRCode } from '../components/QRCode';
+import { CountUp } from '../components/CountUp';
 import { useWorkshop } from '../data/workshops';
 import { LIVE_SYNC_AVAILABLE, useParticipants, useSessionCode } from '../lib/sync';
 import { internalUrl } from '../lib/urls';
@@ -57,7 +58,7 @@ export function Route() {
               <Smartphone /> Únete con tu nombre y grado
             </span>
             <small>{reachable ? 'Un solo QR: escribe tu nombre y grado y recibe aquí todos los enlaces del taller.' : 'Disponible al abrir la web publicada.'}</small>
-            {LIVE_SYNC_AVAILABLE && <small><b>{people.length}</b> {ws.audience === 'docente' ? 'docentes' : 'estudiantes'} conectados</small>}
+            {LIVE_SYNC_AVAILABLE && <small><b><CountUp value={people.length} /></b> {ws.audience === 'docente' ? 'docentes' : 'estudiantes'} conectados</small>}
             <button type="button" className="btn" onClick={openJoin}>Ampliar QR</button>
           </div>
         </div>

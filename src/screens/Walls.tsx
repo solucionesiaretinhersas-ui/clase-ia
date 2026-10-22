@@ -4,8 +4,8 @@ const LLUVIA: WallConfig = {
   id: 'lluvia',
   screenId: 'lluvia',
   kicker: 'Lluvia de ideas · desde tu celular',
-  title: '¿Qué te gustaría que la IA hiciera por ti?',
-  prompt: '¿Qué te gustaría que la IA hiciera por ti para tener más tiempo con tus estudiantes?',
+  title: '¿Qué tarea educativa quieres mejorar?',
+  prompt: '¿Qué tarea educativa te gustaría mejorar con ayuda de la IA para tener más tiempo con tus estudiantes?',
 };
 
 const DIALOGO: WallConfig = {

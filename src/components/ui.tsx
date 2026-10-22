@@ -2,10 +2,12 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Check, Copy, X } from 'lucide-react';
 import { copyText } from '../lib/clipboard';
 import { useToast } from './Toast';
+import { NeuralBg } from './NeuralBg';
 
 export function Ambient() {
   return (
     <div className="ambient" aria-hidden="true">
+      <NeuralBg />
       <div className="orb orb--a" />
       <div className="orb orb--b" />
       <div className="orb orb--c" />

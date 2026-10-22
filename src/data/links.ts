@@ -20,7 +20,7 @@ export const SCREEN_LINKS: Record<string, WorkshopLink[]> = {
     { id: 'chatgpt', label: 'ChatGPT', description: 'Para estructurar tu clase (Prompt 1).', url: 'https://chatgpt.com/' },
     { id: 'prompts', label: 'Mis prompts', description: 'Prompt 1 y 2 editables y copiables.', route: '/m/prompt' },
   ],
-  demo: [{ id: 'demo', label: 'Recurso de demostración', description: 'Misión: salvar el planeta.', route: '/demo' }],
+  recursos: [{ id: 'demo', label: 'Recurso de demostración', description: 'Misión: salvar el planeta.', route: '/demo' }],
   // Taller de estudiantes
   'e-studio': [
     { id: 'e-studio', label: 'Google AI Studio', description: 'Donde crearás tu aplicación (Build).', url: 'https://aistudio.google.com/' },

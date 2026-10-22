@@ -8,6 +8,8 @@ export interface PromptFields {
   rol: string;
   /** A · partes que debe incluir (marcadas) */
   acciones: string[];
+  /** A · otras acciones, en texto libre */
+  accionExtra: string;
   /** S · formato del resultado esperado */
   solucion: string;
 }
@@ -42,6 +44,7 @@ export const EMPTY_FIELDS: PromptFields = {
   contexto: '',
   rol: ROLES[0],
   acciones: ACCIONES.slice(0, 5),
+  accionExtra: '',
   solucion: SOLUCIONES[0],
 };
 
@@ -93,7 +96,9 @@ function parts(raw: PromptFields) {
     areaTxt: area ? ` del área de ${area}` : '',
     objetivo: f.objetivo.trim().replace(/\.$/, '') || '[OBJETIVO DE APRENDIZAJE]',
     contexto: f.contexto.trim().replace(/\.$/, '') || '[CONTEXTO DE TU AULA Y TUS ESTUDIANTES]',
-    acciones: list.length > 1 ? `${list.slice(0, -1).join(', ')} y ${list[list.length - 1]}` : list[0],
+    acciones:
+      (list.length > 1 ? `${list.slice(0, -1).join(', ')} y ${list[list.length - 1]}` : list[0]) +
+      (f.accionExtra.trim() ? `; además, ${f.accionExtra.trim().replace(/\.$/, '')}` : ''),
     solucion: f.solucion.trim() || SOLUCIONES[0],
   };
 }
