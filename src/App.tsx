@@ -3,7 +3,6 @@ import { Ambient } from './components/ui';
 import { ToastProvider } from './components/Toast';
 import { Mission } from './demo/Mission';
 import { Mobile } from './mobile/Mobile';
-import { DemoPanel } from './screens/DemoLive';
 import { Presenter } from './presenter/Presenter';
 import { useWorkshop } from './data/workshops';
 import { navigate, segments, useRoute } from './lib/router';
@@ -15,7 +14,6 @@ export default function App() {
 
   let view;
   if (first === 'm') view = <Mobile path={path} />;
-  else if (first === 'panel') view = <DemoPanel />;
   else if (first === 'demo')
     view = (
       <div className="demo-page">

@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import { Closing } from './Closing';
+import { DemoScreen } from './DemoScreen';
 import { IdeasGame } from './IdeasGame';
 import { Ethics } from './Ethics';
 import { Gallery } from './Gallery';
@@ -9,7 +10,6 @@ import { PracticalWorkshop } from './PracticalWorkshop';
 import { PromptLab } from './PromptLab';
 import { Route } from './Route';
 import { StudioStation } from './StudioStation';
-import { DemoLive } from './DemoLive';
 import { Potencia } from './IntroScreens';
 import { AulaDemo, StudioIntro } from './StudioScreens';
 import { Usos } from './Usos';
@@ -30,7 +30,6 @@ export const SCREEN_COMPONENTS: Record<string, ComponentType> = {
   votacion: OpeningVote,
   potencia: Potencia,
   vibe: AulaDemo,
-  'demo-vivo': DemoLive,
   rocas: RocasIntro,
   'rocas-vs': RocasCompare,
   'rocas-juego': RocasGame,
@@ -60,7 +59,7 @@ export const SCREEN_COMPONENTS: Record<string, ComponentType> = {
   'e-confiar': EConfiar,
   'e-studio': StudioForStudents,
   'e-vibe': VibeCoding,
-  'e-demo': IdeasGame,
+  'e-demo': DemoScreen,
   'reto-ideas': IdeasGame,
   'e-estacion': StudioStation,
   'e-idea': WallIdea,

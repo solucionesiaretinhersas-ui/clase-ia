@@ -212,26 +212,6 @@ export const SCREENS: ScreenMeta[] = [
     },
   },
   {
-    id: 'demo-vivo',
-    moment: 'm2',
-    title: 'Demostración en vivo',
-    kind: 'tool',
-    notes: {
-      minutes: 5,
-      participant: 'El facilitador muestra Google AI Studio real. Observa qué hace, qué espera y qué verifica en cada paso.',
-      objective: 'Proyectar la herramienta real, iniciar sesión en el sitio de Google, entrar a Build, probar un recurso y mejorarlo, sin perder el hilo de la presentación.',
-      explanation:
-        'Google no permite mostrar AI Studio ni su inicio de sesión dentro de otra página. Se abre en una ventana propia al lado de la presentación; esta cabina guía cada paso: qué explicas, qué observan, qué haces, qué esperas y qué verificas.',
-      steps: [
-        'Pulsa Abrir Google AI Studio (ventana a la derecha) e inicia sesión en el sitio de Google.',
-        'Abre el guion flotante (vista dividida) y ponlo sobre AI Studio para ver el paso actual y copiar los prompts.',
-        'Avanza con Siguiente, retrocede con Anterior o usa Pausar si necesitas atender al grupo.',
-        'Si Build no está disponible en tu cuenta, dilo con honestidad y muestra la ilustración del aula completa.',
-      ],
-      activity: 'Demostración guiada de ocho pasos con pausa y retroceso.',
-    },
-  },
-  {
     id: 'estacion',
     moment: 'm2',
     title: 'Llega a Build',

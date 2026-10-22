@@ -188,15 +188,15 @@ export const E_SCREENS: ScreenMeta[] = [
   {
     id: 'e-demo',
     moment: 'e3',
-    title: 'La baraja de ideas',
-    kind: 'activity',
+    title: 'Un ejemplo hecho con IA',
+    kind: 'content',
     notes: {
-      minutes: 4,
-      participant: 'Jueguen en equipos: una carta, un minuto para pensar y luego cada equipo comparte su idea.',
-      objective: 'Despertar la imaginación y las preguntas antes de crear: qué se podría construir con IA.',
-      explanation: 'Cada carta plantea una pregunta que invita a imaginar una aplicación, un juego o un cambio. No hay respuestas correctas: se premia la idea más original o útil.',
-      steps: ['Pulsa E para armar los equipos si aún no lo has hecho.', 'Saca una carta, léela en voz alta y deja correr el minuto.', 'Cada equipo comparte su idea y el grupo decide a quién dar los 10 puntos.', 'Repite con dos o tres cartas y conecta con la aplicación que van a crear.'],
-      activity: 'Juego de cartas por equipos con cronómetro y marcador.',
+      minutes: 3,
+      participant: 'Mira una aplicación hecha con IA: introducción, retos, puntos y resultados.',
+      objective: 'Ver un ejemplo concreto de lo que se puede crear.',
+      explanation: 'Esta misión tiene todo lo que piden en el prompt: pantallas, retos, puntos y retroalimentación.',
+      steps: ['Juega el primer reto con el grupo.', 'Pide a un estudiante pasar al tablero.', 'Pregunta: ¿qué le pedirían ustedes a la IA?'],
+      activity: 'Un estudiante juega frente al grupo.',
     },
   },
   {

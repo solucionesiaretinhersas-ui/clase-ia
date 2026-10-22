@@ -1,6 +1,5 @@
 import { useRef, useState, type ReactNode } from 'react';
 import {
-  AppWindow,
   Bot,
   Dices,
   Expand,
@@ -123,7 +122,6 @@ export function CommandDock({ onClose, a }: { onClose: () => void; a: DockAction
           <Tile icon={muted ? <VolumeX /> : <Volume2 />} label={muted ? 'Activar sonido' : 'Silenciar'} onClick={() => { toggleMute(); if (muted) window.setTimeout(() => sfx.pop(), 30); }} />
           <Tile icon={theme === 'dark' ? <Sun /> : <Moon />} label={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'} onClick={toggleTheme} />
           <Tile icon={<Smartphone />} label="Vista de participación" hint="Como la ven los docentes" onClick={run(() => navigate('/m'))} />
-          <Tile icon={<AppWindow />} label="Demostración en vivo" hint="Cabina de AI Studio" onClick={run(() => a.goTo('demo-vivo'))} />
           <Tile icon={<Bot />} label="Google AI Studio" hint="Pestaña nueva" href={AI_STUDIO_URL} tone="tile--blue" />
           <Tile icon={<MessageSquare />} label="ChatGPT" hint="Pestaña nueva" href={CHATGPT_URL} tone="tile--mint" />
         </div>

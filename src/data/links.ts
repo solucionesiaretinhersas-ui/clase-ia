@@ -24,6 +24,7 @@ export const SCREEN_LINKS: Record<string, WorkshopLink[]> = {
   'e-studio': [
     { id: 'e-studio', label: 'Google AI Studio', description: 'Donde crearás tu aplicación (Build).', url: 'https://aistudio.google.com/' },
   ],
+  'e-demo': [{ id: 'e-demo', label: 'Aplicación de ejemplo', description: 'Misión: salvar el planeta.', route: '/demo' }],
   'e-estacion': [{ id: 'e-guia', label: 'Guía para crear tu app', description: 'Pasos y prompts de mejora.', route: '/m/guia' }],
   'e-lab': [{ id: 'e-prompts', label: 'Mi prompt', description: 'Arma y copia el prompt de tu idea.', route: '/m/prompt' }],
 };

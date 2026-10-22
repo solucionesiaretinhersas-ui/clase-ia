@@ -20,7 +20,7 @@ npm run preview    # sirve dist/ localmente
 | # | Momento | Min | Qué ocurre |
 |---|---|---|---|
 | 1 | La IA llegó a la educación | 12 | Votación, **charla “no viene a reemplazarte, viene a ampliar tu diseño”** con gráfica interactiva (Docente vs. Docente + IA), “¿la IA ayuda o solo tú?” y lluvia de ideas en vivo |
-| 2 | Google AI Studio | 14 | **Qué es y cómo funciona** (ilustración con puntos para tocar), **aula interactiva completa** simulada que se construye por momentos y se mejora con una frase, demostración en vivo y “Llega a Build” |
+| 2 | Google AI Studio | 14 | **Qué es y cómo funciona** (ilustración con puntos para tocar), **aula interactiva completa** simulada que se construye por momentos y se mejora con una frase, la baraja de ideas (dinámica en equipos) y “Llega a Build” |
 | 3 | Tu prompt con ROCAS | 20 | **Metodología ROCAS** (piedras, comparador y juego por equipos) y un **único mensaje para ChatGPT** que le pide el prompt para crear el aula en AI Studio |
 | 4 | Crea tu aula | 30 | Recorrido ChatGPT → AI Studio, creación guiada con avance en vivo y **lupa pedagógica** |
 | 5 | Compartir y mejorar | 6 | Uno o dos docentes presentan (ruleta con pregunta) y diálogo en un mural ilustrado |
@@ -57,7 +57,7 @@ Tecla **R** (o el botón de dados): la ruleta se arma con los docentes que se re
 - **Sonido** sintetizado en el navegador (sin archivos): aciertos, errores, tic de la ruleta, fanfarria y confeti. El botón del altavoz (barra superior, también en el celular) lo silencia; el navegador exige un primer toque para activarlo.
 - **Equipos (tecla E):** divide a los docentes registrados en dos equipos al azar, edita sus nombres y lleva el marcador con turnos. Los juegos suman puntos al equipo en turno.
 - **Juego “Arma el prompt”:** en la pizarra táctil, cada equipo arrastra frases a su letra de ROCAS (Rol, Objetivo, Contexto, Acción, Solución). Acierto: +10 y turno al otro equipo; error: la piedra vuelve y también pasa el turno.
-- **Demostración en vivo de Google AI Studio:** Google no permite mostrar AI Studio ni su inicio de sesión dentro de otra página, así que se abre en una ventana propia a la derecha (con el botón de la pantalla “Demostración en vivo”), junto a un **panel flotante con el guion** (`#/panel`) y los prompts para copiar. Si el navegador bloquea las ventanas emergentes, permítelas para este sitio.
+- **Google AI Studio:** Google no permite mostrar AI Studio ni su inicio de sesión dentro de otra página, así que se abre en su propia ventana desde los botones de acceso. Si el navegador bloquea las ventanas emergentes, permítelas para este sitio.
 ## Dos talleres en la misma aplicación
 
 En la portada hay un selector: **Taller para docentes** (90 min, 6 momentos) y **Taller para estudiantes** (90 min, 5 momentos). Cambia el guion, las actividades, los textos del celular y el certificado; el diseño y las herramientas (pizarra, ruleta, QR, tema claro/oscuro) son los mismos. El QR de ingreso lleva el taller en el enlace (`&w=d` o `&w=e`), así que el celular sabe cuál es sin configurar nada.
@@ -114,11 +114,11 @@ Tecla **D** (o el botón de lápiz de la barra inferior) abre las herramientas s
 | E | Equipos y marcador | | R / J | Ruleta / QR de ingreso |
 
 ### Centro de mando (tecla M o botón del extremo izquierdo de la barra)
-Botones grandes y táctiles para equipos, ruleta, QR, pizarra, notas, vista general, cronómetro, pantalla completa, sonido, tema, vista de participación (`#/m`), demostración en vivo, accesos a Google AI Studio y ChatGPT (pestaña nueva), salto a cualquier actividad y, al final, el **reinicio protegido**: hay que mantener presionado ~2 s, así no se activa por accidente.
+Botones grandes y táctiles para equipos, ruleta, QR, pizarra, notas, vista general, cronómetro, pantalla completa, sonido, tema, vista de participación (`#/m`), accesos a Google AI Studio y ChatGPT (pestaña nueva), salto a cualquier actividad y, al final, el **reinicio protegido**: hay que mantener presionado ~2 s, así no se activa por accidente.
 
 ### Elementos nuevos del rediseño
 - **ROCAS**: piedras, comparador (ejemplo del ciclo del agua), constructor libre de prompts (funciona sin IA) y **juego por equipos** “Construye el prompt más sólido” (arrastrar o tocar, temporizador, puntos, corrección y marcador).
-- **Cabina de demostración** (`demo-vivo`) y panel flotante del guion en `#/panel`. AI Studio no se puede incrustar ni se simula su sesión: se abre en ventana aparte; la app nunca pide ni guarda credenciales.
+- AI Studio no se puede incrustar ni se simula su sesión: se abre en ventana aparte desde los botones de acceso; la app nunca pide ni guarda credenciales.
 - **Flujo ChatGPT → AI Studio**, galería de recursos (demostraciones locales o maquetas rotuladas) y **lupa pedagógica** que sugiere, no certifica.
 - En el celular: barra de avance de la etapa y estado de conexión real (Conectado / Conectando / Sin conexión).
 - El fondo neuronal se pausa en pestañas ocultas y respeta `prefers-reduced-motion`; el sonido tiene botón de silencio.
