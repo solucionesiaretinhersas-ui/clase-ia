@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react';
 import { Closing } from './Closing';
-import { DemoScreen } from './DemoScreen';
+import { IdeasGame } from './IdeasGame';
 import { Ethics } from './Ethics';
 import { Gallery } from './Gallery';
 import { HumanVsAI } from './HumanVsAI';
@@ -60,7 +60,8 @@ export const SCREEN_COMPONENTS: Record<string, ComponentType> = {
   'e-confiar': EConfiar,
   'e-studio': StudioForStudents,
   'e-vibe': VibeCoding,
-  'e-demo': DemoScreen,
+  'e-demo': IdeasGame,
+  'reto-ideas': IdeasGame,
   'e-estacion': StudioStation,
   'e-idea': WallIdea,
   'e-lab': StudentLab,
