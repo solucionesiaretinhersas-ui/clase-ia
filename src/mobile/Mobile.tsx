@@ -14,7 +14,7 @@ import { studioStepsFor } from '../data/studioSteps';
 import { navigate, queryParam, segments } from '../lib/router';
 import { LIVE_SYNC_AVAILABLE, lookupCertificate, registerParticipant, sendIdea, sendResponse, useLiveState, type IssuedCertificate, type LiveAct } from '../lib/sync';
 import { clearStored, usePersistentState } from '../lib/storage';
-import { unlockedLinks } from '../data/links';
+import { linksFor } from '../data/links';
 import { AI_STUDIO_URL, CHATGPT_URL } from '../lib/urls';
 import { PromptLab } from '../screens/PromptLab';
 
@@ -260,7 +260,6 @@ function Live({ session: fromUrl }: { session: string }) {
   const [registered, setRegistered] = usePersistentState('mobile:registered', '');
   const [name] = usePersistentState('mobile:name', '');
   const [grade] = usePersistentState('mobile:grade', '');
-  const [certOpen, setCertOpen] = usePersistentState('mobile:cert', false);
   const [regAt] = usePersistentState('mobile:regAt', 0);
   const [, setSavedCerts] = usePersistentState<IssuedCertificate[]>('cert:saved', []);
   const [draft, setDraft] = useState('');
@@ -279,12 +278,9 @@ function Live({ session: fromUrl }: { session: string }) {
   const current = state ? ws.screens.find((s) => s.id === state.screenId) : undefined;
   const curIdx = current ? ws.screens.indexOf(current) : -1;
   const moment = current ? ws.moments.find((m) => m.id === current.moment) : undefined;
-  const links = current ? unlockedLinks(ws.screens, current.id) : [];
-  const certUnlocked = certOpen || (curIdx >= 0 && curIdx >= ws.screenIndex(ws.certificateScreen));
-
-  useEffect(() => {
-    if (certUnlocked && !certOpen) setCertOpen(true);
-  }, [certUnlocked, certOpen, setCertOpen]);
+  // Todo lo que se ve aquí sigue al facilitador en vivo: si retrocede, desaparece solo.
+  const links = current ? linksFor(current.id) : [];
+  const certUnlocked = curIdx >= 0 && curIdx >= ws.screenIndex(ws.certificateScreen);
 
   // El certificado queda guardado en este dispositivo para consultarlo después (no se borra al cambiar de taller).
   useEffect(() => {
@@ -361,7 +357,7 @@ function Live({ session: fromUrl }: { session: string }) {
           )}
 
           {current ? (
-            <article className="live-now glass" style={{ '--accent': moment?.accent ?? 'var(--violet)' } as CSSProperties}>
+            <article key={current.id} className="live-now glass enter" style={{ '--accent': moment?.accent ?? 'var(--violet)' } as CSSProperties}>
               <span className="kicker">{moment ? `Momento ${moment.index} · ${moment.title}` : 'Introducción'}</span>
               <h2>{current.title}</h2>
               <p className="live-now__label">Qué hacemos ahora</p>
@@ -405,19 +401,9 @@ function Live({ session: fromUrl }: { session: string }) {
                   );
                 })}
               </ul>
-              <p className="note-muted">Los enlaces aparecen aquí a medida que el facilitador avanza.</p>
             </section>
           )}
 
-          <h3 className="mob__h">Recorrido del taller</h3>
-          <ol className="timeline">
-            {ws.screens.map((s, i) => (
-              <li key={s.id} className={i === curIdx ? 'is-now' : i < curIdx ? 'is-past' : ''}>
-                <i />
-                {s.title}
-              </li>
-            ))}
-          </ol>
         </div>
       </div>
     </Shell>

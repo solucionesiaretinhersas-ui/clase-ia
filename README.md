@@ -34,11 +34,11 @@ El botón de sol/luna (barra superior del tablero y barra del celular) alterna e
 
 La interfaz del docente (`#/m/vivo`) se adapta a celular (una columna con título grande) y a computador (dos columnas: lo que pasa ahora y participar a la izquierda; enlaces y recorrido a la derecha).
 
-## Un solo QR, registro con nombre y enlaces que se abren a medida que avanzas
+## Un solo QR, registro con nombre y un celular que sigue al facilitador
 
 - **Un único QR de ingreso** (pantalla “La ruta de hoy”, botón QR de la barra inferior o tecla **J** para verlo a pantalla completa). Al escanearlo, cada docente escribe su **nombre** y entra al taller (`#/m/vivo`).
 - El celular muestra en tiempo real el momento y la pantalla que proyectas, qué hacer ahora, el cuadro de participación y el recorrido completo.
-- **Los enlaces se desbloquean solos** en el celular según la pantalla: Google AI Studio, la guía de creación, ChatGPT, los prompts y el recurso de demostración. No hay que volver a escanear nada.
+- **El celular muestra solo lo que se necesita ahora, en tiempo real:** la actividad de la pantalla proyectada y sus enlaces (Google AI Studio, ChatGPT, tu mensaje ROCAS o tu prompt, la guía). No se acumulan: si el facilitador avanza de más y retrocede, lo que no corresponde desaparece solo. El certificado aparece únicamente cuando se llega a la pantalla de certificados.
 - La etiqueta superior del facilitador muestra el código de sesión, cuántos docentes están conectados y si la conexión está activa (“En vivo”) o falló (“Sin conexión”).
 
 ## Ruleta de docentes

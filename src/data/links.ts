@@ -1,6 +1,5 @@
-import type { ScreenMeta } from './workshop';
-
-// Enlace que se desbloquea en el celular cuando el facilitador llega a la pantalla indicada.
+// Enlaces que el celular muestra SOLO mientras el facilitador está en esa pantalla.
+// Si el facilitador retrocede o avanza, la lista cambia sola: no se acumula nada.
 export interface WorkshopLink {
   id: string;
   label: string;
@@ -11,26 +10,30 @@ export interface WorkshopLink {
   route?: string;
 }
 
+const STUDIO = { id: 'studio', label: 'Google AI Studio', description: 'Donde construirás tu aula (Build).', url: 'https://aistudio.google.com/' };
+const CHATGPT = { id: 'chatgpt', label: 'ChatGPT', description: 'Para pedirle el prompt de tu aula.', url: 'https://chatgpt.com/' };
+const ROCAS_MSG = { id: 'prompts', label: 'Mi mensaje ROCAS', description: 'Arma y copia tu mensaje para ChatGPT.', route: '/m/prompt' };
+const GUIA = { id: 'guia', label: 'Guía de creación', description: 'Pasos para llegar a Build.', route: '/m/guia' };
+
+const E_STUDIO = { id: 'e-studio', label: 'Google AI Studio', description: 'Donde crearás tu aplicación (Build).', url: 'https://aistudio.google.com/' };
+const E_PROMPT = { id: 'e-prompts', label: 'Mi prompt', description: 'Arma y copia el prompt de tu idea.', route: '/m/prompt' };
+const E_GUIA = { id: 'e-guia', label: 'Guía para crear tu app', description: 'Pasos para llegar a Build.', route: '/m/guia' };
+
 export const SCREEN_LINKS: Record<string, WorkshopLink[]> = {
-  'ai-studio': [
-    { id: 'studio', label: 'Google AI Studio', description: 'Donde construirás tu aula (Build).', url: 'https://aistudio.google.com/' },
-  ],
-  estacion: [{ id: 'guia', label: 'Guía de creación', description: 'Pasos para llegar a Build.', route: '/m/guia' }],
-  laboratorio: [
-    { id: 'chatgpt', label: 'ChatGPT', description: 'Para pedirle el prompt de tu aula.', url: 'https://chatgpt.com/' },
-    { id: 'prompts', label: 'Mi mensaje ROCAS', description: 'Arma y copia tu mensaje para ChatGPT.', route: '/m/prompt' },
-  ],
+  // Taller de docentes
+  'ai-studio': [STUDIO],
+  estacion: [STUDIO, GUIA],
+  laboratorio: [ROCAS_MSG, CHATGPT, STUDIO],
+  flujo: [CHATGPT, STUDIO],
+  taller: [ROCAS_MSG, CHATGPT, STUDIO],
   // Taller de estudiantes
-  'e-studio': [
-    { id: 'e-studio', label: 'Google AI Studio', description: 'Donde crearás tu aplicación (Build).', url: 'https://aistudio.google.com/' },
-  ],
-  'e-estacion': [{ id: 'e-guia', label: 'Guía para crear tu app', description: 'Pasos y prompts de mejora.', route: '/m/guia' }],
-  'e-lab': [{ id: 'e-prompts', label: 'Mi prompt', description: 'Arma y copia el prompt de tu idea.', route: '/m/prompt' }],
+  'e-studio': [E_STUDIO],
+  'e-estacion': [E_STUDIO, E_GUIA],
+  'e-lab': [E_PROMPT, E_STUDIO],
+  'e-taller': [E_PROMPT, E_STUDIO],
 };
 
-// Enlaces ya abiertos hasta la pantalla actual (inclusive), en el orden del taller.
-export function unlockedLinks(screens: ScreenMeta[], currentId: string): WorkshopLink[] {
-  const idx = screens.findIndex((s) => s.id === currentId);
-  if (idx < 0) return [];
-  return screens.slice(0, idx + 1).flatMap((s) => SCREEN_LINKS[s.id] ?? []);
+/** Enlaces de la pantalla actual. */
+export function linksFor(currentId: string): WorkshopLink[] {
+  return SCREEN_LINKS[currentId] ?? [];
 }
