@@ -30,6 +30,7 @@ import { ThemeToggle } from '../components/ThemeToggle';
 import { SoundToggle } from '../components/SoundToggle';
 import { TeamsModal } from './TeamsModal';
 import { CommandDock } from './CommandDock';
+import { ScreenGuard } from './ScreenGuard';
 import { sfx } from '../lib/sfx';
 import { CountUp } from '../components/CountUp';
 import { elapsedOf, useTimers } from './timers';
@@ -227,7 +228,7 @@ export function Presenter({ screenId }: { screenId: string }) {
         </header>
 
         <main className="stage__main" key={screen.id} id="contenido">
-          {Screen ? <Screen /> : <p>Pantalla no encontrada.</p>}
+          <ScreenGuard resetKey={screen.id}>{Screen ? <Screen /> : <p>Pantalla no encontrada.</p>}</ScreenGuard>
         </main>
 
         <footer className="navbar">

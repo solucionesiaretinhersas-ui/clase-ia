@@ -68,7 +68,9 @@ export function IdeasGame() {
   const ws = useWorkshop();
   const cards = ws.audience === 'estudiante' ? ESTUDIANTES : DOCENTES;
   const { teams, addPoints, resetScores, update } = useTeams();
-  const [g, setG] = usePersistentState<GameS>('ig:state', INITIAL);
+  const [stored, setG] = usePersistentState<GameS>('ig:state', INITIAL);
+  // Mezcla con los valores por defecto por si hay datos guardados de una versión anterior
+  const g: GameS = { ...INITIAL, ...stored, times: stored?.times ?? {}, timedOut: stored?.timedOut ?? {}, deck: Array.isArray(stored?.deck) ? stored.deck : [] };
   const [paused, setPaused] = useState<number | null>(null);
   const [, tick] = useState(0);
 
