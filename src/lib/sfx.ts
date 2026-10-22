@@ -102,6 +102,17 @@ export const sfx = {
   tick() {
     tone(1400, 0, 0.03, 'square', 0.04);
   },
+  /** Tic-tac de reloj: alterna dos tonos; más fuerte y agudo cuando queda poco tiempo. */
+  clock(n: number, urgent = false) {
+    const hi = n % 2 === 0;
+    tone(hi ? 1900 : 1300, 0, 0.035, 'square', urgent ? 0.1 : 0.05);
+    if (urgent) tone(hi ? 950 : 650, 0, 0.06, 'sine', 0.1);
+  },
+  /** Campanita al detener el reloj. */
+  ding() {
+    tone(1175, 0, 0.35, 'triangle', 0.16);
+    tone(1568, 0.09, 0.5, 'triangle', 0.12);
+  },
   drop() {
     tone(320, 0, 0.12, 'sine', 0.18, 120);
   },

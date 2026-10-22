@@ -464,3 +464,8 @@ kbd { display: inline-block; padding: 0.05em 0.5em; border-radius: 0.4em; border
 .igshare { display: grid; gap: 0.8rem; justify-items: center; text-align: center; width: min(100%, 44rem); padding: 1rem; border-radius: var(--r-lg); background: color-mix(in srgb, var(--mint) 12%, var(--surface)); border: 1.5px solid color-mix(in srgb, var(--mint) 50%, transparent); animation: stuIn 0.4s var(--ease); } .igshare p { margin: 0; font-size: 1.15rem; } .igshare__btns { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; }
 @media (max-width: 900px) { .ig__grid { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .igcard.is-up, .igcard__art { animation: none; } }
+
+/* ───── Botón de terminado y turnos ───── */
+.btn--done { background: linear-gradient(135deg, var(--mint), color-mix(in srgb, var(--mint) 60%, var(--cyan))) !important; color: #04221a !important; border-color: transparent !important; box-shadow: 0 14px 30px -12px var(--mint); } .btn--done svg { color: inherit; }
+.igturn { display: inline-flex; align-items: baseline; gap: 0.5rem; padding: 0.5rem 1.2rem; border-radius: 999px; background: var(--surface-2); font-size: 1.15rem; } .igturn b { font-family: var(--font-display); font-size: 1.4rem; } .igturn--a b { color: var(--violet); } .igturn--b b { color: var(--cyan); } .igturn em { font-style: normal; color: var(--mint); font-weight: 700; }
+.game__time { color: var(--text-2); } .game__time b { color: var(--text); }

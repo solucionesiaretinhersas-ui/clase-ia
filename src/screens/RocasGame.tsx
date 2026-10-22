@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as RPointerEvent } from 'react';
-import { ArrowRight, CircleCheck, Hand, Play, RotateCcw, Trophy } from 'lucide-react';
+import { ArrowRight, CircleCheck, Flag, Hand, Play, RotateCcw, Trophy } from 'lucide-react';
 import { Scoreboard } from '../components/Scoreboard';
 import { useTicker } from '../components/ui';
 import { CHALLENGES, ROCAS, type Challenge, type Fragment, type Letter } from '../data/rocas';
@@ -95,7 +95,7 @@ export function RocasGame() {
   }
 
   /** Comprueba lo colocado: las correctas se fijan y suman; las incorrectas vuelven para corregirse. */
-  function check(auto = false) {
+  function check(auto = false, manual = false) {
     const s = ref.current;
     if (s.phase !== 'playing') return;
     const t: TeamId = s.step === 0 ? s.first : other(s.first);
@@ -136,7 +136,8 @@ export function RocasGame() {
         turnPts += bonus;
         sfx.win();
         confetti({ count: 180 });
-      } else sfx.bad();
+      } else if (manual) sfx.ding();
+      else sfx.bad();
       const turn: Turn = { round: s.round, team: t, pts: turnPts, ok: locked.length, errors, left: remaining, complete };
       setG({ ...s, placed, locked, errors, turnPts, phase: 'review', endsAt: null, turns: [...s.turns, turn] });
     } else {
@@ -156,18 +157,21 @@ export function RocasGame() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playing]);
 
-  // Tic de cuenta regresiva en los últimos 10 segundos
+  // Tic-tac de reloj cada segundo; más urgente en los últimos 10
   const lastLeft = useRef(-1);
   useEffect(() => {
-    if (playing && left <= 10 && left > 0 && left !== lastLeft.current) {
+    if (playing && left > 0 && left !== lastLeft.current) {
       lastLeft.current = left;
-      sfx.tick();
+      sfx.clock(left, left <= 10);
     }
   }, [left, playing]);
 
   const reviewTurn = [...g.turns].reverse().find((t) => t.round === g.round);
   const roundTurns = g.turns.filter((t) => t.round === g.round);
   const roundPts = (t: TeamId) => roundTurns.filter((x) => x.team === t).reduce((a, x) => a + x.pts, 0);
+  const used = (x: Turn) => DURATION - x.left;
+  const roundTime = (t: TeamId) => roundTurns.filter((x) => x.team === t).reduce((a, x) => a + used(x), 0);
+  const totalTime = (t: TeamId) => g.turns.filter((x) => x.team === t).reduce((a, x) => a + used(x), 0);
 
   function afterReview() {
     if (g.step === 0) setG((s) => ({ ...s, step: 1, phase: 'ready', placed: {}, locked: [], turnPts: 0, errors: 0 }));
@@ -230,7 +234,8 @@ export function RocasGame() {
   }
 
   const placedCount = frags.filter((f) => g.placed[f.id]).length;
-  const winnerFinal = teams.aScore === teams.bScore ? null : teams.aScore > teams.bScore ? teams.aName : teams.bName;
+  const tieByTime = teams.aScore === teams.bScore && totalTime('a') !== totalTime('b');
+  const winnerFinal = teams.aScore !== teams.bScore ? (teams.aScore > teams.bScore ? teams.aName : teams.bName) : tieByTime ? (totalTime('a') < totalTime('b') ? teams.aName : teams.bName) : null;
   const ring = useMemo(() => 2 * Math.PI * 44, []);
 
   const chip = (f: Fragment, where: 'pool' | 'slot') => {
@@ -337,6 +342,9 @@ export function RocasGame() {
               <button type="button" className="btn btn--primary btn--xl" onClick={() => check(false)} disabled={placedCount === g.locked.length}>
                 <CircleCheck /> Comprobar
               </button>
+              <button type="button" className="btn btn--xl btn--done" onClick={() => check(true, true)}>
+                <Flag /> ¡Terminamos!
+              </button>
             </div>
           </div>
         </>
@@ -354,6 +362,9 @@ export function RocasGame() {
             </li>
             <li>
               <b>+{reviewTurn.pts}</b> puntos en este turno
+            </li>
+            <li>
+              Tiempo registrado: <b>{used(reviewTurn)} s</b>
             </li>
           </ul>
           <button type="button" className="btn btn--primary btn--lg" onClick={afterReview}>
@@ -373,7 +384,16 @@ export function RocasGame() {
               {teams.bName} <b>{roundPts('b')}</b>
             </span>
           </div>
-          <p>{roundPts('a') === roundPts('b') ? 'Empate en este reto.' : `${roundPts('a') > roundPts('b') ? teams.aName : teams.bName} gana el reto.`}</p>
+          <p className="game__time">
+            Tiempo usado: {teams.aName} <b>{roundTime('a')} s</b> · {teams.bName} <b>{roundTime('b')} s</b>
+          </p>
+          <p>
+            {roundPts('a') !== roundPts('b')
+              ? `${roundPts('a') > roundPts('b') ? teams.aName : teams.bName} gana el reto.`
+              : roundTime('a') !== roundTime('b')
+                ? `Empate en puntos: ${roundTime('a') < roundTime('b') ? teams.aName : teams.bName} gana por terminar más rápido.`
+                : 'Empate en este reto.'}
+          </p>
           <button type="button" className="btn btn--primary btn--lg" onClick={afterRound}>
             {g.round < CHALLENGES.length - 1 ? 'Siguiente reto' : 'Ver resultado final'} <ArrowRight />
           </button>
@@ -387,6 +407,7 @@ export function RocasGame() {
           <p>
             {teams.aName}: {teams.aScore} puntos · {teams.bName}: {teams.bScore} puntos
           </p>
+          {tieByTime && <p>Empataron en puntos: se decide por el menor tiempo total ({teams.aName} {totalTime('a')} s · {teams.bName} {totalTime('b')} s).</p>}
           <div className="game__win-btns">
             <button type="button" className="btn btn--lg" onClick={restart}>
               <RotateCcw /> Jugar otra ronda con nuevos retos

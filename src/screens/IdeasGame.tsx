@@ -1,5 +1,5 @@
-import { useEffect, useState, type CSSProperties } from 'react';
-import { Check, Layers, Pause, Play, RotateCcw, Shuffle } from 'lucide-react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { Check, Flag, Layers, Pause, Play, RotateCcw, Shuffle } from 'lucide-react';
 import { Art, type ArtName } from '../components/MuralArt';
 import { Scoreboard } from '../components/Scoreboard';
 import { useWorkshop } from '../data/workshops';
@@ -43,40 +43,79 @@ const ESTUDIANTES: Card[] = [
 interface GameS {
   deck: number[];
   i: number;
-  phase: 'idle' | 'thinking' | 'share';
+  /** thinking: piensa el equipo en turno · pass: se entrega el turno · share: ambos terminaron */
+  phase: 'idle' | 'thinking' | 'pass' | 'share';
+  /** Equipo que abre la carta actual */
+  first: TeamId;
+  step: 0 | 1;
   endsAt: number;
+  /** Segundos usados por cada equipo en esta carta */
+  times: { a?: number; b?: number };
+  /** Si se acabó el tiempo en vez de tocar "Terminamos" */
+  timedOut: { a?: boolean; b?: boolean };
   given: boolean;
 }
 
 const THINK = 60;
-const INITIAL: GameS = { deck: [], i: -1, phase: 'idle', endsAt: 0, given: false };
+const INITIAL: GameS = { deck: [], i: -1, phase: 'idle', first: 'a', step: 0, endsAt: 0, times: {}, timedOut: {}, given: false };
+const other = (t: TeamId): TeamId => (t === 'a' ? 'b' : 'a');
 
 /**
- * Dinámica "La baraja de ideas": una carta provocadora, un minuto para pensar en equipo,
- * cada equipo comparte y el grupo decide a quién premiar. Funciona con y sin celulares.
+ * Dinámica "La baraja de ideas": una carta provocadora; cada equipo piensa por turnos (un minuto)
+ * y toca "¡Terminamos!" cuando acaba, así queda registrado su tiempo y pasa el otro equipo.
  */
 export function IdeasGame() {
   const ws = useWorkshop();
   const cards = ws.audience === 'estudiante' ? ESTUDIANTES : DOCENTES;
-  const { teams, addPoints, resetScores } = useTeams();
+  const { teams, addPoints, resetScores, update } = useTeams();
   const [g, setG] = usePersistentState<GameS>('ig:state', INITIAL);
   const [paused, setPaused] = useState<number | null>(null);
   const [, tick] = useState(0);
 
+  const turn: TeamId = g.step === 0 ? g.first : other(g.first);
+  const turnName = turn === 'a' ? teams.aName : teams.bName;
+  const nameOf = (t: TeamId) => (t === 'a' ? teams.aName : teams.bName);
+  const thinking = g.phase === 'thinking';
+
   useEffect(() => {
-    if (g.phase !== 'thinking') return;
+    if (!thinking) return;
     const id = window.setInterval(() => tick((n) => n + 1), 250);
     return () => window.clearInterval(id);
-  }, [g.phase]);
+  }, [thinking]);
 
-  const left = g.phase === 'thinking' ? (paused !== null ? paused : Math.max(0, Math.ceil((g.endsAt - Date.now()) / 1000))) : THINK;
+  const left = thinking ? (paused !== null ? paused : Math.max(0, Math.ceil((g.endsAt - Date.now()) / 1000))) : THINK;
 
+  /** Cierra el turno actual: registra el tiempo usado y pasa al otro equipo (o a compartir). */
+  function finish(timedOut: boolean) {
+    setPaused(null);
+    setG((s) => {
+      if (s.phase !== 'thinking') return s;
+      const t: TeamId = s.step === 0 ? s.first : other(s.first);
+      const remaining = Math.max(0, Math.ceil((s.endsAt - Date.now()) / 1000));
+      const usedSec = timedOut ? THINK : Math.min(THINK, THINK - remaining);
+      const times = { ...s.times, [t]: usedSec };
+      const to = { ...s.timedOut, [t]: timedOut };
+      return s.step === 0 ? { ...s, times, timedOut: to, phase: 'pass', step: 1 } : { ...s, times, timedOut: to, phase: 'share' };
+    });
+    if (timedOut) sfx.bad();
+    else sfx.ding();
+  }
+
+  // Fin del tiempo del equipo en turno
   useEffect(() => {
-    if (g.phase === 'thinking' && paused === null && left <= 0) {
-      sfx.win();
-      setG((s) => ({ ...s, phase: 'share' }));
-    } else if (g.phase === 'thinking' && paused === null && left <= 10 && left > 0) sfx.tick?.();
-  }, [left, g.phase, paused, setG]);
+    if (thinking && paused === null && left <= 0) finish(true);
+    // finish usa el estado más reciente mediante setG
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [left, thinking, paused]);
+
+  // Tic-tac de reloj mientras piensa el equipo en turno
+  const lastLeft = useRef(-1);
+  useEffect(() => {
+    if (thinking && paused === null && left > 0 && left !== lastLeft.current) {
+      lastLeft.current = left;
+      sfx.clock(left, left <= 10);
+    }
+  }, [left, thinking, paused]);
 
   const card = g.i >= 0 && g.deck[g.i] !== undefined ? cards[g.deck[g.i]] : null;
 
@@ -84,16 +123,27 @@ export function IdeasGame() {
     key: 'ideas-juego',
     kind: 'info',
     prompt: card ? card.q : 'La baraja de ideas: saca una carta y piensen en equipo.',
-    options: [`${teams.aName}: ${teams.aScore} puntos`, `${teams.bName}: ${teams.bScore} puntos`],
+    options: [thinking ? `Turno de ${turnName}` : `${teams.aName}: ${teams.aScore} puntos`, `${teams.bName}: ${teams.bScore} puntos`],
     open: true,
   });
 
+  function startThinking(step: 0 | 1, first: TeamId) {
+    const t = step === 0 ? first : other(first);
+    update({ turn: t });
+    setPaused(null);
+    lastLeft.current = -1;
+    setG((s) => ({ ...s, phase: 'thinking', step, first, endsAt: Date.now() + THINK * 1000 }));
+    sfx.whoosh();
+  }
   function draw() {
     const needNew = g.deck.length !== cards.length || g.i + 1 >= g.deck.length;
     const deck = needNew ? shuffle(cards.map((_, i) => i)) : g.deck;
     const i = needNew ? 0 : g.i + 1;
+    const first: TeamId = g.i < 0 ? 'a' : other(g.first);
+    setG({ deck, i, phase: 'thinking', first, step: 0, endsAt: Date.now() + THINK * 1000, times: {}, timedOut: {}, given: false });
+    update({ turn: first });
     setPaused(null);
-    setG({ deck, i, phase: 'thinking', endsAt: Date.now() + THINK * 1000, given: false });
+    lastLeft.current = -1;
     sfx.whoosh();
   }
   function pause() {
@@ -112,18 +162,20 @@ export function IdeasGame() {
 
   const pct = ((THINK - left) / THINK) * 100;
   const remaining = g.deck.length ? g.deck.length - g.i - 1 : cards.length;
+  const fastest: TeamId | null = g.times.a !== undefined && g.times.b !== undefined && g.times.a !== g.times.b ? (g.times.a < g.times.b ? 'a' : 'b') : null;
+  const timeTxt = (t: TeamId) => (g.timedOut[t] ? 'se acabó el tiempo' : `${g.times[t] ?? 0} s`);
 
   return (
     <section className="ig enter">
       <header className="screen-head screen-head--row">
         <div>
-          <span className="kicker">Dinámica · en equipos</span>
+          <span className="kicker">Dinámica · por turnos</span>
           <h2 className="h-lg">
             La baraja de <span className="grad-text">ideas</span>
           </h2>
         </div>
         <div className="ig__ctl">
-          <button type="button" className="btn btn--primary btn--lg" onClick={draw} disabled={g.phase === 'thinking' && paused === null}>
+          <button type="button" className="btn btn--primary btn--lg" onClick={draw} disabled={g.phase === 'thinking' || g.phase === 'pass'}>
             <Layers /> {g.phase === 'idle' ? 'Sacar una carta' : remaining === 0 && g.phase === 'share' ? 'Barajar de nuevo' : 'Siguiente carta'}
           </button>
           <button
@@ -153,27 +205,63 @@ export function IdeasGame() {
             ) : (
               <>
                 <Shuffle className="igcard__ph" />
-                <p className="igcard__hint">Saca una carta, léela en voz alta y den un minuto para pensar en equipo.</p>
+                <p className="igcard__hint">Saca una carta y léela en voz alta. Piensa un equipo a la vez: al terminar, toca “¡Terminamos!” y pasa el otro.</p>
               </>
             )}
           </div>
 
           {g.phase !== 'idle' && (
-            <div className={`igtimer ${g.phase === 'share' ? 'is-done' : left <= 10 ? 'is-low' : ''}`} role="timer" aria-live="off">
-              <div className="igtimer__bar">
-                <i style={{ width: `${g.phase === 'share' ? 100 : pct}%` }} />
-              </div>
-              <b>{g.phase === 'share' ? '¡Tiempo!' : `${left} s`}</b>
-              {g.phase === 'thinking' && (
-                <button type="button" className="btn btn--ghost btn--icon" onClick={pause} aria-label={paused === null ? 'Pausar' : 'Reanudar'}>
-                  {paused === null ? <Pause /> : <Play />}
-                </button>
+            <div className={`igturn igturn--${turn}`}>
+              {thinking ? (
+                <>
+                  <span>Turno de</span> <b>{turnName}</b>
+                </>
+              ) : g.phase === 'pass' ? (
+                <>
+                  <span>Tiempo registrado de</span> <b>{nameOf(g.first)}</b>
+                  <em>{timeTxt(g.first)}</em>
+                </>
+              ) : (
+                <span>Los dos equipos ya pensaron</span>
               )}
+            </div>
+          )}
+
+          {thinking && (
+            <div className={`igtimer ${left <= 10 ? 'is-low' : ''}`} role="timer" aria-live="off">
+              <div className="igtimer__bar">
+                <i style={{ width: `${pct}%` }} />
+              </div>
+              <b>{left} s</b>
+              <button type="button" className="btn btn--ghost btn--icon" onClick={pause} aria-label={paused === null ? 'Pausar' : 'Reanudar'}>
+                {paused === null ? <Pause /> : <Play />}
+              </button>
+            </div>
+          )}
+
+          {thinking && (
+            <button type="button" className="btn btn--primary btn--xl btn--done" onClick={() => finish(false)}>
+              <Flag /> ¡Terminamos!
+            </button>
+          )}
+
+          {g.phase === 'pass' && (
+            <div className="igshare">
+              <p>
+                <b>{nameOf(g.first)}</b> terminó en <b>{timeTxt(g.first)}</b>. Ahora piensa <b>{nameOf(other(g.first))}</b>.
+              </p>
+              <button type="button" className="btn btn--primary btn--xl" onClick={() => startThinking(1, g.first)}>
+                <Play /> Empezar {nameOf(other(g.first))}
+              </button>
             </div>
           )}
 
           {g.phase === 'share' && (
             <div className="igshare">
+              <p>
+                <b>{teams.aName}:</b> {timeTxt('a')} · <b>{teams.bName}:</b> {timeTxt('b')}
+                {fastest && <> · terminó primero {nameOf(fastest)}</>}
+              </p>
               <p>
                 <b>Ahora cada equipo comparte su idea.</b> El grupo decide cuál fue la más original o la más útil.
               </p>
@@ -187,12 +275,18 @@ export function IdeasGame() {
               </div>
             </div>
           )}
+
+          {g.phase === 'idle' && (
+            <button type="button" className="btn btn--primary btn--xl" onClick={draw}>
+              <Layers /> Sacar una carta
+            </button>
+          )}
         </div>
 
         <aside className="ig__side">
           <Scoreboard editable={false} />
           <p className="note-muted">
-            Quedan {remaining} {remaining === 1 ? 'carta' : 'cartas'}. Pulsa E para armar los equipos. Si no hay equipos, deja que hablen todos juntos y no uses el marcador.
+            Quedan {remaining} {remaining === 1 ? 'carta' : 'cartas'}. Pulsa E para armar los equipos. Cada carta abre un equipo distinto y el tiempo de cada uno queda registrado.
           </p>
         </aside>
       </div>
