@@ -151,17 +151,11 @@ function renderVectorCertificate(d: CertificateData, width = 2000): HTMLCanvasEl
   ctx.fillStyle = lg;
   ctx.fillRect(w / 2 - nw / 2, 695, nw, 4);
 
-  // Rol
-  ctx.fillStyle = '#5b6275';
-  ctx.font = `500 36px ${SERIF}`;
-  const role = d.audience === 'estudiante' ? 'Estudiante' : 'Docente';
-  ctx.fillText(d.grade ? `${role} · ${d.grade}` : role, w / 2, 758);
-
   // Cuerpo
   const date = (d.date ?? new Date()).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
   ctx.fillStyle = '#2b3347';
   ctx.font = `400 42px ${SERIF}`;
-  const lines = wrap(ctx, `${d.text}, realizado el ${date}, con una intensidad de ${d.minutes} minutos.`, w - 520);
+  const lines = wrap(ctx, `${d.text}, realizado el ${date}, con una intensidad de ${d.minutes} minutos, en el marco de la Semana de la IA.`, w - 520);
   lines.forEach((l, i) => ctx.fillText(l, w / 2, 832 + i * 56));
 
   // Nombre del taller
@@ -337,22 +331,14 @@ export async function renderCertificate(d: CertificateData, width = TPL.w): Prom
   const date = (d.date ?? new Date()).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
   ctx.fillStyle = '#1f2a44';
   ctx.font = `400 29px ${SERIF}`;
-  const lines = wrap(ctx, `${d.text}, realizado el ${date}, con una intensidad de ${d.minutes} minutos.`, 900);
+  const lines = wrap(ctx, `${d.text}, realizado el ${date}, con una intensidad de ${d.minutes} minutos, en el marco de la Semana de la IA.`, 900);
   lines.slice(0, 3).forEach((l, i) => ctx.fillText(l, TPL.w / 2 - 2, 578 + i * 39));
 
   // Nombre (recuadro superior)
   const name = d.name.trim();
   ctx.fillStyle = NAVY_T;
-  const hasRole = Boolean(d.grade?.trim());
-  const ns = fit(ctx, name, 840, hasRole ? 62 : 70, 30, 'italic 700');
-  ctx.fillText(name, 748, hasRole ? 477 : 492);
-  void ns;
-  if (hasRole) {
-    ctx.fillStyle = '#4a5670';
-    ctx.font = `500 25px ${SERIF}`;
-    const role = d.audience === 'estudiante' ? 'Estudiante' : 'Docente';
-    ctx.fillText(`${role} · ${d.grade!.trim()}`, 748, 516);
-  }
+  fit(ctx, name, 840, 70, 30, 'italic 700');
+  ctx.fillText(name, 748, 492);
 
   // Nombre del taller (recuadro inferior)
   ctx.fillStyle = NAVY_T;
