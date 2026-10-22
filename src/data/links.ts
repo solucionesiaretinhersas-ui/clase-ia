@@ -13,14 +13,13 @@ export interface WorkshopLink {
 
 export const SCREEN_LINKS: Record<string, WorkshopLink[]> = {
   'ai-studio': [
-    { id: 'studio', label: 'Google AI Studio', description: 'Donde construirás tu recurso (Build).', url: 'https://aistudio.google.com/' },
+    { id: 'studio', label: 'Google AI Studio', description: 'Donde construirás tu aula (Build).', url: 'https://aistudio.google.com/' },
   ],
-  estacion: [{ id: 'guia', label: 'Guía de creación', description: 'Pasos y prompts de mejora.', route: '/m/guia' }],
+  estacion: [{ id: 'guia', label: 'Guía de creación', description: 'Pasos para llegar a Build.', route: '/m/guia' }],
   laboratorio: [
-    { id: 'chatgpt', label: 'ChatGPT', description: 'Para estructurar tu clase (Prompt 1).', url: 'https://chatgpt.com/' },
-    { id: 'prompts', label: 'Mis prompts', description: 'Prompt 1 y 2 editables y copiables.', route: '/m/prompt' },
+    { id: 'chatgpt', label: 'ChatGPT', description: 'Para pedirle el prompt de tu aula.', url: 'https://chatgpt.com/' },
+    { id: 'prompts', label: 'Mi mensaje ROCAS', description: 'Arma y copia tu mensaje para ChatGPT.', route: '/m/prompt' },
   ],
-  recursos: [{ id: 'demo', label: 'Recurso de demostración', description: 'Misión: salvar el planeta.', route: '/demo' }],
   // Taller de estudiantes
   'e-studio': [
     { id: 'e-studio', label: 'Google AI Studio', description: 'Donde crearás tu aplicación (Build).', url: 'https://aistudio.google.com/' },

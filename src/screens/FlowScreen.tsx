@@ -1,5 +1,5 @@
 import { useEffect, type CSSProperties } from 'react';
-import { ArrowRight, Bot, ClipboardList, Eye, Hammer, MessageSquare, Play, RefreshCw, Search, Sparkles, UserRound, type LucideIcon } from 'lucide-react';
+import { ArrowRight, Bot, ClipboardList, Eye, Hammer, MessageSquare, Play, RefreshCw, UserRound, type LucideIcon } from 'lucide-react';
 import { sfx } from '../lib/sfx';
 import { usePersistentState } from '../lib/storage';
 
@@ -19,14 +19,12 @@ const WHO: Record<Who, { label: string; color: string }> = {
 };
 
 const NODES: Node[] = [
-  { icon: UserRound, title: 'Identificas una necesidad', text: 'Un tema que cuesta, un material que falta, una actividad que quieres mejorar.', who: 'tu' },
-  { icon: ClipboardList, title: 'Construyes el prompt con ROCAS', text: 'Rol, objetivo, contexto, acción y solución, con lo que solo tú sabes de tu grupo.', who: 'tu' },
-  { icon: MessageSquare, title: 'Lo revisas y mejoras en ChatGPT', text: 'Pides que lo evalúe, detecte vacíos y lo deje más claro y completo.', who: 'chatgpt' },
-  { icon: Bot, title: 'Llevas las instrucciones a AI Studio', text: 'Usas la instrucción ya afinada para explorar un recurso o prototipo interactivo (en Build, si está disponible en tu cuenta).', who: 'studio' },
-  { icon: Sparkles, title: 'Obtienes una primera versión', text: 'Es un borrador funcional, no un producto terminado.', who: 'studio' },
-  { icon: Play, title: 'Lo pruebas como estudiante', text: 'Aciertas, te equivocas a propósito y miras cómo responde.', who: 'tu' },
-  { icon: Search, title: 'Detectas errores', text: 'Pedagógicos, visuales o funcionales. Aquí ayuda la lupa pedagógica.', who: 'tu' },
-  { icon: RefreshCw, title: 'Pides mejoras y vuelves a probar', text: 'Un cambio a la vez, y se repite el ciclo hasta que sirva para tu clase.', who: 'studio' },
+  { icon: UserRound, title: 'Piensas tu clase', text: 'Qué tema, para qué grado y qué quieres que tus estudiantes logren.', who: 'tu' },
+  { icon: ClipboardList, title: 'Armas tu mensaje con ROCAS', text: 'Rol, objetivo, contexto, acción y solución, con lo que solo tú sabes de tu grupo.', who: 'tu' },
+  { icon: MessageSquare, title: 'ChatGPT te devuelve el prompt', text: 'Le pides que diseñe tu aula y te entregue el prompt listo para Google AI Studio.', who: 'chatgpt' },
+  { icon: Bot, title: 'AI Studio construye tu aula', text: 'Pegas el prompt en Build y Gemini genera tu aula interactiva, con todos los momentos de la clase.', who: 'studio' },
+  { icon: Play, title: 'La recorres como estudiante', text: 'Contestas, te equivocas a propósito y revisas con la lupa pedagógica si enseña lo que quieres.', who: 'tu' },
+  { icon: RefreshCw, title: 'Pides mejoras y decides', text: 'Un cambio a la vez, hasta que sirva para tu clase. La decisión final es tuya.', who: 'studio' },
 ];
 
 /** Etapa 4: del prompt al recurso, con cada herramienta en su función. Se revela paso a paso. */
@@ -45,9 +43,9 @@ export function FlowScreen() {
     <section className="flow enter">
       <header className="screen-head screen-head--row">
         <div>
-          <span className="kicker">Etapa 4 · Construir un recurso</span>
+          <span className="kicker">Etapa 4 · Tu aula, paso a paso</span>
           <h2 className="h-lg">
-            De la necesidad al <span className="grad-text">recurso probado</span>
+            De tu idea a tu <span className="grad-text">aula lista</span>
           </h2>
         </div>
         <div className="flow__ctl">

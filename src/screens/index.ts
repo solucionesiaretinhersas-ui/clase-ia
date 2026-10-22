@@ -1,5 +1,4 @@
 import type { ComponentType } from 'react';
-import { ExperienceGallery } from './ExperienceGallery';
 import { Closing } from './Closing';
 import { DemoScreen } from './DemoScreen';
 import { Ethics } from './Ethics';
@@ -11,11 +10,12 @@ import { PromptLab } from './PromptLab';
 import { Route } from './Route';
 import { StudioStation } from './StudioStation';
 import { DemoLive } from './DemoLive';
-import { Potencia, VibeDemo } from './IntroScreens';
+import { Potencia } from './IntroScreens';
+import { AulaDemo, StudioIntro } from './StudioScreens';
+import { Usos } from './Usos';
 import { RocasCompare, RocasIntro } from './RocasScreens';
 import { RocasGame } from './RocasGame';
 import { FlowScreen } from './FlowScreen';
-import { ResourceGallery } from './ResourceGallery';
 import { Welcome } from './Welcome';
 import { Certificates } from './Certificates';
 import { StudentLab } from './StudentLab';
@@ -29,7 +29,7 @@ export const SCREEN_COMPONENTS: Record<string, ComponentType> = {
   ruta: Route,
   votacion: OpeningVote,
   potencia: Potencia,
-  vibe: VibeDemo,
+  vibe: AulaDemo,
   'demo-vivo': DemoLive,
   rocas: RocasIntro,
   'rocas-vs': RocasCompare,
@@ -38,11 +38,11 @@ export const SCREEN_COMPONENTS: Record<string, ComponentType> = {
   dialogo: WallDialogo,
   reflexion: WallReflexion,
   'humano-ia': HumanVsAI,
-  'ai-studio': ExperienceGallery,
+  'ai-studio': StudioIntro,
   estacion: StudioStation,
   laboratorio: PromptLab,
   flujo: FlowScreen,
-  recursos: ResourceGallery,
+  usos: Usos,
   taller: PracticalWorkshop,
   galeria: Gallery,
   etica: Ethics,

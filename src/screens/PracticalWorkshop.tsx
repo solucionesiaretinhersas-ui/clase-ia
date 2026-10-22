@@ -1,9 +1,6 @@
-import { useState } from 'react';
-import { Check, ExternalLink, HeartHandshake, ScanSearch, Sparkles } from 'lucide-react';
+import { Check, ExternalLink, HeartHandshake } from 'lucide-react';
 import { CheckinBars } from '../components/CheckinBars';
 import { Lupa } from '../components/Lupa';
-import { CopyButton } from '../components/ui';
-import { REFINEMENTS } from '../data/prompts';
 import { useWorkshop } from '../data/workshops';
 import { usePersistentState } from '../lib/storage';
 import { LIVE_SYNC_AVAILABLE, useLiveResponses, useParticipants, useSessionCode } from '../lib/sync';
@@ -12,10 +9,10 @@ import { useAnnounce } from '../presenter/announce';
 import { usePresenter } from '../presenter/context';
 
 const PHASES = [
-  { title: 'Prompt listo', min: 4, text: 'Ten tu prompt ROCAS revisado en ChatGPT (Prompt 1) y la estructura de tu clase.' },
-  { title: 'Primera versión', min: 6, text: 'En Build, pega el Prompt 2 con tu estructura. Pide siempre simuladores y actividades para el tablero.' },
-  { title: 'Prueba con la lupa', min: 6, text: 'Úsalo como estudiante y revísalo con la lupa pedagógica: ¿enseña lo que quieres, como lo quieres?' },
-  { title: 'Mejora y vuelve a probar', min: 6, text: 'Pide cambios, uno a la vez, con los prompts de abajo, y vuelve a probar.' },
+  { title: 'Prompt listo', min: 4, text: 'Pide a ChatGPT tu aula con el mensaje ROCAS y ten el prompt para AI Studio.' },
+  { title: 'Primera versión', min: 6, text: 'En Build de Google AI Studio, pega el prompt que te dio ChatGPT y deja que construya tu aula.' },
+  { title: 'Prueba con la lupa', min: 6, text: 'Recorre tu aula como estudiante y revísala con la lupa pedagógica: ¿enseña lo que quieres?' },
+  { title: 'Mejora y vuelve a probar', min: 6, text: 'Pide cambios con tus propias palabras, uno a la vez, y vuelve a probar.' },
 ];
 
 const CHECK = ['¡Listo!', 'Voy en proceso', 'Necesito ayuda'];
@@ -23,8 +20,6 @@ const CHECK = ['¡Listo!', 'Voy en proceso', 'Necesito ayuda'];
 export function PracticalWorkshop() {
   const ws = useWorkshop();
   const [phase, setPhase] = usePersistentState('taller:phase', 0);
-  const [tab, setTab] = useState<'mejora' | 'lupa'>('mejora');
-  const [ticks] = usePersistentState<number[]>('taller:lupa', []);
   const { goTo } = usePresenter();
 
   // Avance en vivo: cada docente marca desde su celular cómo va en la fase actual.
@@ -38,8 +33,8 @@ export function PracticalWorkshop() {
     <section className="practice enter">
       <header className="screen-head screen-head--row">
         <div>
-          <span className="kicker">Etapa 4 · Construir y probar</span>
-          <h2 className="h-xl">Tu turno: crea tu recurso</h2>
+          <span className="kicker">Etapa 4 · Crea tu aula</span>
+          <h2 className="h-xl">Tu turno: crea tu aula</h2>
         </div>
         <div className="practice__links">
           <button type="button" className="btn btn--lg" onClick={() => goTo('laboratorio')}>
@@ -81,31 +76,8 @@ export function PracticalWorkshop() {
         </aside>
       </div>
 
-      <div className="seg seg--small" role="tablist" aria-label="Herramientas del taller">
-        <button type="button" role="tab" aria-selected={tab === 'mejora'} className={`seg__btn ${tab === 'mejora' ? 'is-on' : ''}`} onClick={() => setTab('mejora')}>
-          <Sparkles /> Prompts para perfeccionar
-        </button>
-        <button type="button" role="tab" aria-selected={tab === 'lupa'} className={`seg__btn ${tab === 'lupa' ? 'is-on' : ''}`} onClick={() => setTab('lupa')}>
-          <ScanSearch /> Lupa pedagógica <b>{ticks.length}/7</b>
-        </button>
-      </div>
-
-      {tab === 'mejora' ? (
-        <div className="refine">
-          <div className="refine__grid">
-            {REFINEMENTS.map((r) => (
-              <article key={r.title} className="refine__card glass">
-                <strong>{r.title}</strong>
-                <p>{r.prompt}</p>
-                <CopyButton text={r.prompt} />
-              </article>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <Lupa />
-      )}
-      <p className="note-muted">Reemplaza lo que aparece entre [CORCHETES] antes de enviar. Revisa siempre el contenido generado antes de usarlo con estudiantes.</p>
+      <Lupa />
+      <p className="note-muted">Revisa siempre el contenido generado antes de usarlo con estudiantes: la IA puede equivocarse.</p>
     </section>
   );
 }

@@ -6,6 +6,8 @@ const LLUVIA: WallConfig = {
   kicker: 'Lluvia de ideas · desde tu celular',
   title: '¿Qué tarea educativa quieres mejorar?',
   prompt: '¿Qué tarea educativa te gustaría mejorar con ayuda de la IA para tener más tiempo con tus estudiantes?',
+  art: ['bulb', 'rocket', 'cloud'],
+  tone: 'amber',
 };
 
 const DIALOGO: WallConfig = {
@@ -14,6 +16,8 @@ const DIALOGO: WallConfig = {
   kicker: 'Diálogo · desde tu celular',
   title: '¿Qué nos dejan estos recursos?',
   prompt: 'Un aprendizaje, una duda o una idea que te dejaron los recursos presentados.',
+  art: ['book', 'star', 'trophy'],
+  tone: 'blue',
 };
 
 const REFLEXION: WallConfig = {
@@ -22,6 +26,8 @@ const REFLEXION: WallConfig = {
   kicker: 'Reflexión · desde tu celular',
   title: 'Una regla ética para mi aula',
   prompt: 'Escribe una regla ética que aplicarás cuando uses IA con tus estudiantes.',
+  art: ['heart', 'book', 'star'],
+  tone: 'rose',
 };
 
 export const WallLluvia = () => <IdeaWall cfg={LLUVIA} />;
@@ -35,6 +41,8 @@ const E_DONDE: WallConfig = {
   title: '¿Dónde ves inteligencia artificial?',
   prompt: '¿Dónde has visto o usado inteligencia artificial? Escribe una palabra o frase corta.',
   cloud: true,
+  art: ['robot', 'planet', 'cloud'],
+  tone: 'cyan',
 };
 
 const E_PREDICCION: WallConfig = {
@@ -44,6 +52,8 @@ const E_PREDICCION: WallConfig = {
   title: 'Cuando llueve mucho, saco mi ____',
   prompt: 'Completa la frase con UNA sola palabra: “Cuando llueve mucho, saco mi ____”.',
   cloud: true,
+  art: ['cloud', 'bulb', 'star'],
+  tone: 'blue',
 };
 
 const E_IDEA: WallConfig = {
@@ -52,6 +62,8 @@ const E_IDEA: WallConfig = {
   kicker: 'Lluvia de ideas · desde tu celular',
   title: '¿Qué aplicación o juego crearías?',
   prompt: 'Escribe la idea de una aplicación o juego que te gustaría crear.',
+  art: ['rocket', 'robot', 'planet'],
+  tone: 'violet',
 };
 
 const E_REFLEXION: WallConfig = {
@@ -60,6 +72,8 @@ const E_REFLEXION: WallConfig = {
   kicker: 'Cierre · desde tu celular',
   title: 'Lo que me llevo de hoy',
   prompt: 'Escribe una frase: lo que aprendiste hoy o la app que vas a crear después.',
+  art: ['trophy', 'star', 'heart'],
+  tone: 'mint',
 };
 
 export const WallDonde = () => <IdeaWall cfg={E_DONDE} />;

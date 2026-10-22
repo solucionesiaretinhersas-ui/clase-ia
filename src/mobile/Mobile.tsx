@@ -9,7 +9,7 @@ import { ThemeToggle } from '../components/ThemeToggle';
 import { SoundToggle } from '../components/SoundToggle';
 import { sfx } from '../lib/sfx';
 import { ANSWER_KEYS } from '../data/answers';
-import { REFINEMENTS, STUDENT_REFINEMENTS } from '../data/prompts';
+import { STUDENT_REFINEMENTS } from '../data/prompts';
 import { STUDIO_STEPS } from '../data/studioSteps';
 import { navigate, queryParam, segments } from '../lib/router';
 import { LIVE_SYNC_AVAILABLE, lookupCertificate, registerParticipant, sendIdea, sendResponse, useLiveState, type IssuedCertificate, type LiveAct } from '../lib/sync';
@@ -583,8 +583,8 @@ function Guide() {
       <a className="btn btn--primary btn--lg mob__cta" href={AI_STUDIO_URL} target="_blank" rel="noopener noreferrer">
         Abrir Google AI Studio <ExternalLink />
       </a>
-      <h3 className="mob__h">Prompts de mejora</h3>
-      {(ws.audience === 'estudiante' ? STUDENT_REFINEMENTS : REFINEMENTS).map((r) => (
+      {ws.audience === 'estudiante' && <h3 className="mob__h">Prompts de mejora</h3>}
+      {(ws.audience === 'estudiante' ? STUDENT_REFINEMENTS : []).map((r) => (
         <article key={r.title} className="refine__card glass">
           <strong>{r.title}</strong>
           <p>{r.prompt}</p>

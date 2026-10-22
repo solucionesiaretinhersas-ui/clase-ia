@@ -22,20 +22,19 @@ export const ROLES = [
 ];
 
 export const ACCIONES = [
-  'una explicación breve',
-  'ejemplos cercanos a mi contexto',
-  'actividades interactivas',
-  'un simulador que se pueda proyectar en el tablero',
-  'preguntas con retroalimentación inmediata',
+  'bienvenida y objetivos de la clase',
+  'explicación breve con ejemplos de mi contexto',
+  'un simulador o laboratorio para explorar',
+  'actividades con retroalimentación inmediata',
   'una evaluación final',
+  'un cierre con reflexión',
 ];
 
 export const SOLUCIONES = [
-  'la estructura de la clase en una tabla con el propósito, la duración y lo que hace el estudiante en cada parte, y una lista de verificación para revisarla',
-  'una guía de aprendizaje lista para usar, con títulos claros y una rúbrica de 3 niveles',
-  'una secuencia de actividades numeradas con instrucciones para el docente y para el estudiante',
+  'un aula interactiva completa en una sola aplicación web, con menú de navegación por momentos de la clase y textos y botones grandes para proyectar en el tablero',
+  'un aula interactiva con un recorrido guiado por la clase, donde el estudiante avanza de la exploración a la práctica y a la evaluación, y yo veo su progreso',
+  'una experiencia por estaciones o misiones, en una sola aplicación, que se pueda manejar desde el computador, la tableta y el celular',
 ];
-
 export const EMPTY_FIELDS: PromptFields = {
   tema: '',
   grado: '',
@@ -103,35 +102,21 @@ function parts(raw: PromptFields) {
   };
 }
 
-/** Prompt 1 · ChatGPT, con la metodología ROCAS: la estructura de la clase. */
+/**
+ * Mensaje para ChatGPT con ROCAS. Le pide que escriba el prompt que luego se pegará en Google AI Studio
+ * para construir el aula interactiva completa.
+ */
 export function buildChatGptPrompt(f: PromptFields): string {
   const p = parts(f);
   return (
-    `R — ROL: Actúa como ${p.rol}.\n\n` +
-    `O — OBJETIVO: Quiero crear una clase sobre ${p.tema}${p.areaTxt} para estudiantes de ${p.grado}. El objetivo de aprendizaje es ${p.objetivo}.\n\n` +
+    `R — ROL: Actúa como ${p.rol}, experto en crear prompts para Google AI Studio (Build).\n\n` +
+    `O — OBJETIVO: Quiero crear una clase sobre ${p.tema}${p.areaTxt} para estudiantes de ${p.grado} dentro de Google AI Studio. El objetivo de aprendizaje es ${p.objetivo}.\n\n` +
     `C — CONTEXTO: ${p.contexto}.\n\n` +
-    `A — ACCIÓN: Diseña la clase indicando qué debe tener cada parte: ${p.acciones}. Prioriza experiencias interactivas y no solo texto; ` +
-    `para cada parte indica su propósito, una duración sugerida y qué hace el estudiante.\n\n` +
-    `S — SOLUCIÓN: Entrégame ${p.solucion}.`
+    `A — ACCIÓN: Diseña la clase completa y conviértela en un prompt para Google AI Studio. El aula debe incluir: ${p.acciones}. ` +
+    `Organiza todo en momentos (inicio, exploración, práctica, evaluación y cierre) para que todo lo de la clase quede en un solo lugar.\n\n` +
+    `S — SOLUCIÓN: Entrégame únicamente el prompt listo para copiar y pegar en Google AI Studio, que construya ${p.solucion}.`
   );
 }
-
-/** Prompt 2 · Google AI Studio (Build), también con ROCAS: construir el recurso. */
-export function buildStudioPrompt(f: PromptFields): string {
-  const p = parts(f);
-  return (
-    `R — ROL: Actúa como desarrollador de experiencias educativas interactivas, experto en diseño pedagógico.\n\n` +
-    `O — OBJETIVO: Crea una aplicación web para enseñar ${p.tema}${p.areaTxt} a estudiantes de ${p.grado}. El objetivo de aprendizaje es ${p.objetivo}.\n\n` +
-    `C — CONTEXTO: ${p.contexto}.\n\n` +
-    `A — ACCIÓN: Sigue esta estructura de clase: [PEGA AQUÍ LA ESTRUCTURA QUE TE DIO CHATGPT]. Incluye ${p.acciones}, ` +
-    `y al menos una actividad en la que un estudiante pase al tablero a manejarla frente al grupo.\n\n` +
-    `S — SOLUCIÓN: Una aplicación web funcional (no una presentación estática), con textos y botones grandes para proyectar, navegación intuitiva y adaptable a computador, tableta y celular.`
-  );
-}
-
-/** Compatibilidad con el prompt maestro original. */
-export const buildPrompt = buildStudioPrompt;
-
 export function missingFields(f: PromptFields): (keyof PromptFields)[] {
   const n = normalizeFields(f);
   return (['tema', 'grado', 'objetivo', 'contexto'] as const).filter((k) => !n[k].trim());
@@ -182,45 +167,6 @@ export const EXAMPLES: PromptExample[] = [
     },
   },
 ];
-/** Prompts de iteración para pedir mejoras en Build */
-export const REFINEMENTS: { title: string; prompt: string }[] = [
-  {
-    title: 'Añadir un simulador',
-    prompt:
-      'Agrega un simulador interactivo donde el estudiante pueda cambiar [VARIABLE] y ver de inmediato qué ocurre. Debe verse bien proyectado en el tablero.',
-  },
-  {
-    title: 'Contexto de mi comunidad',
-    prompt:
-      'Cambia los ejemplos y los nombres por situaciones de mi contexto: [DESCRIBE TU MUNICIPIO, TU COLEGIO O TU REGIÓN].',
-  },
-  {
-    title: 'Ajustar el nivel',
-    prompt:
-      'Revisa todo el contenido y ajusta el vocabulario y la dificultad para estudiantes de [GRADO]. Usa frases cortas y ejemplos del contexto colombiano.',
-  },
-  {
-    title: 'Más retroalimentación',
-    prompt:
-      'Cuando el estudiante responda mal, no muestres solo “incorrecto”: explica por qué, da una pista y permite intentarlo de nuevo.',
-  },
-  {
-    title: 'Puntos y progreso',
-    prompt:
-      'Agrega un sistema de puntos, una barra de progreso visible y una pantalla final con el resultado y un mensaje según el desempeño.',
-  },
-  {
-    title: 'Para el tablero',
-    prompt:
-      'Haz que todo se vea y se use bien proyectado: textos grandes, buen contraste y botones grandes para que un estudiante pase a manejarlo frente al grupo.',
-  },
-  {
-    title: 'Corregir un error',
-    prompt:
-      'Hay un error: [DESCRIBE QUÉ HICISTE Y QUÉ PASÓ]. Corrígelo sin cambiar el resto del diseño y explícame qué modificaste.',
-  },
-];
-
 /* ───────── Taller de estudiantes ───────── */
 export interface StudentFields {
   idea: string;

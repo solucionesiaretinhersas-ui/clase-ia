@@ -20,11 +20,13 @@ npm run preview    # sirve dist/ localmente
 | # | Momento | Min | Qué ocurre |
 |---|---|---|---|
 | 1 | La IA llegó a la educación | 12 | Votación, **charla “no viene a reemplazarte, viene a ampliar tu diseño”** con gráfica interactiva (Docente vs. Docente + IA), “¿la IA ayuda o solo tú?” y lluvia de ideas en vivo |
-| 2 | Google AI Studio y el vibe coding | 14 | **Vibe coding animado** (describes, la IA programa, pruebas, mejoras), galería de experiencias con votación, **demostración en vivo** (AI Studio en ventana lateral + panel del guion) y “Llega a Build” con avance en vivo |
-| 3 | Tu prompt con ROCAS | 20 | **Metodología ROCAS** (Rol, Objetivo, Contexto, Acción, Solución) con piedras animadas, comparador “prompt frágil vs. fuerte”, **juego por equipos en la pizarra táctil** y constructor de prompts ROCAS para ChatGPT |
-| 4 | Construir y probar | 30 | Demo, **Prompt 2** (también ROCAS) para AI Studio, avance en vivo por fases y **lupa pedagógica** (7 criterios con su prompt de arreglo) |
-| 5 | Compartir y mejorar | 6 | Uno o dos docentes presentan (ruleta con pregunta) y diálogo en vivo |
-| 6 | Llevarlo al aula | 8 | Ética y docencia humanizada, regla ética, compromiso de aplicación, asistencia y certificado |
+| 2 | Google AI Studio | 14 | **Qué es y cómo funciona** (ilustración con puntos para tocar), **aula interactiva completa** simulada que se construye por momentos y se mejora con una frase, demostración en vivo y “Llega a Build” |
+| 3 | Tu prompt con ROCAS | 20 | **Metodología ROCAS** (piedras, comparador y juego por equipos) y un **único mensaje para ChatGPT** que le pide el prompt para crear el aula en AI Studio |
+| 4 | Crea tu aula | 30 | Recorrido ChatGPT → AI Studio, creación guiada con avance en vivo y **lupa pedagógica** |
+| 5 | Compartir y mejorar | 6 | Uno o dos docentes presentan (ruleta con pregunta) y diálogo en un mural ilustrado |
+| 6 | Llevarlo al aula | 8 | El facilitador cierra explicando **para qué se puede usar**, ética, compromiso de aplicación, asistencia y certificado |
+
+Los murales (ideas, diálogo, reglas, compromisos) usan ilustraciones propias en SVG (`src/components/MuralArt.tsx`), notas con cinta, reacciones y fondos por color.
 
 ## Modo claro y oscuro · estilo Apple
 

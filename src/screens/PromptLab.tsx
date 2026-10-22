@@ -1,26 +1,13 @@
 import { useState, type CSSProperties } from 'react';
 import { Check, ExternalLink, Pencil, RotateCcw, Wand2 } from 'lucide-react';
 import { CopyButton } from '../components/ui';
-import {
-  ACCIONES,
-  AREAS,
-  EMPTY_FIELDS,
-  EXAMPLES,
-  GRADOS,
-  ROLES,
-  SOLUCIONES,
-  buildChatGptPrompt,
-  buildStudioPrompt,
-  normalizeFields,
-  type PromptFields,
-} from '../data/prompts';
+import { ACCIONES, AREAS, EMPTY_FIELDS, EXAMPLES, GRADOS, ROLES, SOLUCIONES, buildChatGptPrompt, normalizeFields, type PromptFields } from '../data/prompts';
 import { ROCAS, type Letter } from '../data/rocas';
 import { sfx } from '../lib/sfx';
 import { usePersistentState } from '../lib/storage';
 import { AI_STUDIO_URL, CHATGPT_URL } from '../lib/urls';
 
-type Tab = 'chatgpt' | 'studio';
-const SHORT_SOL = ['Estructura en tabla + lista de verificación', 'Guía lista para usar + rúbrica', 'Secuencia de actividades numeradas'];
+const SHORT_SOL = ['Aula con menú por momentos', 'Recorrido guiado con progreso', 'Estaciones o misiones'];
 
 function ready(f: PromptFields): Record<Letter, boolean> {
   return {
@@ -33,25 +20,24 @@ function ready(f: PromptFields): Record<Letter, boolean> {
 }
 
 /**
- * Constructor de prompts con ROCAS: escribe o elige cada parte, mira cómo se ensambla la
- * instrucción, edítala, cópiala y llévala a ChatGPT. No usa ningún modelo: solo estructura el texto.
+ * Constructor del mensaje para ChatGPT con ROCAS: el docente completa las cinco piedras, mira cómo se
+ * ensambla y copia un único mensaje que le pide a ChatGPT el prompt para Google AI Studio.
+ * No usa ningún modelo: solo ordena el texto.
  */
 export function PromptLab({ compact = false }: { compact?: boolean }) {
   const [stored, setFields] = usePersistentState<PromptFields>('lab:fields', EMPTY_FIELDS);
   const fields = normalizeFields(stored);
-  const [tab, setTab] = usePersistentState<Tab>('lab:tab', 'chatgpt');
-  const [manual, setManual] = usePersistentState<Record<Tab, string | null>>('lab:manual2', { chatgpt: null, studio: null });
+  const [manual, setManual] = usePersistentState<string | null>('lab:manual3', null);
   const [active, setActive] = useState<string | null>(null);
 
-  const generated = tab === 'chatgpt' ? buildChatGptPrompt(fields) : buildStudioPrompt(fields);
-  const edited = manual[tab] ?? null;
-  const text = edited ?? generated;
+  const generated = buildChatGptPrompt(fields);
+  const text = manual ?? generated;
   const ok = ready(fields);
   const done = ROCAS.filter((r) => ok[r.k]).length;
   const blocks = generated.split('\n\n');
 
   const set = <K extends keyof PromptFields>(k: K, v: PromptFields[K]) => {
-    setManual({ chatgpt: null, studio: null });
+    setManual(null);
     setFields((f) => ({ ...normalizeFields(f), [k]: v }));
   };
   const toggleAction = (a: string) => {
@@ -60,7 +46,7 @@ export function PromptLab({ compact = false }: { compact?: boolean }) {
   };
   const reset = () => {
     setFields({ ...EMPTY_FIELDS, rol: '', acciones: [], solucion: '' });
-    setManual({ chatgpt: null, studio: null });
+    setManual(null);
     setActive(null);
     sfx.whoosh();
   };
@@ -69,7 +55,7 @@ export function PromptLab({ compact = false }: { compact?: boolean }) {
     <section className={`lab ${compact ? 'lab--compact' : 'enter'}`}>
       {!compact && (
         <header className="screen-head">
-          <span className="kicker">Constructor de prompts ROCAS</span>
+          <span className="kicker">Pídele a ChatGPT tu aula</span>
           <h2 className="h-lg">Completa las cinco piedras</h2>
         </header>
       )}
@@ -91,7 +77,7 @@ export function PromptLab({ compact = false }: { compact?: boolean }) {
               className={`btn ${active === ex.id ? 'btn--primary' : ''}`}
               onClick={() => {
                 setActive(ex.id);
-                setManual({ chatgpt: null, studio: null });
+                setManual(null);
                 setFields((f) => ({ ...normalizeFields(f), ...ex.fields }));
                 sfx.ok();
               }}
@@ -121,7 +107,7 @@ export function PromptLab({ compact = false }: { compact?: boolean }) {
 
           <fieldset className="stone" style={{ '--c': ROCAS[1].color } as CSSProperties}>
             <legend>
-              <b>O</b> Objetivo <small>¿Qué queremos lograr?</small>
+              <b>O</b> Objetivo <small>¿Qué clase quieres crear?</small>
             </legend>
             <input className="input" value={fields.tema} onChange={(e) => set('tema', e.target.value)} placeholder="Tema. Ej.: el ciclo del agua" aria-label="Tema" />
             <div className="lab__row">
@@ -150,7 +136,7 @@ export function PromptLab({ compact = false }: { compact?: boolean }) {
 
           <fieldset className="stone" style={{ '--c': ROCAS[3].color } as CSSProperties}>
             <legend>
-              <b>A</b> Acción <small>¿Qué debe hacer, paso a paso?</small>
+              <b>A</b> Acción <small>¿Qué debe tener tu aula?</small>
             </legend>
             <div className="lab__checks">
               {ACCIONES.map((a) => (
@@ -159,12 +145,12 @@ export function PromptLab({ compact = false }: { compact?: boolean }) {
                 </button>
               ))}
             </div>
-            <input className="input" value={fields.accionExtra} onChange={(e) => set('accionExtra', e.target.value)} placeholder="Otra acción que necesites (opcional)" aria-label="Otras acciones" />
+            <input className="input" value={fields.accionExtra} onChange={(e) => set('accionExtra', e.target.value)} placeholder="Otra cosa que necesites (opcional)" aria-label="Otras acciones" />
           </fieldset>
 
           <fieldset className="stone" style={{ '--c': ROCAS[4].color } as CSSProperties}>
             <legend>
-              <b>S</b> Solución <small>¿Qué resultado, en qué formato y cómo lo compruebo?</small>
+              <b>S</b> Solución <small>¿Qué resultado esperas y cómo lo compruebas?</small>
             </legend>
             <textarea className="input" rows={2} value={fields.solucion} onChange={(e) => set('solucion', e.target.value)} placeholder="Describe el resultado final, su formato y cómo verificarás que funciona" aria-label="Solución esperada" />
             <div className="lab__checks">
@@ -178,18 +164,21 @@ export function PromptLab({ compact = false }: { compact?: boolean }) {
         </form>
 
         <div className="lab__out glass">
-          <div className="lab__tabs" role="tablist" aria-label="Elige el prompt">
-            <button type="button" role="tab" aria-selected={tab === 'chatgpt'} className={tab === 'chatgpt' ? 'is-active' : ''} onClick={() => setTab('chatgpt')}>
-              <b>1</b> ChatGPT · afina tu prompt
-            </button>
-            <button type="button" role="tab" aria-selected={tab === 'studio'} className={tab === 'studio' ? 'is-active' : ''} onClick={() => setTab('studio')}>
-              <b>2</b> AI Studio · recurso
-            </button>
+          <div className="lab__send">
+            <span className="lab__send-step">
+              <b>1</b> Copia este mensaje
+            </span>
+            <span className="lab__send-step">
+              <b>2</b> Pégalo en ChatGPT
+            </span>
+            <span className="lab__send-step">
+              <b>3</b> Lleva su respuesta a AI Studio
+            </span>
           </div>
 
-          <ol className="assembly" aria-label="Cómo se ensambla tu instrucción">
+          <ol className="assembly" aria-label="Cómo se ensambla tu mensaje">
             {ROCAS.map((r, i) => (
-              <li key={r.k + tab} className={ok[r.k] ? 'is-ready' : ''} style={{ '--c': r.color, '--i': i } as CSSProperties}>
+              <li key={r.k} className={ok[r.k] ? 'is-ready' : ''} style={{ '--c': r.color, '--i': i } as CSSProperties}>
                 <b>{r.k}</b>
                 <span>{(blocks[i] ?? '').replace(/^[A-Z] — [A-ZÓÁÉÍÚ]+: /, '')}</span>
               </li>
@@ -197,8 +186,8 @@ export function PromptLab({ compact = false }: { compact?: boolean }) {
           </ol>
 
           <div className="lab__out-head">
-            <span className="kicker">Texto final · puedes editarlo</span>
-            {edited !== null ? (
+            <span className="kicker">Mensaje final · puedes editarlo</span>
+            {manual !== null ? (
               <span className="chip chip--warn">
                 <Pencil /> Editado a mano
               </span>
@@ -208,17 +197,18 @@ export function PromptLab({ compact = false }: { compact?: boolean }) {
               <span className="chip chip--warn">{done} de 5 piedras</span>
             )}
           </div>
-          <textarea className="input lab__textarea" value={text} onChange={(e) => setManual({ ...manual, [tab]: e.target.value })} rows={compact ? 10 : 9} aria-label="Prompt editable" />
+          <textarea className="input lab__textarea" value={text} onChange={(e) => setManual(e.target.value)} rows={compact ? 10 : 9} aria-label="Mensaje editable" />
           <div className="lab__actions">
-            <CopyButton text={text} label={`Copiar prompt ${tab === 'chatgpt' ? '1' : '2'}`} className="btn--primary btn--lg" />
-            <a className="btn btn--lg" href={tab === 'chatgpt' ? CHATGPT_URL : AI_STUDIO_URL} target="_blank" rel="noopener noreferrer">
-              {tab === 'chatgpt' ? 'Abrir ChatGPT' : 'Abrir AI Studio'} <ExternalLink />
+            <CopyButton text={text} label="Copiar mensaje para ChatGPT" className="btn--primary btn--lg" />
+            <a className="btn btn--lg" href={CHATGPT_URL} target="_blank" rel="noopener noreferrer">
+              Abrir ChatGPT <ExternalLink />
+            </a>
+            <a className="btn btn--lg" href={AI_STUDIO_URL} target="_blank" rel="noopener noreferrer">
+              Abrir AI Studio <ExternalLink />
             </a>
           </div>
           <p className="note-muted">
-            {tab === 'chatgpt'
-              ? 'Pégalo en ChatGPT para revisarlo y mejorarlo. Este constructor solo ordena tu instrucción; no genera nada por sí mismo.'
-              : 'Antes de enviarlo a Build, reemplaza [PEGA AQUÍ LA ESTRUCTURA…] por la respuesta de ChatGPT.'}
+            ChatGPT te responderá con el prompt listo. Léelo, ajústalo si hace falta y pégalo en Build de Google AI Studio. Este constructor solo ordena tu mensaje; no genera nada por sí mismo.
           </p>
         </div>
       </div>
