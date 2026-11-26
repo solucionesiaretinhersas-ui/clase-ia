@@ -113,7 +113,8 @@ export const WORKSHOPS: Record<WorkshopId, WorkshopDef> = {
     moments: G_MOMENTS,
     screens: G_SCREENS,
     outcomes: G_OUTCOMES,
-    certificateScreen: 'g-d14',
+    // El certificado se habilita en la última pantalla (21), cuando el facilitador termina todo.
+    certificateScreen: 'g-certificados',
     hasCertificate: true,
     certificateStyle: 'foro',
     signer: 'Luis Alejandro Caldera Caldera',

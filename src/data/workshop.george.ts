@@ -202,7 +202,7 @@ export const G_SCREENS: ScreenMeta[] = [
   dialogue('g-q4', 'g6', 'Diálogo 4: el problema que resolverías hoy', 2, 'En una frase corta (máx. 15 palabras): ¿qué problema de tu entorno comenzarías a resolver hoy con IA?', {
     objective: 'Cerrar convirtiendo la charla en un compromiso personal, con poca escritura.',
     explanation: 'Es el único momento de escribir y es corto: una frase de máximo 15 palabras. Cada idea es el “paso 1: problema real” del método de la diapositiva 8. Deja el debate para la voz: lee 3 o 4 ideas y pregunta a quien la escribió.',
-    steps: ['Abre el muro y deja 60 a 90 segundos.', 'Lee 3 o 4 ideas y destaca con la estrella las más claras.', 'Pregunta a dos personas: ¿a quién ayudarías primero?', 'Cierra: agradece y avisa que su certificado de participación, firmado por ti, ya está en su celular.'],
+    steps: ['Abre el muro y deja 60 a 90 segundos.', 'Lee 3 o 4 ideas y destaca con la estrella las más claras.', 'Pregunta a dos personas: ¿a quién ayudarías primero?', 'Cierra el muro, agradece y pasa a la última pantalla: ahí se habilita su certificado de participación, firmado por ti.'],
   }),
   {
     id: 'g-certificados',
@@ -213,7 +213,7 @@ export const G_SCREENS: ScreenMeta[] = [
       minutes: 1,
       participant: 'Tu certificado de participación ya está en tu celular: descárgalo como imagen o PDF.',
       objective: 'Ver quiénes se registraron, descargar la asistencia y confirmar cómo se ve el certificado.',
-      explanation: 'El certificado ya está habilitado en los celulares desde la diapositiva de cierre y se queda ahí aunque cambies de pantalla. Esta pantalla es solo para ti: lista de registrados, vista previa y asistencia en CSV.',
+      explanation: 'Al llegar a esta última pantalla se habilita el certificado en los celulares y se queda ahí aunque cambies de pantalla. Antes de llegar aquí no se les muestra. Esta pantalla es solo para ti: lista de registrados, vista previa y asistencia en CSV.',
       steps: ['Revisa la lista de registrados y la vista previa del certificado.', 'Descarga la asistencia (CSV).', 'Quien no lo vea puede entrar de nuevo con el código y su nombre.'],
     },
   },
