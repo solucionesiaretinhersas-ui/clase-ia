@@ -12,7 +12,8 @@ import { usePublicBase } from '../lib/usePublicBase';
 /** QR único de ingreso al taller: se proyecta a pantalla grande. */
 export function JoinModal({ onClose }: { onClose: () => void }) {
   const { base, kind, reachable, override, setOverride, lan } = usePublicBase();
-  const { code } = useSessionCode();
+  const { code, changeCode } = useSessionCode();
+  const [codeDraft, setCodeDraft] = useState('');
   const ws = useWorkshop();
   const people = useParticipants(LIVE_SYNC_AVAILABLE ? code : '', ws.audience);
   const [draft, setDraft] = useState(override ?? '');
@@ -85,6 +86,35 @@ export function JoinModal({ onClose }: { onClose: () => void }) {
               )}
             </div>
           </div>
+
+          {ws.id === 'george' && (
+            <div className="qrc__status is-ok">
+              <div className="qrc__status-msg">
+                <CircleCheck />
+                <div>
+                  <strong>Código fijo del foro: {code}</strong>
+                  <span>No cambia al recargar ni al abrir la charla en otro equipo. Si alguien sale y vuelve a escanear, entra a esta misma sesión. Cámbialo solo para empezar con respuestas limpias.</span>
+                </div>
+              </div>
+              <div className="qrc__input">
+                <input className="input" value={codeDraft} onChange={(e) => setCodeDraft(e.target.value.toUpperCase())} placeholder="FORO27" maxLength={12} aria-label="Nuevo código del foro (empieza por FORO)" />
+                <button
+                  type="button"
+                  className="btn"
+                  disabled={!codeDraft.trim()}
+                  onClick={() => {
+                    if (!window.confirm('¿Cambiar el código? Los celulares ya conectados tendrán que escanear el QR de nuevo y empezarás sin respuestas.')) return;
+                    if (changeCode(codeDraft)) {
+                      setCodeDraft('');
+                      toast('Código del foro actualizado');
+                    } else toast('El código debe empezar por FORO y tener solo letras y números (máx. 12).', 'error');
+                  }}
+                >
+                  Cambiar código
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="join__people">
             <h3>

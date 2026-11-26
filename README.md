@@ -59,6 +59,26 @@ Tecla **R** (o el botón de dados): la ruleta se arma con los docentes que se re
 - **Juego “Arma el prompt”:** en la pizarra táctil, cada equipo arrastra frases a su letra de ROCAS (Rol, Objetivo, Contexto, Acción, Salida). Cada equipo juega por turnos con el tiempo máximo que tú definas en la pantalla y toca ¡Terminamos! al acabar; si empatan en puntos, gana quien terminó más rápido.
 - **Google AI Studio:** Google no permite mostrar AI Studio ni su inicio de sesión dentro de otra página, así que se abre en su propia ventana desde los botones de acceso. Si el navegador bloquea las ventanas emergentes, permítelas para este sitio.
 
+## Tercer taller: Foro Georges Noble School
+
+Selector de la portada → **Georges Noble School** (QR con `&w=g`). Es la charla **“Inteligencia Artificial: de la innovación a la transformación de realidades”** (~21 min con todo; ~18 min si saltas las diapositivas 5, 9 y 13, marcadas OPCIONAL en las notas). Las 14 diapositivas de `FORO.pdf` se proyectan tal cual (imágenes en `public/foro/s01.jpg … s14.jpg`) y entre ellas hay **4 diálogos de opinión rápidos** (no hay respuestas correctas ni se evalúa a nadie; el debate se hace en voz alta). Cada uno muestra una tarjeta “Qué vamos a hacer” en el tablero y en el celular:
+
+| Después de la diapositiva | Formato | Tiempo | Pregunta |
+|---|---|---|---|
+| 2 · Consumidores vs. creadores | Encuesta, un toque | 2 min | ¿Dónde te ubicas hoy: consumidor o creador? |
+| 7 · Oportunidades y desafíos | Nube de **una** palabra | 1 min | ¿Qué sientes frente a la IA y a lo que sueñas ser? |
+| 10 · Vibe coding | Votación, un toque | 1 min | Si crearas una app con IA, ¿para qué campo sería? |
+| 14 · Cierre | Una frase (máx. 15 palabras) | 2 min | ¿Qué problema de tu entorno comenzarías a resolver hoy? |
+
+La última pantalla (`g-certificados`) es solo para ti: lista de registrados, vista previa del certificado y asistencia en CSV.
+
+- **Código de sesión fijo (`FORO26`):** no cambia al recargar ni al abrir la charla en otro equipo. Para empezar con respuestas limpias, cámbialo en la ventana del QR (tecla J); debe empezar por `FORO`. El foro no se reinicia solo a las 12 horas.
+- **Volver a entrar:** si alguien sale o cambia de navegador, reescanea el QR y escribe su nombre en “¿Ya te habías registrado?”: recupera su mismo registro, sin duplicarse.
+- **En el celular:** se ve la diapositiva en pantalla y se pueden repasar las anteriores (“Volver al en vivo”).
+- **Certificado:** desde la diapositiva de cierre (14) se habilita en el celular y **se queda ahí** aunque avances, retrocedas o salgas (antes solo aparecía en la última pantalla y desaparecía al moverte). Si el enlace no trae el taller, el código `FORO…` lo identifica. Es un certificado de tu ponencia dentro del **Foro Intersectorial sobre Inteligencia Artificial** (28 de noviembre de 2026, Georges Noble School; datos en `certificateForo` de `src/data/workshops.ts`), con una sola firma (la tuya, `public/brand/firma-facilitador.png`): “por su participación en el foro… realizado por Luis Alejandro Caldera Caldera”. Para cambiar nombre o firma: `signer` en `src/data/workshops.ts` y esa imagen.
+- Guion y notas del facilitador por diapositiva: `src/data/workshop.george.ts`. Diapositivas y diálogos: `src/screens/GeorgeScreens.tsx`.
+- **Si cambias el PDF:** vuelve a exportar las páginas a `public/foro/sNN.jpg` (mismo nombre y orden). Si agregas o quitas diapositivas, ajusta `G_SCREENS` y el rango en `GEORGE_SCREENS`.
+
 ## Dos talleres en la misma aplicación
 
 En la portada hay un selector: **Taller para docentes** (90 min, 6 momentos) y **Taller para estudiantes** (90 min, 5 momentos). Cambia el guion, las actividades, los textos del celular y el certificado; el diseño y las herramientas (pizarra, ruleta, QR, tema claro/oscuro) son los mismos. El QR de ingreso lleva el taller en el enlace (`&w=d` o `&w=e`), así que el celular sabe cuál es sin configurar nada.

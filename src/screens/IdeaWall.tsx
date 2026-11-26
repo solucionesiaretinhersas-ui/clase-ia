@@ -4,6 +4,7 @@ import { EyeOff, Plus, Smartphone, Star } from 'lucide-react';
 import { ActivityControls, useActivityStatus } from '../components/ActivityShell';
 import { Art, ART_NAMES, type ArtName } from '../components/MuralArt';
 import { QRCode } from '../components/QRCode';
+import { Howto } from '../components/Howto';
 import { useAnnounce } from '../presenter/announce';
 import { usePersistentState } from '../lib/storage';
 import { sfx } from '../lib/sfx';
@@ -25,6 +26,10 @@ export interface WallConfig {
   art?: ArtName[];
   /** Color del mural. */
   tone?: 'violet' | 'blue' | 'cyan' | 'mint' | 'amber' | 'rose';
+  /** Pasos que explican la actividad (en el tablero antes de abrir y en el celular). */
+  howto?: string[];
+  /** Duración sugerida, en minutos. */
+  minutes?: number;
 }
 
 interface Idea {
@@ -40,7 +45,7 @@ const REACTIONS = ['👏', '💡', '❤️'];
 /** Muro de ideas: los docentes envían desde el celular y las ideas aparecen en el tablero al instante. */
 export function IdeaWall({ cfg }: { cfg: WallConfig }) {
   const [status] = useActivityStatus(cfg.id);
-  const who = useWorkshop().audience === 'estudiante' ? 'estudiantes' : 'docentes';
+  const who = useWorkshop().who;
   const { code } = useSessionCode();
   const { base } = usePublicBase();
   const live = useLiveResponses(LIVE_SYNC_AVAILABLE ? code : '', cfg.id);
@@ -55,7 +60,7 @@ export function IdeaWall({ cfg }: { cfg: WallConfig }) {
     setReact((r) => ({ ...r, [id]: { ...(r[id] ?? {}), [e]: (r[id]?.[e] ?? 0) + 1 } }));
   };
 
-  useAnnounce(cfg.screenId, { key: cfg.id, kind: 'ideas', prompt: cfg.prompt, open: status === 'open' });
+  useAnnounce(cfg.screenId, { key: cfg.id, kind: 'ideas', prompt: cfg.prompt, open: status === 'open', howto: cfg.howto });
 
   const ideas = useMemo<Idea[]>(() => {
     const remote = live.responses.map((r) => ({ id: r.id, text: r.value, at: r.at, local: false }));
@@ -120,6 +125,7 @@ export function IdeaWall({ cfg }: { cfg: WallConfig }) {
           <Art name={ART_NAMES[(art.length + 3) % ART_NAMES.length]} className="mural__deco mural__deco--c" />
           {ideas.length === 0 ? (
             <div className="empty mural__empty">
+              {cfg.howto && status !== 'open' && <Howto steps={cfg.howto} minutes={cfg.minutes} kind={cfg.cloud ? 'nube de palabras' : 'lluvia de ideas'} />}
               <Art name={art[0]} className="mural__empty-art" />
               <p>{status === 'open' ? 'Esperando ideas…' : 'El muro está esperando.'}</p>
               <span>

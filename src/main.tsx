@@ -11,6 +11,7 @@ import './styles/join.css';
 import './styles/student.css';
 import './styles/experience.css';
 import './styles/board.css';
+import './styles/george.css';
 import './styles/transitions.css';
 import App from './App';
 

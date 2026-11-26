@@ -24,7 +24,15 @@ export function Route() {
         <span className="kicker">La ruta de hoy</span>
         <h2 className="h-xl">
           {TOTAL_MINUTES} minutos para pasar <br />
-          de <span className="grad-text">una idea</span> a <span className="grad-text">una experiencia</span>
+          {ws.id === 'george' ? (
+            <>
+              de <span className="grad-text">usar la IA</span> a <span className="grad-text">construir con ella</span>
+            </>
+          ) : (
+            <>
+              de <span className="grad-text">una idea</span> a <span className="grad-text">una experiencia</span>
+            </>
+          )}
         </h2>
       </header>
 
@@ -55,14 +63,14 @@ export function Route() {
           <QRCode value={internalUrl(base, joinRoute(code))} size={120} />
           <div>
             <span>
-              <Smartphone /> Únete con tu nombre y grado
+              <Smartphone /> {ws.mixedAudience ? 'Únete desde tu celular' : 'Únete con tu nombre y grado'}
             </span>
-            <small>{reachable ? 'Un solo QR: escribe tu nombre y grado y recibe aquí todos los enlaces del taller.' : 'Disponible al abrir la web publicada.'}</small>
-            {LIVE_SYNC_AVAILABLE && <small><b><CountUp value={people.length} /></b> {ws.audience === 'docente' ? 'docentes' : 'estudiantes'} conectados</small>}
+            <small>{reachable ? (ws.mixedAudience ? 'Un solo QR: escribe tu nombre, sigue las diapositivas en tu celular, participa y recibe tu certificado. Si sales, vuelve a escanear: entras a la misma sesión.' : 'Un solo QR: escribe tu nombre y grado y recibe aquí todos los enlaces del taller.') : 'Disponible al abrir la web publicada.'}</small>
+            {LIVE_SYNC_AVAILABLE && <small><b><CountUp value={people.length} /></b> {ws.who} conectados</small>}
             <button type="button" className="btn" onClick={openJoin}>Ampliar QR</button>
           </div>
         </div>
-        <strong>{ws.audience === 'docente' ? 'Cada docente sale con un recurso educativo interactivo, creado con su criterio.' : 'Cada estudiante sale con una aplicación propia, creada con inteligencia artificial.'}</strong>
+        <strong>{ws.id === 'george' ? 'Todos salen con una idea clara: la IA se puede entender, usar con criterio y construir.' : ws.audience === 'docente' ? 'Cada docente sale con un recurso educativo interactivo, creado con su criterio.' : 'Cada estudiante sale con una aplicación propia, creada con inteligencia artificial.'}</strong>
         <button type="button" className="btn btn--primary btn--lg" onClick={() => goTo(SCREENS[2].id)}>
           Empezar <ArrowRight />
         </button>

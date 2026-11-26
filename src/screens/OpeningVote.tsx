@@ -14,12 +14,13 @@ import { internalUrl } from '../lib/urls';
 
 const ID = 'apertura';
 const OPTIONS_D = ['Nunca la he usado', 'Alguna vez, por curiosidad', 'La uso para planear clases', 'Ya creo recursos con IA'];
-const OPTIONS_E = ['Nunca la he usado', 'Alguna vez, por curiosidad', 'La uso para mis tareas', 'Ya creo cosas con IA'];
+const OPTIONS_G = ['Nunca la he usado', 'Alguna vez, por curiosidad', 'La uso en mi día a día', 'Ya creo cosas con IA'];
+const OPTIONS_E =['Nunca la he usado', 'Alguna vez, por curiosidad', 'La uso para mis tareas', 'Ya creo cosas con IA'];
 
 export function OpeningVote() {
   const ws = useWorkshop();
   const student = ws.audience === 'estudiante';
-  const OPTIONS = student ? OPTIONS_E : OPTIONS_D;
+  const OPTIONS = ws.id === 'george' ? OPTIONS_G : student ? OPTIONS_E : OPTIONS_D;
   const QUESTION = student ? '¿Has usado inteligencia artificial?' : '¿Has usado inteligencia artificial para preparar tus clases?';
   const [status] = useActivityStatus(ID);
   const [manual, setManual] = usePersistentState<number[]>(`vote:${ID}`, [0, 0, 0, 0]);

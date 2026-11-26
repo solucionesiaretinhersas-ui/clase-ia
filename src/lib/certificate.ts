@@ -12,6 +12,23 @@ export interface CertificateData {
   minutes: number;
   facilitator?: string;
   date?: Date;
+  /**
+   * Institución distinta a la de la plantilla ilustrada (Santa Rosa de Lima). Si se indica,
+   * se usa el diseño vectorial con este nombre, porque la plantilla trae el suyo impreso.
+   */
+  institution?: string;
+  /** `foro`: una sola firma, la del facilitador (`signer`), sin institución emisora. */
+  style?: 'foro';
+  /** Nombre del facilitador que firma el certificado de estilo `foro`. */
+  signer?: string;
+  /** Evento en el que se presentó la ponencia (estilo `foro`); `date` es ISO `AAAA-MM-DD`. */
+  foro?: { event: string; venue: string; date: string; role: string };
+}
+
+/** Fecha ISO `AAAA-MM-DD` a texto largo en español, sin depender de la zona horaria. */
+function longDate(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 const NAVY = '#14213d';
@@ -117,10 +134,16 @@ function renderVectorCertificate(d: CertificateData, width = 2000): HTMLCanvasEl
   // Encabezado
   ctx.fillStyle = GOLD;
   ctx.font = `600 34px ${SERIF}`;
-  spaced(ctx, 'INSTITUCIÓN EDUCATIVA', w / 2, 210, 10);
+  spaced(ctx, d.style === 'foro' ? 'FORO INTERSECTORIAL SOBRE' : d.institution ? 'COLEGIO' : 'INSTITUCIÓN EDUCATIVA', w / 2, 210, 10);
   ctx.fillStyle = NAVY;
-  ctx.font = `700 92px ${SERIF}`;
-  ctx.fillText('SANTA ROSA DE LIMA', w / 2, 305);
+  const inst = (d.style === 'foro' ? 'Inteligencia Artificial' : d.institution ?? 'Santa Rosa de Lima').toUpperCase();
+  let instSize = 92;
+  ctx.font = `700 ${instSize}px ${SERIF}`;
+  while (ctx.measureText(inst).width > w - 400 && instSize > 48) {
+    instSize -= 4;
+    ctx.font = `700 ${instSize}px ${SERIF}`;
+  }
+  ctx.fillText(inst, w / 2, 305);
 
   // Cinta de título
   ctx.fillStyle = GOLD;
@@ -155,19 +178,30 @@ function renderVectorCertificate(d: CertificateData, width = 2000): HTMLCanvasEl
   const date = (d.date ?? new Date()).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
   ctx.fillStyle = '#2b3347';
   ctx.font = `400 42px ${SERIF}`;
-  const lines = wrap(ctx, `${d.text}, realizado el ${date}, con una intensidad de ${d.minutes} minutos, en el marco de la Semana de la IA.`, w - 520);
+  const f = d.foro;
+  const bodyText =
+    d.style === 'foro'
+      ? `${d.text}, presentada por ${d.signer ?? 'el ponente'} en el ${f?.event ?? 'foro'}, realizado el ${f ? longDate(f.date) : date}${f ? ` en ${f.venue}` : ''}.`
+      : `${d.text}, realizado el ${date}, con una intensidad de ${d.minutes} minutos${d.institution ? `, en ${d.institution}` : ', en el marco de la Semana de la IA'}.`;
+  const lines = wrap(ctx, bodyText, w - 520);
   lines.forEach((l, i) => ctx.fillText(l, w / 2, 832 + i * 56));
 
   // Nombre del taller
   const ty = 832 + lines.length * 56 + 40;
   ctx.fillStyle = NAVY;
-  ctx.font = `italic 700 54px ${SERIF}`;
+  let titleSize = 54;
+  ctx.font = `italic 700 ${titleSize}px ${SERIF}`;
+  // Los títulos largos de ponencia se reducen hasta que quepan en una línea.
+  while (ctx.measureText(`«${d.title}»`).width > w - 360 && titleSize > 32) {
+    titleSize -= 2;
+    ctx.font = `italic 700 ${titleSize}px ${SERIF}`;
+  }
   ctx.fillText(`«${d.title}»`, w / 2, ty);
 
   // Sello
   const sy = h - 262;
   ctx.save();
-  ctx.translate(w / 2, sy);
+  ctx.translate(d.style === 'foro' ? w * 0.84 : w / 2, sy);
   ctx.scale(0.8, 0.8);
   ctx.fillStyle = '#9c1c2b';
   ctx.beginPath();
@@ -208,7 +242,7 @@ function renderVectorCertificate(d: CertificateData, width = 2000): HTMLCanvasEl
   const lineY = h - 185;
   ctx.strokeStyle = NAVY;
   ctx.lineWidth = 2.5;
-  [w * 0.24, w * 0.76].forEach((cx) => {
+  (d.style === 'foro' ? [w * 0.5] : [w * 0.24, w * 0.76]).forEach((cx) => {
     ctx.beginPath();
     ctx.moveTo(cx - 260, lineY);
     ctx.lineTo(cx + 260, lineY);
@@ -216,16 +250,23 @@ function renderVectorCertificate(d: CertificateData, width = 2000): HTMLCanvasEl
   });
   ctx.fillStyle = NAVY;
   ctx.font = `700 36px ${SERIF}`;
-  ctx.fillText(d.facilitator?.trim() || 'Facilitador(a) del taller', w * 0.24, lineY + 46);
-  ctx.fillText('Rectoría', w * 0.76, lineY + 46);
-  ctx.fillStyle = '#5b6275';
-  ctx.font = `italic 30px ${SERIF}`;
-  ctx.fillText('Facilitador(a)', w * 0.24, lineY + 84);
-  ctx.fillText('I.E. Santa Rosa de Lima', w * 0.76, lineY + 84);
+  if (d.style === 'foro') {
+    ctx.fillText(d.signer ?? 'Facilitador', w * 0.5, lineY + 46);
+    ctx.fillStyle = '#5b6275';
+    ctx.font = `italic 30px ${SERIF}`;
+    ctx.fillText(d.foro?.role ?? 'Ponente', w * 0.5, lineY + 84);
+  } else {
+    ctx.fillText(d.facilitator?.trim() || 'Facilitador(a) del taller', w * 0.24, lineY + 46);
+    ctx.fillText('Rectoría', w * 0.76, lineY + 46);
+    ctx.fillStyle = '#5b6275';
+    ctx.font = `italic 30px ${SERIF}`;
+    ctx.fillText('Facilitador(a)', w * 0.24, lineY + 84);
+    ctx.fillText(d.institution ?? 'I.E. Santa Rosa de Lima', w * 0.76, lineY + 84);
+  }
 
   ctx.fillStyle = GOLD;
   ctx.font = `600 24px ${SERIF}`;
-  spaced(ctx, 'AULA IA · TALLER CON GOOGLE AI STUDIO', w / 2, 142, 6);
+  spaced(ctx, d.style === 'foro' ? (d.foro ? `${d.foro.venue.toUpperCase()} · ${longDate(d.foro.date).toUpperCase()}` : 'FORO') : d.institution ? 'AULA IA · TALLER DE INTELIGENCIA ARTIFICIAL' : 'AULA IA · TALLER CON GOOGLE AI STUDIO', w / 2, 142, 6);
 
   return canvas;
 }
@@ -295,6 +336,22 @@ function fit(ctx: CanvasRenderingContext2D, text: string, maxW: number, start: n
  * `width` limita el ancho de salida (por defecto, el tamaño original de la plantilla).
  */
 export async function renderCertificate(d: CertificateData, width = TPL.w): Promise<HTMLCanvasElement> {
+  if (d.style === 'foro') {
+    // Diseño vectorial con una sola firma (la del facilitador) dibujada sobre la línea central.
+    const canvas = renderVectorCertificate(d, Math.max(width, 1600));
+    const sig = await loadSignature('firma-facilitador.png');
+    const ctx = canvas.getContext('2d');
+    if (sig && ctx) {
+      // Coordenadas lógicas (el diseño mide 2000 de ancho), igual que en renderVectorCertificate.
+      const k = canvas.width / 2000;
+      ctx.setTransform(k, 0, 0, k, 0, 0);
+      const h = 110;
+      const sw = (sig.naturalWidth / sig.naturalHeight) * h;
+      ctx.drawImage(sig, 1000 - sw / 2, canvas.height / k - 185 - 6 - h, sw, h);
+    }
+    return canvas;
+  }
+  if (d.institution) return renderVectorCertificate(d, Math.max(width, 1600));
   let img: HTMLImageElement;
   try {
     img = await loadTemplate();
@@ -438,10 +495,10 @@ export function fileSlug(name: string): string {
 /** CSV con BOM y separador `;` para que Excel en español lo abra con tildes y columnas correctas. */
 export function attendanceCsv(
   rows: { name: string; grade?: string; at: number }[],
-  meta: { workshop: string; audience: string; date: Date },
+  meta: { workshop: string; audience: string; date: Date; gradeLabel?: string },
 ): Blob {
   const esc = (v: string) => `"${v.replace(/"/g, '""')}"`;
-  const gradeHead = meta.audience === 'estudiante' ? 'Grado' : 'Área / grado';
+  const gradeHead = meta.gradeLabel ?? (meta.audience === 'estudiante' ? 'Grado' : 'Área / grado');
   const lines = [
     ['N.°', 'Nombre', gradeHead, 'Hora de ingreso', 'Fecha', 'Taller'].map(esc).join(';'),
     ...rows.map((r, i) =>

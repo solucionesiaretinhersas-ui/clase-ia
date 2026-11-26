@@ -1,11 +1,27 @@
 import { useSyncExternalStore } from 'react';
 import { MOMENTS, SCREENS, TOTAL_MINUTES, type Moment, type ScreenMeta } from './workshop';
 import { E_MOMENTS, E_OUTCOMES, E_SCREENS } from './workshop.estudiantes';
+import { G_MOMENTS, G_OUTCOMES, G_SCREENS } from './workshop.george';
 
-export type WorkshopId = 'docentes' | 'estudiantes';
+export type WorkshopId = 'docentes' | 'estudiantes' | 'george';
+
+/** Institución de los talleres originales (los de Santa Rosa de Lima). */
+const SANTA_ROSA = { name: 'Institución Educativa Santa Rosa de Lima', short: 'Santa Rosa de Lima' };
 
 export interface WorkshopDef {
   id: WorkshopId;
+  /** Institución que recibe el taller (portada, barra superior y certificado). */
+  institution: { name: string; short: string };
+  /** Solo si es distinta a la de la plantilla del certificado: nombre que se imprime en él. */
+  certificateInstitution?: string;
+  /** Si se indica, certificado de una sola firma emitido por el facilitador (sin institución). */
+  certificateStyle?: 'foro';
+  /** Nombre del facilitador que firma el certificado de ese estilo. */
+  signer?: string;
+  /** Datos del evento que se imprimen en el certificado de estilo `foro`. */
+  certificateForo?: { event: string; venue: string; date: string; role: string };
+  /** Público mixto (estudiantes y público general): el celular pide curso u ocupación en vez de grado. */
+  mixedAudience: boolean;
   /** Etiqueta para el selector */
   label: string;
   audience: 'docente' | 'estudiante';
@@ -17,6 +33,10 @@ export interface WorkshopDef {
   outcomes: string[];
   /** Pantalla con la lista de asistencia y los certificados */
   certificateScreen: string;
+  /** Falso en los talleres que no entregan certificado. */
+  hasCertificate: boolean;
+  /** Etiqueta del público en contadores y mensajes (p. ej. “docentes”). */
+  who: string;
   certificate: { title: string; text: string };
   /** Pantalla cuya fase de laboratorio usa la estación para volver */
   labScreen: string;
@@ -40,6 +60,7 @@ export const WORKSHOPS: Record<WorkshopId, WorkshopDef> = {
   docentes: {
     ...build({
       id: 'docentes',
+      institution: SANTA_ROSA,
       label: 'Taller para docentes',
       audience: 'docente',
       subtitle: 'De la idea a la experiencia',
@@ -49,6 +70,9 @@ export const WORKSHOPS: Record<WorkshopId, WorkshopDef> = {
       screens: SCREENS,
       outcomes: D_OUTCOMES,
       certificateScreen: 'certificados',
+      hasCertificate: true,
+      mixedAudience: false,
+      who: 'docentes',
       certificate: {
         title: 'Aula IA: De la idea a la experiencia',
         text: 'por su participación en el taller de creación de recursos educativos interactivos con inteligencia artificial y Google AI Studio',
@@ -60,6 +84,7 @@ export const WORKSHOPS: Record<WorkshopId, WorkshopDef> = {
   },
   estudiantes: build({
     id: 'estudiantes',
+    institution: SANTA_ROSA,
     label: 'Taller para estudiantes',
     audience: 'estudiante',
     subtitle: 'Crea tu propia aplicación con IA',
@@ -68,12 +93,45 @@ export const WORKSHOPS: Record<WorkshopId, WorkshopDef> = {
     screens: E_SCREENS,
     outcomes: E_OUTCOMES,
     certificateScreen: 'e-certificados',
+    hasCertificate: true,
+    mixedAudience: false,
+    who: 'estudiantes',
     certificate: {
       title: 'Crea tu propia aplicación con IA',
       text: 'por su participación en el taller de inteligencia artificial y creación de aplicaciones con Google AI Studio',
     },
     labScreen: 'e-lab',
     introCover: 'e-inicio',
+  }),
+  george: build({
+    id: 'george',
+    institution: { name: 'Georges Noble School', short: 'Georges Noble School' },
+    label: 'Georges Noble School',
+    audience: 'estudiante',
+    subtitle: 'De la innovación a la transformación de realidades',
+    quote: 'El verdadero poder de la inteligencia artificial no está en lo que puede generar, sino en las realidades que podemos transformar con ella.',
+    moments: G_MOMENTS,
+    screens: G_SCREENS,
+    outcomes: G_OUTCOMES,
+    certificateScreen: 'g-d14',
+    hasCertificate: true,
+    certificateStyle: 'foro',
+    signer: 'Luis Alejandro Caldera Caldera',
+    // Foro Intersectorial sobre Inteligencia Artificial, 28 de noviembre de 2026, 8:00 a. m. a 10:00 a. m.
+    certificateForo: {
+      event: 'Foro Intersectorial sobre Inteligencia Artificial',
+      venue: 'Georges Noble School',
+      date: '2026-11-28',
+      role: 'Panelista · Universidad de Córdoba',
+    },
+    mixedAudience: true,
+    who: 'participantes',
+    certificate: {
+      title: 'Inteligencia Artificial: de la innovación a la transformación de realidades',
+      text: 'por su participación en la ponencia',
+    },
+    labScreen: 'g-d14',
+    introCover: 'g-inicio',
   }),
 };
 
@@ -84,7 +142,7 @@ const EVENT = 'aula-ia:workshop';
 function read(): WorkshopId {
   try {
     const v = window.localStorage.getItem(KEY);
-    if (v === 'docentes' || v === 'estudiantes') return v;
+    if (v === 'docentes' || v === 'estudiantes' || v === 'george') return v;
   } catch {
     /* sin almacenamiento */
   }
@@ -104,14 +162,15 @@ export function setWorkshopId(id: WorkshopId) {
   window.dispatchEvent(new Event(EVENT));
 }
 
-/** Convierte el parámetro `w` de la URL (`e` / `d`) en el taller correspondiente. */
+/** Convierte el parámetro `w` de la URL (`e` / `d` / `g`) en el taller correspondiente. */
 export function workshopFromParam(w: string): WorkshopId | null {
   if (w === 'e') return 'estudiantes';
   if (w === 'd') return 'docentes';
+  if (w === 'g') return 'george';
   return null;
 }
 
-export const workshopParam = (id: WorkshopId) => (id === 'estudiantes' ? 'e' : 'd');
+export const workshopParam = (id: WorkshopId) => (id === 'estudiantes' ? 'e' : id === 'george' ? 'g' : 'd');
 
 function subscribe(cb: () => void) {
   window.addEventListener(EVENT, cb);
@@ -160,5 +219,5 @@ export function joinRoute(code: string): string {
 }
 
 export function allScreenIds(): string[] {
-  return [...WORKSHOPS.docentes.screens, ...WORKSHOPS.estudiantes.screens].map((s) => s.id);
+  return Object.values(WORKSHOPS).flatMap((w) => w.screens.map((s) => s.id));
 }

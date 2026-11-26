@@ -1,4 +1,5 @@
-import { useEffect, useLayoutEffect, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
+import type { ScreenMeta } from '../data/workshop';
 import { Award, Check, ChevronLeft, ChevronRight, ExternalLink, FileText, Gamepad2, Hand, Presentation, Radio, Rocket, Sparkles } from 'lucide-react';
 import { WORKSHOPS, getWorkshopId, setWorkshopId, useWorkshop, workshopFromParam } from '../data/workshops';
 import type { CertificateData } from '../lib/certificate';
@@ -12,13 +13,14 @@ import { ANSWER_KEYS } from '../data/answers';
 import { STUDENT_REFINEMENTS } from '../data/prompts';
 import { studioStepsFor } from '../data/studioSteps';
 import { navigate, queryParam, segments } from '../lib/router';
-import { LIVE_SYNC_AVAILABLE, lookupCertificate, registerParticipant, sendIdea, sendResponse, useLiveState, type IssuedCertificate, type LiveAct } from '../lib/sync';
+import { LIVE_SYNC_AVAILABLE, isForoCode, lookupCertificate, recoverParticipant, registerParticipant, sendIdea, sendResponse, useLiveState, type IssuedCertificate, type LiveAct } from '../lib/sync';
 import { clearStored, usePersistentState } from '../lib/storage';
 import { linksFor } from '../data/links';
 import { AI_STUDIO_URL, CHATGPT_URL } from '../lib/urls';
 import { PromptLab } from '../screens/PromptLab';
 
 function Shell({ title, children, back = true, wide = false }: { title: string; children: ReactNode; back?: boolean; wide?: boolean }) {
+  const ws = useWorkshop();
   return (
     <div className={`mob ${wide ? 'mob--wide' : ''}`}>
       <header className="mob__bar">
@@ -30,7 +32,7 @@ function Shell({ title, children, back = true, wide = false }: { title: string; 
           ) : (
             <span className="brand__mark" aria-hidden="true">A</span>
           )}
-          <span className="mob__bar-title">Aula IA · Santa Rosa de Lima</span>
+          <span className="mob__bar-title">Aula IA · {ws.institution.short}</span>
           <SoundToggle />
           <ThemeToggle />
         </div>
@@ -48,7 +50,8 @@ const STUDENT_GRADES = ['Sexto', 'Séptimo', 'Octavo', 'Noveno', 'Décimo', 'Und
 export function Mobile({ path }: { path: string }) {
   const [, page] = segments(path);
   // El enlace del QR indica a qué taller pertenece (w=d docentes, w=e estudiantes).
-  const wParam = workshopFromParam(queryParam(path, 'w'));
+  // Si el enlace no trae el taller, el código del foro (empieza por FORO) lo identifica.
+  const wParam = workshopFromParam(queryParam(path, 'w')) ?? (isForoCode(queryParam(path, 's')) ? 'george' : null);
   useLayoutEffect(() => {
     if (wParam && getWorkshopId() !== wParam) setWorkshopId(wParam);
   }, [wParam]);
@@ -134,6 +137,16 @@ function Participate({ session, act }: { session: string; act: LiveAct }) {
     <section className="part glass" aria-label="Participa">
       <span className="kicker">Tu turno</span>
       <h3>{act.prompt}</h3>
+      {act.howto && act.howto.length > 0 && (
+        <div className="part__how">
+          <strong>Qué vas a hacer</strong>
+          <ol>
+            {act.howto.map((s) => (
+              <li key={s}>{s}</li>
+            ))}
+          </ol>
+        </div>
+      )}
       {!act.open && <p className="note-warn">Esperando a que el facilitador abra la participación…</p>}
 
       {act.kind === 'choice' ? (
@@ -189,6 +202,28 @@ function Participate({ session, act }: { session: string; act: LiveAct }) {
 function Register({ session, onDone }: { session: string; onDone: () => void }) {
   const ws = useWorkshop();
   const isStudent = ws.audience === 'estudiante';
+  // Charla abierta (sin certificado): público mixto, así que se pide “curso u ocupación” en vez de grado.
+  const open = ws.mixedAudience;
+  const [recoverName, setRecoverName] = useState('');
+  const [recoverState, setRecoverState] = useState<'idle' | 'loading' | 'notfound' | 'error'>('idle');
+
+  /** “Volver a entrar”: recupera el registro hecho antes con ese nombre, sin crear un participante nuevo. */
+  async function recover(e: FormEvent) {
+    e.preventDefault();
+    const n = recoverName.trim();
+    if (!n) return;
+    setRecoverState('loading');
+    try {
+      const p = await recoverParticipant(session, n);
+      if (!p) return setRecoverState('notfound');
+      setRegAt(p.at);
+      setSavedName(p.name);
+      setSavedGrade(p.grade ?? '');
+      onDone();
+    } catch {
+      setRecoverState('error');
+    }
+  }
   const [savedName, setSavedName] = usePersistentState('mobile:name', '');
   const [savedGrade, setSavedGrade] = usePersistentState('mobile:grade', '');
   const [, setRegAt] = usePersistentState('mobile:regAt', 0);
@@ -216,15 +251,21 @@ function Register({ session, onDone }: { session: string; onDone: () => void }) 
   return (
     <Shell title="Bienvenido al taller" back={false}>
       <p className="mob__lead">
-        {isStudent ? 'Escribe tu nombre y tu grado para entrar.' : 'Escribe tu nombre y el área o grado en que enseñas para entrar.'} Los usaremos en la ruleta, la asistencia y tu
-        certificado.
+        {open
+          ? 'Escribe tu nombre y tu curso u ocupación para participar y recibir tu certificado.'
+          : `${isStudent ? 'Escribe tu nombre y tu grado para entrar.' : 'Escribe tu nombre y el área o grado en que enseñas para entrar.'} Los usaremos en la ruleta, la asistencia y tu certificado.`}
       </p>
       <form className="mob__form" onSubmit={submit}>
         <label className="field">
           <span>Nombre completo</span>
           <input className="input input--xl" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ej.: Marta Rodríguez" maxLength={40} autoComplete="name" required />
         </label>
-        {isStudent ? (
+        {open ? (
+          <label className="field">
+            <span>Curso u ocupación</span>
+            <input className="input input--xl" value={grade} onChange={(e) => setGrade(e.target.value)} placeholder="Ej.: Grado 10, ingeniera, comerciante…" maxLength={40} required />
+          </label>
+        ) : isStudent ? (
           <label className="field">
             <span>Grado</span>
             <select className="input input--xl" value={grade} onChange={(e) => setGrade(e.target.value)} required>
@@ -245,10 +286,24 @@ function Register({ session, onDone }: { session: string; onDone: () => void }) 
         </button>
       </form>
       {state === 'error' && <p className="note-warn">No se pudo registrar. Revisa tu conexión e inténtalo de nuevo.</p>}
+      {open && (
+        <form className="mob__form part glass" onSubmit={recover}>
+          <span className="kicker">¿Ya te habías registrado?</span>
+          <p className="note-muted">Si saliste de la página o cambiaste de navegador, escribe tu nombre tal como lo pusiste y volverás a entrar a tu misma sesión.</p>
+          <input className="input" value={recoverName} onChange={(e) => setRecoverName(e.target.value)} placeholder="Tu nombre" maxLength={40} aria-label="Tu nombre registrado" />
+          <button type="submit" className="btn btn--lg" disabled={!recoverName.trim() || recoverState === 'loading'}>
+            {recoverState === 'loading' ? 'Buscando…' : 'Volver a entrar'}
+          </button>
+          {recoverState === 'notfound' && <p className="note-warn">No encontramos ese nombre en esta sesión. Revisa cómo lo escribiste o regístrate arriba.</p>}
+          {recoverState === 'error' && <p className="note-warn">No se pudo buscar. Revisa tu conexión e inténtalo de nuevo.</p>}
+        </form>
+      )}
       <p className="note-muted">Sesión {session}. Solo se guardan estos datos para este taller.</p>
-      <button type="button" className="btn btn--ghost" onClick={() => navigate('/m/certificados')}>
-        ¿Ya participaste? Consulta tu certificado
-      </button>
+      {ws.hasCertificate && (
+        <button type="button" className="btn btn--ghost" onClick={() => navigate('/m/certificados')}>
+          ¿Ya participaste? Consulta tu certificado
+        </button>
+      )}
     </Shell>
   );
 }
@@ -280,18 +335,41 @@ function Live({ session: fromUrl }: { session: string }) {
   const moment = current ? ws.moments.find((m) => m.id === current.moment) : undefined;
   // Todo lo que se ve aquí sigue al facilitador en vivo: si retrocede, desaparece solo.
   const links = current ? linksFor(current.id) : [];
-  const certUnlocked = curIdx >= 0 && curIdx >= ws.screenIndex(ws.certificateScreen);
+  const certReached = ws.hasCertificate && curIdx >= 0 && curIdx >= ws.screenIndex(ws.certificateScreen);
+  // Una vez habilitado, el certificado se queda en el celular aunque el facilitador avance, retroceda o cierre.
+  const [certEver, setCertEver] = usePersistentState('mobile:certEver', false);
+  useEffect(() => {
+    if (certReached && !certEver) setCertEver(true);
+  }, [certReached, certEver, setCertEver]);
+  const certUnlocked = ws.hasCertificate && (certReached || certEver);
+
+  // El código del foro identifica el taller aunque el enlace no traiga el parámetro del taller.
+  useLayoutEffect(() => {
+    if (isForoCode(session) && getWorkshopId() !== 'george') setWorkshopId('george');
+  }, [session]);
 
   // El certificado queda guardado en este dispositivo para consultarlo después (no se borra al cambiar de taller).
   useEffect(() => {
     if (!certUnlocked || !name || registered !== session) return;
-    const issued: IssuedCertificate = { session, kind: ws.audience, name, grade, at: regAt || Date.now(), facilitator: state?.fac };
+    const issued: IssuedCertificate = { session, kind: ws.audience, workshop: ws.id, name, grade, at: regAt || Date.now(), facilitator: state?.fac };
     setSavedCerts((list) => {
       const prev = list.find((c) => c.session === session);
       if (prev && prev.name === issued.name && prev.grade === issued.grade && prev.facilitator === issued.facilitator) return list;
       return [issued, ...list.filter((c) => c.session !== session)];
     });
-  }, [certUnlocked, name, grade, registered, session, ws.audience, regAt, state?.fac, setSavedCerts]);
+  }, [certUnlocked, name, grade, registered, session, ws.audience, ws.id, regAt, state?.fac, setSavedCerts]);
+
+  // Foro: el celular muestra la diapositiva que se proyecta y deja repasar las anteriores.
+  const slides = useMemo(() => ws.screens.filter((s) => SLIDE_ID.test(s.id)), [ws.screens]);
+  const liveSlide = current && SLIDE_ID.test(current.id) ? current.id : '';
+  const [lastSlide, setLastSlide] = usePersistentState('mobile:lastSlide', '');
+  const [maxSlide, setMaxSlide] = usePersistentState('mobile:maxSlide', 0);
+  useEffect(() => {
+    if (!liveSlide) return;
+    if (liveSlide !== lastSlide) setLastSlide(liveSlide);
+    const idx = slides.findIndex((s) => s.id === liveSlide);
+    if (idx > maxSlide) setMaxSlide(idx);
+  }, [liveSlide, lastSlide, maxSlide, slides, setLastSlide, setMaxSlide]);
 
   if (!LIVE_SYNC_AVAILABLE) return <Hub />;
 
@@ -345,6 +423,10 @@ function Live({ session: fromUrl }: { session: string }) {
                   audience: ws.audience,
                   title: ws.certificate.title,
                   text: ws.certificate.text,
+                  institution: ws.certificateInstitution,
+                  style: ws.certificateStyle,
+                  signer: ws.signer,
+                  foro: ws.certificateForo,
                   minutes: ws.total,
                   facilitator: state?.fac,
                   date: new Date(regAt || Date.now()),
@@ -354,6 +436,10 @@ function Live({ session: fromUrl }: { session: string }) {
                 Ver todos mis certificados
               </button>
             </section>
+          )}
+
+          {slides.length > 0 && (liveSlide || lastSlide) && (
+            <SlideFollow slides={slides} liveId={liveSlide} lastId={lastSlide} maxIdx={Math.max(maxSlide, slides.findIndex((s) => s.id === liveSlide))} />
           )}
 
           {current ? (
@@ -407,6 +493,51 @@ function Live({ session: fromUrl }: { session: string }) {
         </div>
       </div>
     </Shell>
+  );
+}
+
+const SLIDE_ID = /^g-d\d\d$/;
+
+/**
+ * Diapositiva del foro en el celular. Sigue al facilitador en vivo; con “Anterior” y “Siguiente”
+ * se pueden repasar las que ya pasaron (nunca las que aún no se han mostrado).
+ */
+function SlideFollow({ slides, liveId, lastId, maxIdx }: { slides: ScreenMeta[]; liveId: string; lastId: string; maxIdx: number }) {
+  const [review, setReview] = useState<string | null>(null);
+  // Cuando el facilitador cambia de diapositiva, el celular vuelve a seguirlo.
+  useEffect(() => setReview(null), [liveId]);
+  const nowId = liveId || lastId;
+  const shownId = review ?? nowId;
+  const idx = Math.max(0, slides.findIndex((s) => s.id === shownId));
+  const slide = slides[idx];
+  const reviewing = review !== null && review !== nowId;
+  const go = (d: number) => {
+    const next = slides[Math.min(Math.max(idx + d, 0), Math.min(maxIdx, slides.length - 1))];
+    setReview(next.id === nowId ? null : next.id);
+    sfx.pop();
+  };
+  const src = `${import.meta.env.BASE_URL}foro/s${shownId.slice(-2)}.jpg`;
+  return (
+    <section className="part glass slidefollow" aria-label="Diapositiva del foro">
+      <span className="kicker">{reviewing ? 'Repasando una diapositiva anterior' : liveId ? 'En pantalla ahora' : 'Última diapositiva'}</span>
+      <img className="slidefollow__img" src={src} alt={slide?.title ?? 'Diapositiva del foro'} draggable={false} />
+      <div className="slidefollow__bar">
+        <button type="button" className="btn btn--icon" onClick={() => go(-1)} disabled={idx <= 0} aria-label="Diapositiva anterior">
+          <ChevronLeft />
+        </button>
+        <span>
+          {idx + 1} / {slides.length}
+        </span>
+        <button type="button" className="btn btn--icon" onClick={() => go(1)} disabled={idx >= Math.min(maxIdx, slides.length - 1)} aria-label="Diapositiva siguiente">
+          <ChevronRight />
+        </button>
+      </div>
+      {reviewing && (
+        <button type="button" className="btn btn--primary" onClick={() => setReview(null)}>
+          <Radio /> Volver al en vivo
+        </button>
+      )}
+    </section>
   );
 }
 
@@ -637,13 +768,17 @@ function Exit({ session }: { session: string }) {
 
 /* ───────── Mis certificados: guardados en este dispositivo y consulta por código + nombre ───────── */
 function certData(c: IssuedCertificate): CertificateData {
-  const def = WORKSHOPS[c.kind === 'estudiante' ? 'estudiantes' : 'docentes'];
+  const def = WORKSHOPS[c.workshop ?? (c.kind === 'estudiante' ? 'estudiantes' : 'docentes')];
   return {
     name: c.name,
     grade: c.grade,
     audience: c.kind,
     title: def.certificate.title,
     text: def.certificate.text,
+    institution: def.certificateInstitution,
+    style: def.certificateStyle,
+    signer: def.signer,
+    foro: def.certificateForo,
     minutes: def.total,
     facilitator: c.facilitator,
     date: new Date(c.at),
@@ -682,7 +817,7 @@ function MyCertificates() {
             list.map((c) => (
               <section key={c.session} className="part glass" aria-label={`Certificado ${c.session}`}>
                 <span className="kicker">
-                  {c.kind === 'estudiante' ? 'Taller para estudiantes' : 'Taller para docentes'} · {new Date(c.at).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  {c.workshop === 'george' ? 'Foro Intersectorial · Georges Noble School' : c.kind === 'estudiante' ? 'Taller para estudiantes' : 'Taller para docentes'} · {new Date(c.at).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </span>
                 <CertificateCard data={certData(c)} />
               </section>

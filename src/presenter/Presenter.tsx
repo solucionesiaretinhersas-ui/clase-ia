@@ -103,7 +103,8 @@ export function Presenter({ screenId }: { screenId: string }) {
   // Un taller nuevo siempre empieza limpio: si la sesión guardada es de hace más de 12 horas, se reinicia.
   useEffect(() => {
     const started = readStored<number>(`session:started:${ws.id}`, 0);
-    if (started && Date.now() - started > 12 * 3600 * 1000) resetWorkshop();
+    // El foro mantiene su código fijo: no se reinicia solo (solo con el botón explícito de taller nuevo).
+    if (ws.id !== 'george' && started && Date.now() - started > 12 * 3600 * 1000) resetWorkshop();
   }, []);
   const [fac] = usePersistentState('cert:facilitator', '');
   const [liveState, setLiveState] = useState<'pending' | 'ok' | 'error'>('pending');
@@ -278,7 +279,7 @@ export function Presenter({ screenId }: { screenId: string }) {
             </span>
             <span className="brand__text">
               <strong>Aula IA</strong>
-              <small>I.E. Santa Rosa de Lima</small>
+              <small>{ws.id === 'george' ? ws.institution.short : `I.E. ${ws.institution.short}`}</small>
             </span>
           </button>
 
@@ -302,7 +303,7 @@ export function Presenter({ screenId }: { screenId: string }) {
                 title={liveState === 'error' ? 'No se pudo conectar con Firebase: revisa que Firestore esté activo y las reglas publicadas' : 'Sesión en vivo: muestra el QR de ingreso (J)'}
               >
                 {liveState === 'ok' && <span className="dot dot--pulse" />}
-                {liveState === 'ok' ? 'En vivo' : liveState === 'error' ? 'Sin conexión' : 'Conectando'} · {code} · <CountUp value={people.length} /> {ws.audience === 'docente' ? 'docentes' : 'estudiantes'}
+                {liveState === 'ok' ? 'En vivo' : liveState === 'error' ? 'Sin conexión' : 'Conectando'} · {code} · <CountUp value={people.length} /> {ws.who}
               </button>
             )}
             <TimerPill momentId={moment?.id} timers={timers} onToggle={toggle} />

@@ -14,7 +14,7 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app';
 import { collection, doc, getDoc, getDocs, getFirestore, onSnapshot, setDoc, type Firestore } from 'firebase/firestore';
 import { readStored, usePersistentState, writeStored } from './storage';
-import { useWorkshop } from '../data/workshops';
+import { useWorkshop, type WorkshopId } from '../data/workshops';
 import { useEffect, useMemo, useState } from 'react';
 
 const env = import.meta.env;
@@ -69,6 +69,8 @@ export type ParticipantKind = 'docente' | 'estudiante';
 export interface SessionRecord {
   code: string;
   kind: ParticipantKind;
+  /** Taller de esta sesión (falta en las sesiones guardadas antes de existir el de Georges Noble). */
+  workshop?: WorkshopId;
   startedAt: number;
 }
 
@@ -79,10 +81,10 @@ export function readHistory(): SessionRecord[] {
   return readStored<SessionRecord[]>(HISTORY_KEY, []);
 }
 
-function remember(code: string, kind: ParticipantKind) {
+function remember(code: string, kind: ParticipantKind, workshop: WorkshopId) {
   const h = readHistory();
   if (h.some((r) => r.code === code)) return;
-  writeStored(HISTORY_KEY, [...h, { code, kind, startedAt: Date.now() }].slice(-80));
+  writeStored(HISTORY_KEY, [...h, { code, kind, workshop, startedAt: Date.now() }].slice(-80));
 }
 
 /**
@@ -95,23 +97,49 @@ export function useSessionCode() {
   const kind = ws.audience;
   const [code, setCode] = usePersistentState<string>(`session:code:${ws.id}`, '');
   useEffect(() => {
+    // Un código aleatorio guardado antes de existir el código fijo del foro se reemplaza por el fijo.
+    if (ws.id === 'george' && code && !isForoCode(code)) {
+      setCode(FORO_DEFAULT_CODE);
+      remember(FORO_DEFAULT_CODE, kind, ws.id);
+      return;
+    }
     if (!code) {
       // Si otra ejecución del efecto ya creó el código, se reutiliza (evita sesiones huérfanas).
       const existing = readStored<string>(`session:code:${ws.id}`, '');
       if (existing) return setCode(existing);
-      const c = newCode();
+      // El foro usa un código fijo: el QR no cambia aunque se recargue o se abra en otro equipo.
+      const c = ws.id === 'george' ? FORO_DEFAULT_CODE : newCode();
       setCode(c);
       writeStored(`session:started:${ws.id}`, Date.now());
-      remember(c, kind);
-    } else remember(code, kind);
+      remember(c, kind, ws.id);
+    } else remember(code, kind, ws.id);
   }, [code, setCode, ws.id, kind]);
   const renew = () => {
-    const c = newCode();
+    const c = ws.id === 'george' ? `FORO${newCode().slice(0, 4)}` : newCode();
     setCode(c);
     writeStored(`session:started:${ws.id}`, Date.now());
-    remember(c, kind);
+    remember(c, kind, ws.id);
   };
-  return { code, renew };
+  /** Cambia el código a uno elegido (solo el foro): sirve para empezar con respuestas limpias. */
+  const changeCode = (raw: string): boolean => {
+    const c = normalizeForoCode(raw);
+    if (!c) return false;
+    setCode(c);
+    writeStored(`session:started:${ws.id}`, Date.now());
+    remember(c, kind, ws.id);
+    return true;
+  };
+  return { code, renew, changeCode };
+}
+
+/** Código por defecto del foro de Georges Noble. Todos los códigos del foro empiezan por FORO. */
+export const FORO_DEFAULT_CODE = 'FORO26';
+export const isForoCode = (code: string) => /^FORO/.test(code.trim().toUpperCase());
+
+/** Letras y números, empieza por FORO y cabe en 12 caracteres; devuelve '' si no es válido. */
+export function normalizeForoCode(raw: string): string {
+  const c = raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  return /^FORO[A-Z0-9]{0,8}$/.test(c) ? c : '';
 }
 export async function sendResponse(session: string, activityId: string, value: string): Promise<void> {
   if (!db) throw new Error('Sincronización en vivo no configurada');
@@ -134,6 +162,8 @@ export interface LiveAct {
   prompt: string;
   options?: string[];
   open: boolean;
+  /** Pasos cortos que explican qué se hace en esta actividad (se muestran en el celular). */
+  howto?: string[];
 }
 
 export interface LiveState {
@@ -238,6 +268,29 @@ export async function registerParticipant(session: string, name: string, grade: 
   await setDoc(doc(db, 'sessions', clean, 'participants', deviceId()), { name: n, grade: g, kind, at: Date.now() });
 }
 
+/**
+ * “Volver a entrar”: busca en la sesión a quien ya se registró con ese nombre y adopta su
+ * identificador de dispositivo, así no aparece como un participante nuevo ni pierde lo enviado.
+ */
+export async function recoverParticipant(session: string, name: string): Promise<Participant | null> {
+  if (!db) throw new Error('Sincronización en vivo no configurada');
+  const code = session.trim().toUpperCase();
+  if (!/^[A-Z0-9]{3,12}$/.test(code)) throw new Error('Código de sesión inválido');
+  const snap = await getDocs(collection(db, 'sessions', code, 'participants'));
+  const want = norm(name);
+  const hit = snap.docs
+    .map((d) => ({ id: d.id, ...(d.data() as Omit<Participant, 'id'>) }))
+    .filter((p) => norm(p.name) === want)
+    .sort((a, b) => a.at - b.at)[0];
+  if (!hit) return null;
+  try {
+    localStorage.setItem('aula-ia:device', hit.id);
+  } catch {
+    /* sin almacenamiento: se registrará como nuevo */
+  }
+  return hit;
+}
+
 /** Docentes registrados en la sesión, en tiempo real. */
 export function useParticipants(session: string, kind?: ParticipantKind) {
   const [all, setList] = useState<Participant[]>([]);
@@ -258,6 +311,8 @@ export function useParticipants(session: string, kind?: ParticipantKind) {
 export interface IssuedCertificate {
   session: string;
   kind: ParticipantKind;
+  /** Taller que lo emitió (para elegir el título y el colegio). Falta en los certificados antiguos. */
+  workshop?: WorkshopId;
   name: string;
   grade: string;
   at: number;
@@ -290,5 +345,5 @@ export async function lookupCertificate(session: string, name: string): Promise<
   } catch {
     /* el certificado se puede emitir sin el nombre del facilitador */
   }
-  return { session: code, kind: hit.kind ?? 'docente', name: hit.name, grade: hit.grade ?? '', at: hit.at, facilitator };
+  return { session: code, kind: hit.kind ?? 'docente', workshop: isForoCode(code) ? 'george' : undefined, name: hit.name, grade: hit.grade ?? '', at: hit.at, facilitator };
 }

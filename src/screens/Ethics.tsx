@@ -73,7 +73,7 @@ export function Ethics() {
   return (
     <section className="ethics enter">
       <header className="screen-head">
-        <span className="kicker">{student ? 'Momento 5 · Cierre' : 'Momento 6 · Cierre'}</span>
+        <span className="kicker">{ws.id === 'george' ? 'Momento 3 · Uso responsable' : student ? 'Momento 5 · Cierre' : 'Momento 6 · Cierre'}</span>
         <h2 className="h-lg">{student ? <>Usa la IA <span className="grad-text">con cabeza</span></> : <>La IA llegó para ayudarnos, <span className="grad-text">no para reemplazarnos</span></>}</h2>
       </header>
 

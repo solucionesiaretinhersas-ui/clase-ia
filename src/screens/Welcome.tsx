@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, GraduationCap, Lightbulb, School, Sparkles, Volume2, VolumeX, WandSparkles } from 'lucide-react';
+import { ArrowRight, Brain, GraduationCap, Lightbulb, School, Sparkles, Volume2, VolumeX, WandSparkles } from 'lucide-react';
 import { LoopVideo } from '../components/LoopVideo';
 import { useMuted } from '../lib/sfx';
 import { usePersistentState } from '../lib/storage';
@@ -27,7 +27,7 @@ export function Welcome() {
       <LoopVideo src="/brand/inicio.mp4" sound={soundOn && !appMuted} onBlocked={setBlocked} />
       <div className="welcome__scrim" aria-hidden="true" />
       <div className="welcome__copy enter">
-        <span className="welcome__inst">Institución Educativa Santa Rosa de Lima</span>
+        <span className="welcome__inst">{ws.institution.name}</span>
         <h1 className="welcome__title">
           Aula IA<span className="welcome__sub grad-text">{ws.subtitle}</span>
         </h1>
@@ -36,7 +36,7 @@ export function Welcome() {
         <div className="seg" role="group" aria-label="Elige el taller">
           {(Object.keys(WORKSHOPS) as WorkshopId[]).map((id) => (
             <button key={id} type="button" className={`seg__btn ${ws.id === id ? 'is-on' : ''}`} onClick={() => pick(id)} aria-pressed={ws.id === id}>
-              {id === 'docentes' ? <School /> : <GraduationCap />}
+              {id === 'docentes' ? <School /> : id === 'george' ? <Brain /> : <GraduationCap />}
               {WORKSHOPS[id].label}
             </button>
           ))}
@@ -51,7 +51,7 @@ export function Welcome() {
             ¡Empecemos!
           </span>
           <span className="welcome__meta">
-            Taller para {ws.audience === 'docente' ? 'docentes' : 'estudiantes'} · {ws.total} minutos
+            {ws.id === 'george' ? 'Foro Intersectorial sobre Inteligencia Artificial' : `Taller para ${ws.audience === 'docente' ? 'docentes' : 'estudiantes'}`} · {ws.total} minutos
           </span>
           <BrandLogo label="con Google AI Studio" />
           <button type="button" className="welcome__sound" onClick={() => setSoundOn((v) => !v)} aria-pressed={soundOn && !appMuted}>
@@ -88,7 +88,7 @@ export function Welcome() {
           </div>
           <div className="orbit__node orbit__node--c">
             <Sparkles />
-            <b>{ws.audience === 'docente' ? 'Experiencia' : 'Tu app'}</b>
+            <b>{ws.audience === 'docente' ? 'Experiencia' : ws.id === 'george' ? 'Solución' : 'Tu app'}</b>
           </div>
         </div>
       </div>

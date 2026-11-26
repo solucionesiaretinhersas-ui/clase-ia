@@ -25,7 +25,7 @@ export function Certificates() {
   const isStudent = ws.audience === 'estudiante';
 
   // Solo sesiones de este taller, la más reciente primero.
-  const sessions = useMemo(() => history.filter((h) => h.kind === ws.audience).sort((a, b) => b.startedAt - a.startedAt), [history, ws.audience]);
+  const sessions = useMemo(() => history.filter((h) => h.kind === ws.audience && (h.workshop ? h.workshop === ws.id : ws.id !== 'george')).sort((a, b) => b.startedAt - a.startedAt), [history, ws.audience, ws.id]);
   const code = sel || current;
   const record = sessions.find((s) => s.code === code);
 
@@ -37,7 +37,7 @@ export function Certificates() {
   function csv() {
     const when = record ? new Date(record.startedAt) : new Date();
     downloadBlob(
-      attendanceCsv(sorted.map((p) => ({ name: p.name, grade: p.grade, at: p.at })), { workshop: ws.certificate.title, audience: ws.audience, date: when }),
+      attendanceCsv(sorted.map((p) => ({ name: p.name, grade: p.grade, at: p.at })), { workshop: ws.certificate.title, audience: ws.audience, date: when, gradeLabel: ws.mixedAudience ? 'Curso u ocupación' : undefined }),
       `asistencia-${ws.id}-${code}.csv`,
     );
     toast('Lista de asistencia descargada');
@@ -47,7 +47,7 @@ export function Certificates() {
     <section className="certs enter">
       <header className="screen-head screen-head--row">
         <div>
-          <span className="kicker">Cierre · {isStudent ? 'Estudiantes' : 'Docentes'}</span>
+          <span className="kicker">Cierre · {ws.id === 'george' ? 'Participantes' : isStudent ? 'Estudiantes' : 'Docentes'}</span>
           <h2 className="h-lg">Asistencia y certificados</h2>
         </div>
         <button type="button" className="btn btn--primary btn--lg" onClick={csv} disabled={people.length === 0}>
@@ -59,7 +59,7 @@ export function Certificates() {
         <div className="certs__list glass">
           <label className="field">
             <span>
-              <History /> Sesión de {isStudent ? 'estudiantes' : 'docentes'}
+              <History /> Sesión de {ws.who}
             </span>
             <select className="input" value={code} onChange={(e) => { setSel(e.target.value === current ? '' : e.target.value); setPicked(''); }}>
               {sessions.map((s) => (
@@ -90,10 +90,12 @@ export function Certificates() {
               ))}
             </ul>
           )}
-          <label className="field">
-            <span>Tu nombre como facilitador (aparece en el certificado)</span>
-            <input className="input" value={facilitator} onChange={(e) => setFacilitator(e.target.value)} placeholder="Ej.: Luis Alejandro Caldera" maxLength={60} />
-          </label>
+          {ws.certificateStyle !== 'foro' && (
+            <label className="field">
+              <span>Tu nombre como facilitador (aparece en el certificado)</span>
+              <input className="input" value={facilitator} onChange={(e) => setFacilitator(e.target.value)} placeholder="Ej.: Luis Alejandro Caldera" maxLength={60} />
+            </label>
+          )}
           <p className="note-muted">
             Cada participante descarga su certificado desde su celular y queda guardado ahí. Si lo pierde, puede pedirlo de nuevo con el código <b>{code}</b> y su nombre.
           </p>
@@ -102,11 +104,15 @@ export function Certificates() {
         <div className="certs__preview">
           <CertificateCard
             data={{
-              name: who?.name ?? (isStudent ? 'Nombre del estudiante' : 'Nombre del docente'),
+              name: who?.name ?? (ws.id === 'george' ? 'Nombre del participante' : isStudent ? 'Nombre del estudiante' : 'Nombre del docente'),
               grade: who?.grade,
               audience: ws.audience,
               title: ws.certificate.title,
               text: ws.certificate.text,
+              institution: ws.certificateInstitution,
+              style: ws.certificateStyle,
+              signer: ws.signer,
+              foro: ws.certificateForo,
               minutes: ws.total,
               facilitator,
               date: who ? new Date(who.at) : record ? new Date(record.startedAt) : new Date(),

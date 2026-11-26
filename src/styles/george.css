@@ -1,0 +1,31 @@
+/* Foro Georges Noble School: diapositivas del PDF proyectadas a pantalla completa */
+.gslide { height: 100%; display: grid; place-items: center; padding: 0.2rem 0; }
+.gslide img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(100vh - 9.5rem);
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  border-radius: 1.1rem;
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow);
+  background: #fff;
+  user-select: none;
+}
+.gn-sub { display: block; font-weight: 500; color: var(--text-2); font-size: 0.8em; }
+
+/* Tarjeta “Qué vamos a hacer” (tablero) */
+.howto { display: grid; gap: 0.6rem; width: min(100%, 36rem); padding: 1rem 1.2rem; border-radius: var(--r-md); border: 1px solid var(--line-strong); background: var(--surface-strong); text-align: left; }
+.howto__head { display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap; font-weight: 700; font-size: clamp(1rem, 1.3vw, 1.3rem); }
+.howto__head svg { width: 1.2em; color: var(--btn-primary); }
+.howto__head em { margin-left: auto; display: inline-flex; align-items: center; gap: 0.3em; font-style: normal; font-weight: 600; font-size: 0.85em; color: var(--text-2); }
+.howto ol { margin: 0; padding-left: 1.3rem; display: grid; gap: 0.3rem; color: var(--text); font-size: clamp(1rem, 1.3vw, 1.3rem); line-height: 1.35; }
+
+/* Celular: pasos de la actividad y diapositiva en vivo */
+.part__how { display: grid; gap: 0.3rem; padding: 0.7rem 0.9rem; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--line); font-size: 0.95rem; }
+.part__how ol { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.15rem; color: var(--text-2); }
+.slidefollow { display: grid; gap: 0.6rem; }
+.slidefollow__img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; border-radius: 0.8rem; border: 1px solid var(--line-strong); background: #fff; user-select: none; -webkit-touch-callout: none; }
+.slidefollow__bar { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; font-weight: 600; color: var(--text-2); }

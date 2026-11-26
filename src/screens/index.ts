@@ -22,6 +22,7 @@ import { HowAI, WhatIsAI } from './StudentScreens';
 import { AppFactory, RobiGame } from './StudentGames';
 import { VibeKids } from './StudentVibe';
 import { EConfiar, EIaONo } from './StudentClassify';
+import { GEORGE_SCREENS } from './GeorgeScreens';
 import { WallDialogo, WallDonde, WallEReflexion, WallIdea, WallLluvia, WallPrediccion, WallReflexion } from './Walls';
 
 export const SCREEN_COMPONENTS: Record<string, ComponentType> = {
@@ -69,4 +70,9 @@ export const SCREEN_COMPONENTS: Record<string, ComponentType> = {
   'e-etica': Ethics,
   'e-reflexion': WallEReflexion,
   'e-certificados': Certificates,
+  // Foro Georges Noble School: diapositivas del PDF + 4 muros de diálogo
+  'g-inicio': Welcome,
+  'g-ruta': Route,
+  ...GEORGE_SCREENS,
+  'g-certificados': Certificates,
 };
