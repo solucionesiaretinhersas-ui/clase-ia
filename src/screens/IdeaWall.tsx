@@ -30,6 +30,8 @@ export interface WallConfig {
   howto?: string[];
   /** Duración sugerida, en minutos. */
   minutes?: number;
+  /** Abrir la participación automáticamente al llegar a la pantalla. */
+  autoOpen?: boolean;
 }
 
 interface Idea {
@@ -44,7 +46,11 @@ const REACTIONS = ['👏', '💡', '❤️'];
 
 /** Muro de ideas: los docentes envían desde el celular y las ideas aparecen en el tablero al instante. */
 export function IdeaWall({ cfg }: { cfg: WallConfig }) {
-  const [status] = useActivityStatus(cfg.id);
+  const [status, setStatus] = useActivityStatus(cfg.id);
+  // Muros con `autoOpen` (el foro): se abren solos al llegar a la pantalla; si el facilitador los cierra, quedan cerrados.
+  useEffect(() => {
+    if (cfg.autoOpen && status === 'idle') setStatus('open');
+  }, [cfg.autoOpen, status, setStatus]);
   const who = useWorkshop().who;
   const { code } = useSessionCode();
   const { base } = usePublicBase();
@@ -125,7 +131,7 @@ export function IdeaWall({ cfg }: { cfg: WallConfig }) {
           <Art name={ART_NAMES[(art.length + 3) % ART_NAMES.length]} className="mural__deco mural__deco--c" />
           {ideas.length === 0 ? (
             <div className="empty mural__empty">
-              {cfg.howto && status !== 'open' && <Howto steps={cfg.howto} minutes={cfg.minutes} kind={cfg.cloud ? 'nube de palabras' : 'lluvia de ideas'} />}
+              {cfg.howto && <Howto steps={cfg.howto} minutes={cfg.minutes} kind={cfg.cloud ? 'nube de palabras' : 'lluvia de ideas'} />}
               <Art name={art[0]} className="mural__empty-art" />
               <p>{status === 'open' ? 'Esperando ideas…' : 'El muro está esperando.'}</p>
               <span>

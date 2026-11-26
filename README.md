@@ -70,6 +70,8 @@ Selector de la portada → **Georges Noble School** (QR con `&w=g`). Es la charl
 | 10 · Vibe coding | Votación, un toque | 1 min | Si crearas una app con IA, ¿para qué campo sería? |
 | 14 · Cierre | Una frase (máx. 15 palabras) | 2 min | ¿Qué problema de tu entorno comenzarías a resolver hoy? |
 
+**Se abren solos:** al llegar a cada diálogo la participación se abre automáticamente (los celulares ya pueden responder) y las respuestas y barras aparecen en pantalla en vivo, sin pulsar nada. Si quieres detener uno, usa “Cerrar” y se queda cerrado. Antes del foro, en la portada usa “Empezar un taller nuevo (limpiar todo)” para borrar estados de ensayo guardados en tu computador (si un diálogo quedó “cerrado” en un ensayo, no se reabre solo).
+
 La última pantalla (`g-certificados`) es solo para ti: lista de registrados, vista previa del certificado y asistencia en CSV.
 
 - **Código de sesión fijo (`FORO26`):** no cambia al recargar ni al abrir la charla en otro equipo. Para empezar con respuestas limpias, cámbialo en la ventana del QR (tecla J); debe empezar por `FORO`. El foro no se reinicia solo a las 12 horas.

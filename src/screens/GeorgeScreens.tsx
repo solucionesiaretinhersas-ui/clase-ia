@@ -120,8 +120,13 @@ function usePoll(id: string, n: number) {
 function TapPoll({ cfg }: { cfg: PollCfg }) {
   const { id: POLL_ID, options: POLL_OPTIONS, howto: POLL_HOWTO } = cfg;
   const p = usePoll(POLL_ID, POLL_OPTIONS.length);
+  const [, setStatus] = useActivityStatus(POLL_ID);
+  // La votación se abre sola al llegar a la pantalla y las barras se ven desde el primer voto.
+  useEffect(() => {
+    if (p.status === 'idle') setStatus('open');
+  }, [p.status, setStatus]);
   const { base, reachable } = usePublicBase();
-  const [reveal, setReveal] = usePersistentState(`poll:${POLL_ID}:show`, false);
+  const [reveal, setReveal] = usePersistentState(`poll:${POLL_ID}:show`, true);
   const show = reveal || p.status === 'closed';
   const max = Math.max(1, ...p.votes);
   const leader = p.total ? p.votes.indexOf(Math.max(...p.votes)) : -1;
@@ -140,12 +145,12 @@ function TapPoll({ cfg }: { cfg: PollCfg }) {
           <span className="kicker">{cfg.kicker}</span>
           <h2 className="h-lg">{cfg.title}</h2>
         </div>
-        <ActivityControls id={POLL_ID} openLabel="Abrir encuesta" onReset={() => { p.clear(); setReveal(false); }} />
+        <ActivityControls id={POLL_ID} openLabel="Abrir encuesta" onReset={() => { p.clear(); setReveal(true); }} />
       </header>
 
       <div className="vote__body">
         <div>
-          {!p.open && p.status === 'idle' && <Howto steps={POLL_HOWTO} minutes={cfg.minutes} kind="votación de un toque" />}
+          {p.total === 0 && <Howto steps={POLL_HOWTO} minutes={cfg.minutes} kind="votación de un toque" />}
           <div className={`vote__options ${!p.open ? 'is-locked' : ''}`}>
             {POLL_OPTIONS.map((o, k) => {
               const key = ANSWER_KEYS[k % 4];
@@ -207,6 +212,7 @@ const Q2: WallConfig = {
   art: ['star', 'cloud', 'heart'],
   tone: 'cyan',
   minutes: 1,
+  autoOpen: true,
   howto: ['Piensa en la IA y en lo que sueñas ser.', 'Escribe UNA palabra y envíala (10 segundos).', 'Mira cómo crecen las palabras que más se repiten.'],
 };
 const Q4: WallConfig = {
@@ -218,6 +224,7 @@ const Q4: WallConfig = {
   art: ['rocket', 'heart', 'trophy'],
   tone: 'rose',
   minutes: 2,
+  autoOpen: true,
   howto: ['Piensa en un problema real de tu entorno.', 'Escríbelo en una frase corta (máximo 15 palabras).', 'Envíalo: enseguida comentamos algunas ideas en voz alta.'],
 };
 
