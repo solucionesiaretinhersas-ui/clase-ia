@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, type ComponentType, type CSSProperties } from 'react';
-import { Eye, EyeOff, Smartphone } from 'lucide-react';
+import { Smartphone } from 'lucide-react';
 import { ActivityControls, useActivityStatus } from '../components/ActivityShell';
 import { Howto } from '../components/Howto';
 import { QRCode } from '../components/QRCode';
@@ -126,8 +126,8 @@ function TapPoll({ cfg }: { cfg: PollCfg }) {
     if (p.status === 'idle') setStatus('open');
   }, [p.status, setStatus]);
   const { base, reachable } = usePublicBase();
-  const [reveal, setReveal] = usePersistentState(`poll:${POLL_ID}:show`, true);
-  const show = reveal || p.status === 'closed';
+  // Los resultados siempre se ven: no hay botón para ocultarlos (así ningún ensayo guardado los deja ocultos).
+  const show = true;
   const max = Math.max(1, ...p.votes);
   const leader = p.total ? p.votes.indexOf(Math.max(...p.votes)) : -1;
   useAnnounce(POLL_ID, {
@@ -145,7 +145,7 @@ function TapPoll({ cfg }: { cfg: PollCfg }) {
           <span className="kicker">{cfg.kicker}</span>
           <h2 className="h-lg">{cfg.title}</h2>
         </div>
-        <ActivityControls id={POLL_ID} openLabel="Abrir encuesta" onReset={() => { p.clear(); setReveal(true); }} />
+        <ActivityControls id={POLL_ID} openLabel="Abrir encuesta" onReset={() => p.clear()} />
       </header>
 
       <div className="vote__body">
@@ -174,9 +174,6 @@ function TapPoll({ cfg }: { cfg: PollCfg }) {
             <span className="vote__total">
               <b>{p.total}</b> {p.total === 1 ? 'voto' : 'votos'}
             </span>
-            <button type="button" className="btn btn--ghost" onClick={() => setReveal(!reveal)} disabled={p.status === 'closed'}>
-              {show ? <EyeOff /> : <Eye />} {show ? 'Ocultar resultados' : 'Mostrar resultados'}
-            </button>
           </div>
         </div>
 
